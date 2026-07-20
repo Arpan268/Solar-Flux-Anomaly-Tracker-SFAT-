@@ -3,9 +3,9 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 export async function register(req, res) {
-    const { username, role, password } = req.body
+    const { username, email, role, password } = req.body
 
-    if (!username || !role || !password) {
+    if (!username || !email || !role || !password) {
         return res.status(400).json({ message: 'All fields are required' })
     }
     try {
@@ -17,6 +17,7 @@ export async function register(req, res) {
 
         const user = new User({
             username,
+            email,
             userId: customUserId,
             role,
             password: hashedPassword
@@ -26,6 +27,7 @@ export async function register(req, res) {
             message: 'User successfully registered',
             user: {
                 id: user.userId,
+                email: user.email,
                 username: user.username,
                 role: user.role
             }
