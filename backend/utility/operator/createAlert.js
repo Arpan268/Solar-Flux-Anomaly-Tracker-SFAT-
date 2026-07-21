@@ -27,7 +27,7 @@ export async function createAlert(data) {
 
         const mailOptions = {
             from: 'sfat.notification@gmail.com',
-            to: emailList,
+            bcc: emailList,
             subject: `🚨 URGENT: ${data.classification} Solar Flare Detected!`,
             html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #ff4d4d; border-radius: 8px;">

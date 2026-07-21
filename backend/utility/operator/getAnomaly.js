@@ -1,7 +1,8 @@
 import { criticalEvent } from "../events/addEvents.js";
 
+let currentFlareClass = 'Normal'
+
 export async function getAnomaly(data) {
-    const isAnomaly = data.flux >= 1e-5
     let classification = 'Normal'
 
     if (data.flux >= 1e-4) {
@@ -14,7 +15,12 @@ export async function getAnomaly(data) {
         classification = 'C-Class Flare'
     }
 
-    if (isAnomaly) {
+    if (classification !== 'Normal' && classification !== currentFlareClass) {
+        currentFlareClass = classification
         criticalEvent.emit('critical-event', { ...data, classification })
+    }
+
+    else if (classification === 'Normal' && currentFlareClass !== 'Normal') {
+        currentFlareClass = 'Normal'
     }
 }
