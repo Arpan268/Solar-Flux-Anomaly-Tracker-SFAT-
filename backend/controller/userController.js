@@ -42,6 +42,37 @@ export async function deleteUser(req, res) {
     }
 }
 
+export async function handleStatus(req, res) {
+    try {
+        const { updatedStatus } = req.body
+        const user = await User.findById(req.params.id)
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' })
+        }
+
+        user.status = updatedStatus
+
+        if (updatedStatus === 'Rejected') {
+            user.rejectedAt = new Date()
+        }
+        else {
+            user.rejectedAt = null
+        }
+
+        if (updatedStatus === 'Approved') {
+            res.status(200).json({ message: 'User approved' })
+        }
+        else if (updatedStatus === 'Rejected') {
+            res.status(200).json({ message: 'User rejected' })
+        }
+    }
+
+    catch (err) {
+        console.error('Error deleting user:', err)
+        return res.status(500).json({ message: 'Server error' })
+    }
+}
 
 export async function getProfile(req, res) {
     try {

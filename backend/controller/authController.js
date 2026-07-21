@@ -61,6 +61,13 @@ export async function login(req, res) {
             return res.status(400).json({ message: 'Incorrect password' })
         }
 
+        if (user.status === 'Pending') {
+            return res.status(403).json({ message: 'Login failed. Your account is pending admin approval' })
+        }
+        else if (user.status === 'Rejected') {
+            return res.status(403).json({ message: 'Login failed. Your account approval is rejected by the admin' })
+        }
+
         const accessToken = jwt.sign(
             {
                 id: user.userId,
@@ -121,6 +128,10 @@ export async function refreshToken(req, res) {
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' })
+        }
+
+        if (user.status !== 'Approved') {
+            return res.status(403).json({ message: 'Access denied. Account is no longer approved' })
         }
 
         const newAccessToken = jwt.sign(
