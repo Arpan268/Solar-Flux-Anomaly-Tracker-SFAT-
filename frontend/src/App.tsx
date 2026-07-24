@@ -23,6 +23,7 @@ import AnalystViewLiveData from './pages/analyst/viewLiveData';
 import AnalystViewGraphs from './pages/analyst/viewGraphs';
 
 import AdminDashboard from './pages/admin/adminDashboard';
+import ManageUsers from './pages/admin/manageUsers';
 
 export default function App() {
   return (
@@ -112,6 +113,11 @@ export default function App() {
         <Route path="/admin" element={
           <PrivateRoute allowedRoles={['Admin']}>
             <AdminDashboard />
+          </PrivateRoute>
+        } />
+        <Route path="/admin/manage-users" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <ManageUsers />
           </PrivateRoute>
         } />
 

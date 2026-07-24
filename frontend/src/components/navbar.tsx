@@ -62,7 +62,10 @@ export default function Navbar() {
                             )}
 
                             {auth.role === 'Admin' && (
-                                <Link to="/admin" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Admin Panel</Link>
+                                <>
+                                    <Link to="/admin" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Admin Panel</Link>
+                                    <Link to="/admin/manage-users" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Manage Users</Link>
+                                </>
                             )}
 
                             <button
