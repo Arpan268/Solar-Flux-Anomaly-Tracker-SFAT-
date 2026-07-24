@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/navbar';
 import PublicRoute from './components/publicRoute';
 import PrivateRoute from './components/privateRoute';
+import HomeRedirect from "./components/homeRedirect";
 
 import Landing from './pages/public/landingPage';
 import Register from './pages/public/register';
@@ -11,6 +12,8 @@ import AboutUs from './pages/public/aboutUs';
 import OperatorDashboard from './pages/operator/operatorDashboard';
 import OperatorViewAnomalies from './pages/operator/viewAnomalies';
 import OperatorLogAnomalies from './pages/operator/logAnomalies';
+import UpdateAnomaly from './pages/operator/updateAnomalies';
+import OperatorInstructions from './pages/operator/viewInstructions';
 
 import SupervisorDashboard from './pages/supervisor/supervisorDashboard';
 import SupervisorViewAnomalies from './pages/supervisor/viewAnomalies';
@@ -25,17 +28,18 @@ import AnalystViewGraphs from './pages/analyst/viewGraphs';
 import AdminDashboard from './pages/admin/adminDashboard';
 import ManageUsers from './pages/admin/manageUsers';
 
+
 export default function App() {
   return (
     <main className='min-h-screen bg-linear-to-b from-zinc-950 via-slate-900 to-gray-900'>
       <Navbar />
       <Routes>
 
-        <Route path="/" element={
-          <PublicRoute>
-            <Landing />
-          </PublicRoute>
-        } />
+        <Route
+          path="/"
+          element={<HomeRedirect />}
+        />
+        {/* Public Routes */}
         <Route path="/register" element={
           <PublicRoute>
             <Register />
@@ -52,6 +56,7 @@ export default function App() {
           </PublicRoute>
         } />
 
+        {/* Operator Routes */}
         <Route path="/operator" element={
           <PrivateRoute allowedRoles={['Operator']}>
             <OperatorDashboard />
@@ -62,12 +67,23 @@ export default function App() {
             <OperatorViewAnomalies />
           </PrivateRoute>
         } />
-        <Route path="/operator/log-anomalies" element={
+        <Route path="/operator/log-anomaly" element={
           <PrivateRoute allowedRoles={['Operator']}>
             <OperatorLogAnomalies />
           </PrivateRoute>
         } />
+        <Route path="/operator/update-anomaly/:id" element={
+          <PrivateRoute allowedRoles={['Operator']}>
+            <UpdateAnomaly />
+          </PrivateRoute>
+        } />
+        <Route path="/operator/view-instructions" element={
+          <PrivateRoute allowedRoles={['Operator']}>
+            <OperatorInstructions />
+          </PrivateRoute>
+        } />
 
+        {/* Supervisor Routes */}
         <Route path="/supervisor" element={
           <PrivateRoute allowedRoles={['Supervisor']}>
             <SupervisorDashboard />
@@ -89,6 +105,7 @@ export default function App() {
           </PrivateRoute>
         } />
 
+        {/* Analyst Routes */}
         <Route path="/analyst" element={
           <PrivateRoute allowedRoles={['Analyst']}>
             <AnalystDashboard />
@@ -110,6 +127,7 @@ export default function App() {
           </PrivateRoute>
         } />
 
+        {/* Admin Routes */}
         <Route path="/admin" element={
           <PrivateRoute allowedRoles={['Admin']}>
             <AdminDashboard />

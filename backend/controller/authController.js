@@ -25,6 +25,7 @@ export async function register(req, res) {
         await user.save()
         res.status(201).json({
             message: 'User successfully registered',
+            userId: user.userId,
             user: {
                 id: user.userId,
                 email: user.email,
@@ -36,6 +37,13 @@ export async function register(req, res) {
 
     catch (err) {
         console.error('Error registering user:', err)
+
+        if (err.code === 11000) {
+            const duplicateField = err.keyValue ? Object.keys(err.keyValue)[0] : 'field'
+            const fieldLabel = duplicateField === 'email' ? 'Email' : duplicateField === 'userId' ? 'User ID' : 'Value'
+            return res.status(409).json({ message: `${fieldLabel} already exists` })
+        }
+
         return res.status(500).json({ message: 'Server error' })
     }
 }

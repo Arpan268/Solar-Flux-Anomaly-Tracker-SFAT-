@@ -39,7 +39,7 @@ export default function Navbar() {
                                 <>
                                     <Link to="/operator" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Dashboard</Link>
                                     <Link to="/operator/view-anomalies" className="hover:text-white transition-colors hover:scale-105 transform duration-300">My Logs</Link>
-                                    <Link to="/operator/log-anomalies" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Instructions</Link>
+                                    <Link to="/operator/view-instructions" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Instructions</Link>
                                 </>
                             )}
 
@@ -70,7 +70,7 @@ export default function Navbar() {
 
                             <button
                                 onClick={handleLogout}
-                                className="bg-red-600/80 px-4 py-1 rounded text-white hover:bg-red-600 transition-colors ml-4"
+                                className="bg-red-600/80 px-4 py-1 rounded text-white hover:bg-red-600 transition-colors ml-4 cursor-pointer hover:scale-105 transform duration-300"
                             >
                                 Logout
                             </button>

@@ -1,24 +1,39 @@
 import Anomaly from '../../models/anomalies.js'
+import { criticalEvent } from '../../events/addEvents.js'
 
 export async function viewUnacknowledgedAnomalies(req, res) {
-    try {
-        const page = parseInt(req.query.page) || 1
-        const limit = parseInt(req.query.limit) || 6
-        const skip = (page - 1) * limit
+    res.setHeader('Content-Type', 'text/event-stream')
+    res.setHeader('Cache-Control', 'no-cache')
+    res.setHeader('Connection', 'keep-alive')
 
-        const filter = { isAcknowledged: false }
-        const total = await Anomaly.countDocuments(filter)
-        const anomalies = await Anomaly.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 })
+    const fetchAndSend = async () => {
+        try {
+            const page = parseInt(req.query.page) || 1
+            const limit = parseInt(req.query.limit) || 6
+            const skip = (page - 1) * limit
 
-        res.status(200).json({
-            anomalies, total, totalPages: Math.ceil(total / limit), currentPage: page
-        })
+            const filter = { isAcknowledged: false }
+            const total = await Anomaly.countDocuments(filter)
+            const anomalies = await Anomaly.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 })
+
+            res.write(`data: ${JSON.stringify({ anomalies, total, totalPages: Math.ceil(total / limit), currentPage: page })}\n\n`)
+        } catch (err) {
+            console.error(err)
+        }
     }
 
-    catch (err) {
-        console.error('Error fetching anomalies: ', err)
-        return res.status(500).json({ message: 'Server error' })
+    await fetchAndSend()
+
+    const updateListener = () => {
+        fetchAndSend()
     }
+
+    criticalEvent.on('new_anomaly_logged', updateListener)
+
+    req.on('close', () => {
+        criticalEvent.off('new_anomaly_logged', updateListener)
+        res.end()
+    })
 }
 
 export async function viewAcknowledgedAnomalies(req, res) {

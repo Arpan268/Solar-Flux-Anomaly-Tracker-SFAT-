@@ -1,4 +1,4 @@
-import { criticalEvent } from "../events/addEvents.js";
+import { criticalEvent } from "../../events/addEvents.js";
 
 let currentFlareClass = 'Normal'
 

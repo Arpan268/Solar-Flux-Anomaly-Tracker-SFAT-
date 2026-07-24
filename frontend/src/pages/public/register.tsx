@@ -28,7 +28,7 @@ export default function Register() {
 
         try {
             const res = await axios.post('/api/auth/register', form, { withCredentials: true });
-            setRegisteredUserId(res.data.userId);
+            setRegisteredUserId(res.data.userId || res.data.user?.id);
         } catch (err: any) {
             setError(err.response?.data?.message || 'Registration failed. Please try again.');
             console.error(err);

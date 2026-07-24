@@ -10,7 +10,7 @@ const router = express.Router()
 
 router.get('/live-data', handleLiveData)
 router.post('/log-data', logData)
-router.get('view-anomalies', viewAnomalies)
+router.get('/view-anomalies', viewAnomalies)
 router.put('/:id/update-anomaly', updateAnomalies)
 router.get('/unread-instructions', viewUnreadInstructions)
 router.get('/read-instructions', viewReadInstructions)

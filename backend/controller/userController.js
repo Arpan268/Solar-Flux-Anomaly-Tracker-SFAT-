@@ -60,16 +60,20 @@ export async function handleStatus(req, res) {
             user.rejectedAt = null
         }
 
+        await user.save()
+
         if (updatedStatus === 'Approved') {
-            res.status(200).json({ message: 'User approved' })
+            return res.status(200).json({ message: 'User approved' })
         }
         else if (updatedStatus === 'Rejected') {
-            res.status(200).json({ message: 'User rejected' })
+            return res.status(200).json({ message: 'User rejected' })
         }
+
+        return res.status(200).json({ message: 'User status updated' })
     }
 
     catch (err) {
-        console.error('Error deleting user:', err)
+        console.error('Error updating user status:', err)
         return res.status(500).json({ message: 'Server error' })
     }
 }
