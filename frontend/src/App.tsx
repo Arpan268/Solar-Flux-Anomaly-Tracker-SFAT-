@@ -4,7 +4,6 @@ import PublicRoute from './components/publicRoute';
 import PrivateRoute from './components/privateRoute';
 import HomeRedirect from "./components/homeRedirect";
 
-import Landing from './pages/public/landingPage';
 import Register from './pages/public/register';
 import Login from './pages/public/login';
 import AboutUs from './pages/public/aboutUs';

@@ -68,11 +68,21 @@ export default function SupervisorAnomalies() {
     async function handleAcknowledge(id: string) {
         if (!auth?.accessToken) return;
 
+        const anomalyToMove = unacknowledged.find((item) => item._id === id);
+
         try {
             await axios.put(`/api/user/supervisor/${id}/acknowledge-anomaly`, {}, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` },
                 withCredentials: true,
             });
+
+            setUnacknowledged((prev) => prev.filter((item) => item._id !== id));
+
+            if (anomalyToMove) {
+                const updatedAnomaly = { ...anomalyToMove, isAcknowledged: true };
+                setAcknowledged((prev) => [updatedAnomaly, ...prev]);
+            }
+
         } catch (err) {
             setError("Failed to acknowledge anomaly.");
         }
@@ -148,13 +158,13 @@ export default function SupervisorAnomalies() {
                                         <td className="p-4 text-right space-x-3">
                                             <button
                                                 onClick={() => handleDelete(anomaly._id)}
-                                                className="bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-4 py-2 rounded text-sm font-semibold shadow-sm transition-colors"
+                                                className="bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-4 py-2 rounded text-sm font-semibold shadow-sm transition-colors cursor-pointer"
                                             >
                                                 Delete
                                             </button>
                                             <button
                                                 onClick={() => handleAcknowledge(anomaly._id)}
-                                                className="bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/30 px-4 py-2 rounded text-sm font-semibold shadow-sm transition-colors"
+                                                className="bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/30 px-4 py-2 rounded text-sm font-semibold shadow-sm transition-colors cursor-pointer"
                                             >
                                                 Acknowledge
                                             </button>
@@ -176,7 +186,7 @@ export default function SupervisorAnomalies() {
             <div className="flex justify-center mb-10">
                 <button
                     onClick={() => setShowHistory(!showHistory)}
-                    className="bg-gray-800 text-slate-300 hover:text-white px-8 py-3 rounded-lg font-semibold border border-gray-700 hover:border-gray-500 transition-all shadow-lg hover:shadow-gray-700/20"
+                    className="bg-gray-800 text-slate-300 hover:text-white px-8 py-3 cursor-pointer rounded-lg font-semibold border border-gray-700 hover:border-gray-500 transition-all shadow-lg hover:shadow-gray-700/20"
                 >
                     {showHistory ? "Hide Historical Anomalies" : "View Previous Anomalies"}
                 </button>
@@ -220,7 +230,7 @@ export default function SupervisorAnomalies() {
                                             <td className="p-4 text-right">
                                                 <button
                                                     onClick={() => handleDelete(anomaly._id)}
-                                                    className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-3 py-1.5 rounded text-xs font-semibold shadow-sm"
+                                                    className="opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-3 py-1.5 rounded text-xs font-semibold shadow-sm"
                                                 >
                                                     Delete
                                                 </button>
@@ -244,8 +254,8 @@ export default function SupervisorAnomalies() {
                                         key={index}
                                         onClick={() => setPage(index + 1)}
                                         className={`w-10 h-10 rounded font-semibold transition-colors ${page === index + 1
-                                                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                                                : "bg-gray-800 text-slate-400 hover:bg-gray-700 hover:text-white border border-gray-700"
+                                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+                                            : "bg-gray-800 text-slate-400 hover:bg-gray-700 hover:text-white border border-gray-700"
                                             }`}
                                     >
                                         {index + 1}

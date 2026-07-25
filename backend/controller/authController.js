@@ -2,6 +2,16 @@ import User from '../models/users.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
+function getCookieOptions(maxAge) {
+    return {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        path: '/',
+        ...(maxAge !== undefined ? { maxAge } : {}),
+    }
+}
+
 export async function register(req, res) {
     const { username, email, role, password } = req.body
 
@@ -98,13 +108,8 @@ export async function login(req, res) {
             }
         )
 
-        res.cookie('refreshtoken', refreshToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-            path: '/',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        })
+        res.cookie('accesstoken', accessToken, getCookieOptions())
+        res.cookie('refreshtoken', refreshToken, getCookieOptions())
 
         res.status(200).json({
             accessToken,
@@ -125,8 +130,10 @@ export async function login(req, res) {
 
 export async function refreshToken(req, res) {
     const token = req.cookies.refreshtoken
+    const cookieOptions = getCookieOptions()
 
     if (!token) {
+        res.clearCookie('refreshtoken', cookieOptions)
         return res.status(401).json({ message: 'No refresh token provided' })
     }
 
@@ -135,10 +142,12 @@ export async function refreshToken(req, res) {
         const user = await User.findOne({ userId: decoded.id })
 
         if (!user) {
+            res.clearCookie('refreshtoken', cookieOptions)
             return res.status(404).json({ message: 'User not found' })
         }
 
         if (user.status !== 'Approved') {
+            res.clearCookie('refreshtoken', cookieOptions)
             return res.status(403).json({ message: 'Access denied. Account is no longer approved' })
         }
 
@@ -154,6 +163,8 @@ export async function refreshToken(req, res) {
             { expiresIn: '15m' }
         )
 
+        res.cookie('accesstoken', newAccessToken, getCookieOptions())
+
         res.status(200).json({
             accessToken: newAccessToken,
             user: {
@@ -166,6 +177,7 @@ export async function refreshToken(req, res) {
 
     catch (err) {
         console.error('Error refreshing token:', err)
+        res.clearCookie('refreshtoken', cookieOptions)
         return res.status(403).json({ message: 'Server error' })
     }
 }
@@ -173,13 +185,9 @@ export async function refreshToken(req, res) {
 
 export async function logout(req, res) {
     try {
-        const cookieOptions = {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-            path: '/',
-        }
+        const cookieOptions = getCookieOptions()
 
+        res.clearCookie('accesstoken', cookieOptions)
         res.clearCookie('refreshtoken', cookieOptions)
 
         res.status(200).json({ message: 'Logged out successfully' })

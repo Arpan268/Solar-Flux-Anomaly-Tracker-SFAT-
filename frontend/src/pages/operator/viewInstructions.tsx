@@ -117,7 +117,7 @@ export default function OperatorInstructions() {
 
                             <button
                                 onClick={() => handleMarkAsRead(inst._id)}
-                                className="w-full md:w-auto whitespace-nowrap bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/30 px-6 py-3 rounded-lg font-bold shadow-sm transition-colors"
+                                className="w-full md:w-auto cursor-pointer whitespace-nowrap bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/30 px-6 py-3 rounded-lg font-bold shadow-sm transition-colors"
                             >
                                 Mark as Read
                             </button>

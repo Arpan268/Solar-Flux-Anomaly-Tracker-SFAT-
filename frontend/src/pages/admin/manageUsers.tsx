@@ -18,7 +18,7 @@ export default function ManageUsers() {
         async function fetchPendingUsers() {
             if (!auth?.accessToken) return;
             try {
-                const res = await axios.get("/api/user", {
+                const res = await axios.get("/api/user/pending", {
                     headers: { Authorization: `Bearer ${auth.accessToken}` },
                     withCredentials: true,
                 });

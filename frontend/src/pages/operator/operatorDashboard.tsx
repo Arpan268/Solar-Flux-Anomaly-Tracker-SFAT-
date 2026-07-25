@@ -142,7 +142,7 @@ export default function OperatorDashboard() {
                         </div>
 
                         <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
-                            <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">e- Correction</p>
+                            <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Electron Correction</p>
                             <p className="text-slate-300 font-medium">{latestData.electron_correction ? latestData.electron_correction.toExponential(2) : "N/A"}</p>
                         </div>
 

@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 export function verifyToken(req, res, next) {
     const authHeader = req.headers.authorization
     const queryToken = req.query.token
+    const cookieToken = req.cookies?.accesstoken
 
     let token
 
@@ -10,6 +11,8 @@ export function verifyToken(req, res, next) {
         token = authHeader.split(' ')[1]
     } else if (queryToken) {
         token = queryToken
+    } else if (cookieToken) {
+        token = cookieToken
     }
 
     if (!token) {
