@@ -54,7 +54,6 @@ export default function OperatorDashboard() {
                 const alertData = JSON.parse(event.data);
                 setAnomalyData(alertData);
             } catch (err) {
-                console.error(err);
             }
         });
 
@@ -71,8 +70,8 @@ export default function OperatorDashboard() {
 
     useEffect(() => {
         if (!latestData) {
-            setCountdown(60)
-            return
+            setCountdown(60);
+            return;
         }
 
         const timer = setInterval(() => {
@@ -97,7 +96,7 @@ export default function OperatorDashboard() {
             time_tag: anomalyData.time_tag,
             flux: anomalyData.flux,
             classification: anomalyData.classification,
-            electron_contaminaton: anomalyData.electron_contaminaton,
+            electron_contamination: anomalyData.electron_contaminaton,
         };
 
         navigate("/operator/log-anomaly", {
@@ -166,26 +165,26 @@ export default function OperatorDashboard() {
                 </div>
             ) : (
                 !error && (
-                    <div className="bg-gray-900 border border-gray-700 rounded-xl p-8 text-center text-slate-400">
+                    <div className="bg-gray-900 border border-gray-700 rounded-xl p-8 text-center text-slate-400 mb-8">
                         Awaiting live telemetry stream...
                     </div>
                 )
             )}
 
             {anomalyData && (
-                <div className="bg-red-900/20 border border-red-600/50 rounded-xl p-6 shadow-lg shadow-red-900/20 flex flex-col sm:flex-row items-center justify-between gap-6 animate-pulse">
+                <div className="bg-red-900/20 border border-red-600/50 rounded-xl p-6 shadow-lg shadow-red-900/20 flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
                     <div>
                         <h3 className="text-xl font-bold text-red-500 mb-2">
                             Critical {anomalyData.classification} Detected
                         </h3>
                         <p className="text-red-400/80 text-sm">
-                            Telemetry recorded a flux level of {anomalyData.flux.toExponential(2)} at {new Date(anomalyData.time_tag).toLocaleTimeString()}. This requires immediate logging and supervisor review.
+                            Telemetry recorded a flux level of {anomalyData.flux.toExponential(2)} at {new Date(anomalyData.time_tag).toLocaleTimeString()}. This requires immediate logging.
                         </p>
                     </div>
 
                     <button
                         onClick={handleLogAnomaly}
-                        className="w-full sm:w-auto whitespace-nowrap bg-red-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors transform hover:scale-105 cursor-pointer"
+                        className="w-full sm:w-auto whitespace-nowrap bg-red-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors"
                     >
                         Log Anomaly
                     </button>
