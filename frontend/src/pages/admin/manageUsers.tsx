@@ -9,9 +9,18 @@ interface PendingUser {
     role: string;
 }
 
+interface Shift {
+    _id: string;
+    name: string;
+    startTime: string;
+    endTime: string;
+}
+
 export default function ManageUsers() {
     const { auth } = useAuth();
     const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
+    const [availableShifts, setAvailableShifts] = useState<Shift[]>([]);
+    const [selectedShifts, setSelectedShifts] = useState<Record<string, string>>({});
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -31,14 +40,40 @@ export default function ManageUsers() {
                 setError("Failed to load registration requests.");
             }
         }
+
+        async function fetchAvailableShifts() {
+            if (!auth?.accessToken) return;
+            try {
+                const res = await axios.get("/api/user/shifts/available", {
+                    headers: { Authorization: `Bearer ${auth.accessToken}` },
+                    withCredentials: true,
+                });
+                setAvailableShifts(res.data);
+            } catch (err) {
+                console.error("Failed to load shifts:", err);
+            }
+        }
+
         fetchPendingUsers();
+        fetchAvailableShifts();
     }, [auth]);
 
-    async function handleApprove(id: string) {
+    async function handleApprove(id: string, role: string) {
         if (!auth?.accessToken) return;
 
+        let payload: any = { updatedStatus: 'Approved' };
+
+        if (role === 'Operator') {
+            const shiftId = selectedShifts[id];
+            if (!shiftId) {
+                setError("Please select a shift for this operator before approving.");
+                return;
+            }
+            payload.shiftId = shiftId;
+        }
+
         try {
-            await axios.put(`/api/user/${id}/status`, { updatedStatus: 'Approved' }, {
+            await axios.put(`/api/user/${id}/status`, payload, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` },
                 withCredentials: true,
             });
@@ -107,16 +142,34 @@ export default function ManageUsers() {
                                             {user.role}
                                         </span>
                                     </td>
-                                    <td className="p-4 text-right space-x-3">
+                                    <td className="p-4 text-right space-x-3 whitespace-nowrap">
+                                        {user.role === 'Operator' && (
+                                            <select
+                                                className="bg-gray-800 text-sm text-slate-200 border border-gray-600 rounded px-2 py-1.5 mr-2 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 cursor-pointer"
+                                                value={selectedShifts[user._id] || ""}
+                                                onChange={(e) => setSelectedShifts(prev => ({ ...prev, [user._id]: e.target.value }))}
+                                            >
+                                                <option value="" disabled>Assign Shift Slot</option>
+                                                {availableShifts.map(shift => (
+                                                    <option key={shift._id} value={shift._id}>
+                                                        {shift.name} ({shift.startTime} - {shift.endTime})
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        )}
                                         <button
                                             onClick={() => handleReject(user._id)}
-                                            className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-4 py-1.5 rounded text-sm font-semibold shadow-sm cursor-pointer"
+                                            className="opacity-0 cursor-pointer group-hover:opacity-100 transition-opacity bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-4 py-1.5 rounded-lg text-sm font-semibold"
                                         >
                                             Reject
                                         </button>
                                         <button
-                                            onClick={() => handleApprove(user._id)}
-                                            className="bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/30 px-4 py-1.5 rounded text-sm font-semibold shadow-sm transition-colors cursor-pointer"
+                                            onClick={() => handleApprove(user._id, user.role)}
+                                            disabled={user.role === 'Operator' && !selectedShifts[user._id]}
+                                            className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${user.role === 'Operator' && !selectedShifts[user._id]
+                                                ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed border border-gray-700/50'
+                                                : 'bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/30'
+                                                }`}
                                         >
                                             Approve
                                         </button>
@@ -126,7 +179,6 @@ export default function ManageUsers() {
                         </tbody>
                     </table>
                 </div>
-
                 {pendingUsers?.length === 0 && (
                     <div className="p-8 text-center text-slate-500">
                         No pending registration requests at this time.

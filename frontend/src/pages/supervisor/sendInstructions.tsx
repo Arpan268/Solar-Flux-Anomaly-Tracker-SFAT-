@@ -85,7 +85,7 @@ export default function SendInstructions() {
                         <select
                             value={targetOperator}
                             onChange={(e) => setTargetOperator(e.target.value)}
-                            className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500"
+                            className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 cursor-pointer"
                         >
                             <option value="All">Broadcast to ALL Operators</option>
                             {operators.map((op) => (

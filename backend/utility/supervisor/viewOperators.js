@@ -8,15 +8,12 @@ export async function viewOperators(req, res) {
 
         const filter = { role: 'Operator', status: 'Approved' }
         const total = await User.countDocuments(filter)
-        const users = await User.find(filter).skip(skip).limit(limit).select('-password -status -rejectedAt -role')
+        const users = await User.find(filter).skip(skip).limit(limit).select('-password -status -rejectedAt -role').populate('shift')
 
         res.status(200).json({
             users, total, totalPages: Math.ceil(total / limit), currentPage: page
         })
-    }
-
-    catch (err) {
-        console.error('Error fetching operators:', err)
+    } catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }

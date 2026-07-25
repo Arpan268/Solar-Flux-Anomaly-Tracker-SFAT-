@@ -6,5 +6,6 @@ export interface AuthData {
 export interface AuthContextType {
     auth: AuthData | null,
     setAuth: React.Dispatch<React.SetStateAction<AuthData | null>>,
-    loading: boolean
+    loading: boolean,
+    logout: () => Promise<void>
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { useAuth } from "../../context/authContext";
 
 interface LiveData {
@@ -17,14 +18,81 @@ interface AnomalyData extends LiveData {
     classification: string;
 }
 
+interface ShiftDetails {
+    startTime: string;
+    endTime: string;
+}
+
 export default function OperatorDashboard() {
-    const { auth } = useAuth();
+    const { auth, logout } = useAuth();
     const navigate = useNavigate();
     const [liveData, setLiveData] = useState<LiveData[]>([]);
     const [anomalyData, setAnomalyData] = useState<AnomalyData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [countdown, setCountdown] = useState<number>(60);
     const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
+    const [shift, setShift] = useState<ShiftDetails | null>(null);
+    const [shiftTimeRemaining, setShiftTimeRemaining] = useState<string>("");
+
+    useEffect(() => {
+        async function fetchProfile() {
+            if (!auth?.accessToken) return;
+            try {
+                const res = await axios.get('/api/user/me', {
+                    headers: { Authorization: `Bearer ${auth.accessToken}` }
+                });
+                if (res.data.shift) {
+                    setShift(res.data.shift);
+                }
+            } catch (err) {
+                console.error("Failed to load profile/shift details:", err);
+            }
+        }
+        fetchProfile();
+    }, [auth]);
+
+    useEffect(() => {
+        if (!shift) return;
+
+        const timer = setInterval(() => {
+            const now = new Date();
+            const [startH, startM] = shift.startTime.split(':').map(Number);
+            const [endH, endM] = shift.endTime.split(':').map(Number);
+
+            const startDate = new Date(now);
+            startDate.setHours(startH, startM, 0, 0);
+
+            const endDate = new Date(now);
+            endDate.setHours(endH, endM, 0, 0);
+
+            if (endDate <= startDate) {
+                if (now < startDate) {
+                    startDate.setDate(startDate.getDate() - 1);
+                } else {
+                    endDate.setDate(endDate.getDate() + 1);
+                }
+            }
+
+            const remainingMs = endDate.getTime() - now.getTime();
+
+            if (remainingMs <= 0) {
+                clearInterval(timer);
+                if (logout) {
+                    logout();
+                } else {
+                    navigate("/login");
+                }
+            } else {
+                const h = Math.floor(remainingMs / 3600000);
+                const m = Math.floor((remainingMs % 3600000) / 60000);
+                const s = Math.floor((remainingMs % 60000) / 1000);
+                setShiftTimeRemaining(`${h}h ${m}m ${s}s`);
+            }
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [shift, logout, navigate]);
 
     useEffect(() => {
         if (!auth?.accessToken) return;
@@ -54,6 +122,7 @@ export default function OperatorDashboard() {
                 const alertData = JSON.parse(event.data);
                 setAnomalyData(alertData);
             } catch (err) {
+                console.error(err);
             }
         });
 
@@ -106,14 +175,42 @@ export default function OperatorDashboard() {
 
     return (
         <div className="max-w-6xl mx-auto mt-12 p-6">
-            <div className="mb-8">
-                <h2 className="text-3xl font-extrabold text-white tracking-tight">Operator Dashboard</h2>
-                <p className="text-slate-400 mt-2">Live NOAA Telemetry & Anomaly Detection</p>
+            <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h2 className="text-3xl font-extrabold text-white tracking-tight">Operator Dashboard</h2>
+                    <p className="text-slate-400 mt-2">Live NOAA Telemetry & Anomaly Detection</p>
+                </div>
+                {shiftTimeRemaining && (
+                    <div className="bg-slate-800 border border-slate-600 px-4 py-2 rounded-lg text-slate-300 text-sm font-mono flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                        Shift Ends In: <span className="text-white font-bold">{shiftTimeRemaining}</span>
+                    </div>
+                )}
             </div>
 
             {error && (
                 <div className="bg-red-900/30 border border-red-500/50 text-red-400 p-4 rounded-lg mb-6">
                     {error}
+                </div>
+            )}
+
+            {anomalyData && (
+                <div className="bg-red-900/20 border border-red-600/50 rounded-xl p-6 shadow-lg shadow-red-900/20 flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
+                    <div>
+                        <h3 className="text-xl font-bold text-red-500 mb-2">
+                            Critical {anomalyData.classification} Detected
+                        </h3>
+                        <p className="text-red-400/80 text-sm">
+                            Telemetry recorded a flux level of {anomalyData.flux.toExponential(2)} at {new Date(anomalyData.time_tag).toLocaleTimeString()}. This requires immediate logging.
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={handleLogAnomaly}
+                        className="w-full sm:w-auto whitespace-nowrap bg-red-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors"
+                    >
+                        Log Anomaly
+                    </button>
                 </div>
             )}
 
@@ -169,26 +266,6 @@ export default function OperatorDashboard() {
                         Awaiting live telemetry stream...
                     </div>
                 )
-            )}
-
-            {anomalyData && (
-                <div className="bg-red-900/20 border border-red-600/50 rounded-xl p-6 shadow-lg shadow-red-900/20 flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
-                    <div>
-                        <h3 className="text-xl font-bold text-red-500 mb-2">
-                            Critical {anomalyData.classification} Detected
-                        </h3>
-                        <p className="text-red-400/80 text-sm">
-                            Telemetry recorded a flux level of {anomalyData.flux.toExponential(2)} at {new Date(anomalyData.time_tag).toLocaleTimeString()}. This requires immediate logging.
-                        </p>
-                    </div>
-
-                    <button
-                        onClick={handleLogAnomaly}
-                        className="w-full sm:w-auto whitespace-nowrap bg-red-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors"
-                    >
-                        Log Anomaly
-                    </button>
-                </div>
             )}
         </div>
     );

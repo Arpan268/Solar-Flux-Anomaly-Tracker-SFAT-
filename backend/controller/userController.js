@@ -1,4 +1,5 @@
 import User from '../models/users.js'
+import Shift from '../models/shifts.js'
 
 export async function getUsers(req, res) {
     try {
@@ -8,19 +9,15 @@ export async function getUsers(req, res) {
 
         const filter = { status: 'Approved' }
         const total = await User.countDocuments(filter)
-        const users = await User.find(filter).skip(skip).limit(limit).select('-password')
+        const users = await User.find(filter).skip(skip).limit(limit).select('-password').populate('shift')
 
         res.status(200).json({
             users, total, totalPages: Math.ceil(total / limit), currentPage: page
         })
-    }
-
-    catch (err) {
-        console.error('Error fetching users:', err)
+    } catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }
-
 
 export async function deleteUser(req, res) {
     try {
@@ -36,10 +33,7 @@ export async function deleteUser(req, res) {
         await User.findByIdAndDelete(req.params.id)
 
         res.status(200).json({ message: 'User deleted successfully' })
-    }
-
-    catch (err) {
-        console.error('Error deleting user:', err)
+    } catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }
@@ -57,17 +51,27 @@ export async function getPendingUsers(req, res) {
         res.status(200).json({
             users, total, totalPages: Math.ceil(total / limit), currentPage: page
         })
+    } catch (err) {
+        return res.status(500).json({ message: 'Server error' })
     }
+}
 
-    catch (err) {
-        console.error('Error fetching users:', err)
+export async function getAvailableShifts(req, res) {
+    try {
+        const allShifts = await Shift.find()
+        const assignedUsers = await User.find({ role: 'Operator', status: 'Approved', shift: { $ne: null } })
+        const assignedShiftIds = assignedUsers.map(u => u.shift.toString())
+        const availableShifts = allShifts.filter(s => !assignedShiftIds.includes(s._id.toString()))
+
+        res.status(200).json(availableShifts)
+    } catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }
 
 export async function handleStatus(req, res) {
     try {
-        const { updatedStatus } = req.body
+        const { updatedStatus, shiftId } = req.body
         const user = await User.findById(req.params.id)
 
         if (!user) {
@@ -78,40 +82,37 @@ export async function handleStatus(req, res) {
 
         if (updatedStatus === 'Rejected') {
             user.rejectedAt = new Date()
-        }
-        else {
+            user.shift = null
+        } else {
             user.rejectedAt = null
+            if (updatedStatus === 'Approved' && user.role === 'Operator' && shiftId) {
+                user.shift = shiftId
+            }
         }
 
         await user.save()
 
         if (updatedStatus === 'Approved') {
             return res.status(200).json({ message: 'User approved' })
-        }
-        else if (updatedStatus === 'Rejected') {
+        } else if (updatedStatus === 'Rejected') {
             return res.status(200).json({ message: 'User rejected' })
         }
 
         return res.status(200).json({ message: 'User status updated' })
-    }
 
-    catch (err) {
-        console.error('Error updating user status:', err)
+    } catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }
 
 export async function getProfile(req, res) {
     try {
-        const user = await User.findById({ userId: req.user.id }).select('-password')
+        const user = await User.findById({ _id: req.user.id }).select('-password').populate('shift')
         if (!user) {
             return res.status(404).json({ message: 'User not found' })
         }
         res.status(200).json(user)
-    }
-
-    catch (err) {
-        console.error('Error fetching user profile:', err)
+    } catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }
