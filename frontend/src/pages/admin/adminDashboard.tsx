@@ -106,7 +106,7 @@ export default function Dashboard() {
                                         {user.role !== "Admin" && (
                                             <button
                                                 onClick={() => handleDelete(user._id)}
-                                                className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-4 py-1.5 rounded text-sm font-semibold shadow-sm"
+                                                className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-4 py-1.5 rounded text-sm font-semibold shadow-sm cursor-pointer"
                                             >
                                                 Revoke Access
                                             </button>

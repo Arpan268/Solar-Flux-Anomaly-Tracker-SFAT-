@@ -6,7 +6,7 @@ export async function viewAnomalies(req, res) {
         const limit = parseInt(req.query.limit) || 10
         const skip = (page - 1) * limit
 
-        const filter = { isAcknowledged: true }
+        const filter = { isAcknowledged: true, source: process.env.DATA_SOURCE }
         const total = await Anomaly.countDocuments(filter)
         const anomalies = await Anomaly.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 })
 

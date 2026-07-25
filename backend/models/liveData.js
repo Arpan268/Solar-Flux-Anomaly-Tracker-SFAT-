@@ -7,7 +7,8 @@ const liveDataSchema = new mongoose.Schema({
     observed_flux: { type: Number },
     electron_correction: { type: Number },
     electron_contaminaton: { type: Boolean },
-    energy: { type: String }
+    energy: { type: String },
+    source: { type: String, enum: ['live', 'mock'], required: true }
 }, { timestamps: true })
 
-export default mongoose.model('LiveData', liveDataSchema)
+export default mongoose.models.LiveData || mongoose.model('LiveData', liveDataSchema)

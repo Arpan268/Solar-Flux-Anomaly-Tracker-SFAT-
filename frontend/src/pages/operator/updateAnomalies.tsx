@@ -48,7 +48,11 @@ export default function UpdateAnomaly() {
                 navigate(-1);
             }, 2000);
         } catch (err) {
-            setError("Failed to update anomaly record. Please try again.");
+            const message = axios.isAxiosError(err) && err.response?.data?.message
+                ? err.response.data.message
+                : "Failed to update anomaly record. Please try again.";
+
+            setError(message);
             setIsSubmitting(false);
         }
     }
@@ -137,7 +141,7 @@ export default function UpdateAnomaly() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-blue-600/30 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-blue-600/30 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
                             >
                                 {isSubmitting ? "Saving Updates..." : "Update Anomaly"}
                             </button>

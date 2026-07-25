@@ -2,7 +2,7 @@ import LiveData from '../../models/liveData.js'
 
 export async function downloadData(req, res) {
     try {
-        const liveData = await LiveData.find().lean().sort({ createdAt: -1 })
+        const liveData = await LiveData.find({ source: process.env.DATA_SOURCE }).lean().sort({ createdAt: -1 })
 
         if (liveData.length === 0) {
             return res.status(404).json({ message: 'No data found' })

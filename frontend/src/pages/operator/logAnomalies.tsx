@@ -16,6 +16,7 @@ export default function LogAnomaly() {
         time_tag: string;
         flux: number;
         classification: string;
+        electron_contaminaton: boolean;
     } | null>(null);
 
     useEffect(() => {
@@ -23,6 +24,7 @@ export default function LogAnomaly() {
             time_tag: string;
             flux: number;
             classification: string;
+            electron_contaminaton: boolean;
         } | null;
 
         if (stateData) {
@@ -64,6 +66,7 @@ export default function LogAnomaly() {
                     time_tag: anomalyData?.time_tag,
                     flux: anomalyData?.flux,
                     classification: anomalyData?.classification,
+                    electron_contaminaton: anomalyData?.electron_contaminaton,
                     notes: notes,
                 },
                 {
@@ -77,7 +80,11 @@ export default function LogAnomaly() {
                 navigate("/operator");
             }, 2000);
         } catch (err) {
-            setError("Failed to log anomaly to the database. Please try again.");
+            const message = axios.isAxiosError(err) && err.response?.data?.message
+                ? err.response.data.message
+                : "Failed to log anomaly to the database. Please try again.";
+
+            setError(message);
             setIsSubmitting(false);
         }
     }

@@ -96,7 +96,8 @@ export default function OperatorDashboard() {
         const anomalyPayload = {
             time_tag: anomalyData.time_tag,
             flux: anomalyData.flux,
-            classification: anomalyData.classification
+            classification: anomalyData.classification,
+            electron_contaminaton: anomalyData.electron_contaminaton,
         };
 
         navigate("/operator/log-anomaly", {
@@ -130,9 +131,19 @@ export default function OperatorDashboard() {
                             <p className="text-xs text-yellow-400 mt-1">Data age: {getDataAge()}s</p>
                         </div>
 
-                        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
+                        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50 lg:col-span-2 text-center">
                             <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Primary Flux</p>
                             <p className="text-blue-400 font-bold text-xl">{latestData.flux.toExponential(2)}</p>
+                        </div>
+
+                        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
+                            <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Observed Flux</p>
+                            <p className="text-slate-300 font-medium">{latestData.observed_flux ? latestData.observed_flux.toExponential(2) : "N/A"}</p>
+                        </div>
+
+                        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
+                            <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">e- Correction</p>
+                            <p className="text-slate-300 font-medium">{latestData.electron_correction ? latestData.electron_correction.toExponential(2) : "N/A"}</p>
                         </div>
 
                         <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
@@ -143,6 +154,13 @@ export default function OperatorDashboard() {
                         <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
                             <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Energy Band</p>
                             <p className="text-slate-200 font-medium">{latestData.energy || "N/A"}</p>
+                        </div>
+
+                        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
+                            <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Electron Contamination</p>
+                            <p className={`font-bold ${latestData.electron_contaminaton ? 'text-red-400' : 'text-emerald-400'}`}>
+                                {latestData.electron_contaminaton ? "CONTAMINATED" : "CLEAN"}
+                            </p>
                         </div>
                     </div>
                 </div>

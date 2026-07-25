@@ -8,7 +8,7 @@ export async function viewUnreadInstructions(req, res) {
         const limit = parseInt(req.query.limit) || 6
         const skip = (page - 1) * limit
 
-        const filter = { isRead: false, targetOperatorId: operatorId }
+        const filter = { isRead: false, targetOperatorId: operatorId, source: process.env.DATA_SOURCE }
         const total = await Instructions.countDocuments(filter)
         const instructions = await Instructions.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 })
 
@@ -31,7 +31,7 @@ export async function viewReadInstructions(req, res) {
         const limit = parseInt(req.query.limit) || 6
         const skip = (page - 1) * limit
 
-        const filter = { isRead: true, targetOperatorId: operatorId }
+        const filter = { isRead: true, targetOperatorId: operatorId, source: process.env.DATA_SOURCE }
         const total = await Instructions.countDocuments(filter)
         const instructions = await Instructions.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 })
 

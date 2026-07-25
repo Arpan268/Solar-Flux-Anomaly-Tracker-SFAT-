@@ -5,8 +5,8 @@ export async function viewLiveData(req, res) {
         const page = parseInt(req.query.page) || 1
         const limit = parseInt(req.query.limit) || 100
         const skip = (page - 1) * limit
-        const total = await LiveData.countDocuments()
-        const liveData = await LiveData.find().skip(skip).limit(limit).sort({ createdAt: -1 })
+        const total = await LiveData.countDocuments({ source: process.env.DATA_SOURCE })
+        const liveData = await LiveData.find({ source: process.env.DATA_SOURCE }).skip(skip).limit(limit).sort({ createdAt: -1 })
 
         res.status(200).json({
             liveData, total, totalPages: Math.ceil(total / limit), currentPage: page

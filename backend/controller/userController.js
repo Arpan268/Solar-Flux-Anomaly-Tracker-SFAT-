@@ -5,8 +5,10 @@ export async function getUsers(req, res) {
         const page = parseInt(req.query.page) || 1
         const limit = parseInt(req.query.limit) || 5
         const skip = (page - 1) * limit
-        const total = await User.countDocuments()
-        const users = await User.find().skip(skip).limit(limit).select('-password')
+
+        const filter = { status: 'Approved' }
+        const total = await User.countDocuments(filter)
+        const users = await User.find(filter).skip(skip).limit(limit).select('-password')
 
         res.status(200).json({
             users, total, totalPages: Math.ceil(total / limit), currentPage: page

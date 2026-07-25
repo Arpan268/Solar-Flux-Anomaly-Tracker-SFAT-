@@ -13,7 +13,8 @@ export async function sendInstructions(req, res) {
                 message: message,
                 isRead: false,
                 supervisorId: supervisorId,
-                targetOperatorId: op.userId
+                targetOperatorId: op.userId,
+                source: process.env.DATA_SOURCE
             }))
 
             await Instructions.insertMany(broadcastData)
@@ -25,7 +26,8 @@ export async function sendInstructions(req, res) {
                 message: message,
                 isRead: false,
                 supervisorId: supervisorId,
-                targetOperatorId: targetOperator
+                targetOperatorId: targetOperator,
+                source: process.env.DATA_SOURCE
             })
 
             await instruction.save()

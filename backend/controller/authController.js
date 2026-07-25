@@ -76,11 +76,14 @@ export async function login(req, res) {
             return res.status(403).json({ message: 'Login failed. Your account approval is rejected by the admin' })
         }
 
+        const tokenPayload = {
+            id: user.userId,
+            userId: user.userId,
+            role: user.role,
+        }
+
         const accessToken = jwt.sign(
-            {
-                id: user.userId,
-                role: user.role,
-            },
+            tokenPayload,
             process.env.ACCESS_TOKEN_SECRET,
             {
                 expiresIn: '15m'
@@ -88,10 +91,7 @@ export async function login(req, res) {
         )
 
         const refreshToken = jwt.sign(
-            {
-                id: user.userId,
-                role: user.role,
-            },
+            tokenPayload,
             process.env.REFRESH_TOKEN_SECRET,
             {
                 expiresIn: '7d'
@@ -142,8 +142,14 @@ export async function refreshToken(req, res) {
             return res.status(403).json({ message: 'Access denied. Account is no longer approved' })
         }
 
+        const tokenPayload = {
+            id: user.userId,
+            userId: user.userId,
+            role: user.role,
+        }
+
         const newAccessToken = jwt.sign(
-            { id: user.userId, role: user.role },
+            tokenPayload,
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '15m' }
         )

@@ -4,10 +4,10 @@ export async function viewDiagrams(req, res) {
     try {
         const limit = parseInt(req.query.limit) || 500
 
-        const data = await LiveData.find()
+        const data = await LiveData.find({ source: process.env.DATA_SOURCE })
             .sort({ createdAt: -1 })
             .limit(limit)
-            .select('time_tag flux classification -_id')
+            .select('time_tag flux -_id')
             .lean()
 
         const chartData = data.reverse()

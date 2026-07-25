@@ -110,13 +110,13 @@ export default function ManageUsers() {
                                     <td className="p-4 text-right space-x-3">
                                         <button
                                             onClick={() => handleReject(user._id)}
-                                            className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-4 py-1.5 rounded text-sm font-semibold shadow-sm"
+                                            className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-4 py-1.5 rounded text-sm font-semibold shadow-sm cursor-pointer"
                                         >
                                             Reject
                                         </button>
                                         <button
                                             onClick={() => handleApprove(user._id)}
-                                            className="bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/30 px-4 py-1.5 rounded text-sm font-semibold shadow-sm transition-colors"
+                                            className="bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/30 px-4 py-1.5 rounded text-sm font-semibold shadow-sm transition-colors cursor-pointer"
                                         >
                                             Approve
                                         </button>
