@@ -16,6 +16,8 @@ app.use(cors({
 }))
 app.use(cookieParser())
 
+app.get('/api/health', (req, res) => res.status(200).send('OK'))
+
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 

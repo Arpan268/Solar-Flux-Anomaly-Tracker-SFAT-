@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/navbar';
 import PublicRoute from './components/publicRoute';
@@ -29,8 +30,31 @@ import AdminDashboard from './pages/admin/adminDashboard';
 import ManageUsers from './pages/admin/manageUsers';
 import UpdateProfile from './components/updateProfile';
 
-
 export default function App() {
+  const [isServerAwake, setIsServerAwake] = useState(false);
+
+  useEffect(() => {
+    const wakeUpServer = async () => {
+      try {
+        await fetch('/api/health');
+        setIsServerAwake(true);
+      } catch (error) {
+        setTimeout(wakeUpServer, 3000);
+      }
+    };
+    wakeUpServer();
+  }, []);
+
+  if (!isServerAwake) {
+    return (
+      <div className='min-h-screen bg-linear-to-b from-zinc-950 via-slate-900 to-gray-900 flex flex-col items-center justify-center text-white font-sans'>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-emerald-500 mb-6"></div>
+        <h2 className="text-2xl font-bold mb-2">Connecting to Secure Server...</h2>
+        <p className="text-gray-400">Waking up the data pipeline. Please allow up to 45 seconds.</p>
+      </div>
+    );
+  }
+
   return (
     <main className='min-h-screen bg-linear-to-b from-zinc-950 via-slate-900 to-gray-900'>
       <Navbar />
@@ -40,6 +64,7 @@ export default function App() {
           path="/"
           element={<HomeRedirect />}
         />
+
         {/* Public Routes */}
         <Route path="/register" element={
           <PublicRoute>
