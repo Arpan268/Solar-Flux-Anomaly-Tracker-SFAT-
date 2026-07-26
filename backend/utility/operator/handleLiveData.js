@@ -10,7 +10,6 @@ export async function handleLiveData(req, res) {
         res.setHeader('Connection', 'keep-alive')
 
         const initialData = await liveData()
-
         res.write(`data: ${JSON.stringify(initialData)}\n\n`)
 
         const alertListener = (alertData) => {
@@ -18,11 +17,19 @@ export async function handleLiveData(req, res) {
         }
         criticalEvent.on('critical-event', alertListener)
 
+        const instructionListener = (data) => {
+            const currentUserId = req.user?.userId || req.user?.id;
+            if (data.targetOperator === 'All' || data.targetOperator === currentUserId) {
+                res.write(`event: new_instruction\ndata: {"hasUnread": true}\n\n`)
+            }
+        }
+        criticalEvent.on('new_instruction', instructionListener)
+
         const intervalId = setInterval(async () => {
             const latestData = await liveData()
 
             if (!latestData) {
-                console.warn('Skippinginterval: No data received from NOAA')
+                console.warn('Skipping interval: No data received from NOAA')
                 return
             }
 
@@ -30,7 +37,6 @@ export async function handleLiveData(req, res) {
                 res.write(`data: ${JSON.stringify(latestData)}\n\n`)
                 getAnomaly(latestData)
             }
-
             catch (err) {
                 console.error('Error processing anomaly logic')
             }
@@ -39,13 +45,12 @@ export async function handleLiveData(req, res) {
         req.on('close', () => {
             clearInterval(intervalId)
             criticalEvent.off('critical-event', alertListener)
+            criticalEvent.off('new_instruction', instructionListener)
             res.end()
         })
     }
-
     catch (err) {
         console.error('Error establishing live data connection: ', err)
-
         if (!res.headersSent) {
             return res.status(500).json({ message: 'Server error initializing stream' })
         }

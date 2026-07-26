@@ -27,8 +27,8 @@ export default function ViewOperators() {
     const [error, setError] = useState<string | null>(null);
     const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-    const [editingOperatorId, setEditingOperatorId] = useState<string | null>(null);
-    const [newShiftId, setNewShiftId] = useState<string>("");
+    const [isEditingShifts, setIsEditingShifts] = useState(false);
+    const [draftShifts, setDraftShifts] = useState<Record<string, string>>({});
 
     useEffect(() => {
         async function fetchOperators() {
@@ -43,7 +43,6 @@ export default function ViewOperators() {
                 setTotalPages(res.data.totalPages);
                 setError(null);
             } catch (err) {
-                console.error("Failed to fetch operators", err);
                 setError("Failed to load the operator roster.");
             } finally {
                 setLoading(false);
@@ -59,7 +58,6 @@ export default function ViewOperators() {
                 });
                 setAllShifts(res.data);
             } catch (err) {
-                console.error("Failed to fetch shifts", err);
             }
         }
 
@@ -69,7 +67,6 @@ export default function ViewOperators() {
 
     async function handleDelete(operatorId: string) {
         if (!auth?.accessToken) return;
-
         const confirmDelete = window.confirm("CRITICAL ACTION: Are you sure you want to remove this operator? This cannot be undone.");
         if (!confirmDelete) return;
 
@@ -86,48 +83,94 @@ export default function ViewOperators() {
                 setPage((prev) => prev - 1);
             }
         } catch (err) {
-            console.error("Failed to delete operator", err);
             setActionMessage({ type: "error", text: "Failed to remove operator. Please check server logs." });
         } finally {
             setTimeout(() => setActionMessage(null), 5000);
         }
     }
 
-    async function handleSaveShift(operatorId: string) {
+    function handleEditToggle() {
+        if (isEditingShifts) {
+            setIsEditingShifts(false);
+            setDraftShifts({});
+        } else {
+            const initialDrafts: Record<string, string> = {};
+            operators.forEach(op => {
+                initialDrafts[op._id] = op.shift?._id || "";
+            });
+            setDraftShifts(initialDrafts);
+            setIsEditingShifts(true);
+        }
+    }
+
+    function handleDraftChange(operatorId: string, shiftId: string) {
+        setDraftShifts(prev => ({ ...prev, [operatorId]: shiftId }));
+    }
+
+    async function handleBulkSave() {
         if (!auth?.accessToken) return;
-        if (!newShiftId) return;
+
+        const assignments = Object.keys(draftShifts).map(operatorId => ({
+            operatorId,
+            shiftId: draftShifts[operatorId] === "" ? null : draftShifts[operatorId]
+        }));
 
         try {
-            await axios.put(`/api/user/supervisor/${operatorId}/reassign-shift`,
-                { shiftId: newShiftId },
+            await axios.put(`/api/user/supervisor/bulk-reassign-shifts`,
+                { assignments },
                 {
                     headers: { Authorization: `Bearer ${auth.accessToken}` },
                     withCredentials: true,
                 }
             );
 
-            setOperators((prev) => prev.map((op) =>
-                op._id === operatorId
-                    ? { ...op, shift: allShifts.find((s) => s._id === newShiftId) || null }
-                    : op
-            ));
+            setOperators((prev) => prev.map((op) => ({
+                ...op,
+                shift: draftShifts[op._id] ? allShifts.find(s => s._id === draftShifts[op._id]) || null : null
+            })));
 
-            setActionMessage({ type: "success", text: "Shift updated successfully." });
-            setEditingOperatorId(null);
-            setNewShiftId("");
+            setActionMessage({ type: "success", text: "All shifts updated successfully." });
+            setIsEditingShifts(false);
         } catch (err: any) {
-            console.error("Failed to update shift", err);
-            const errorMsg = err.response?.data?.message || "Failed to update shift.";
+            const errorMsg = err.response?.data?.message || "Failed to update shifts.";
             setActionMessage({ type: "error", text: errorMsg });
         } finally {
             setTimeout(() => setActionMessage(null), 5000);
         }
     }
+
     return (
         <div className="max-w-7xl mx-auto mt-12 p-6">
-            <div className="mb-8">
-                <h2 className="text-3xl font-extrabold text-white tracking-tight">Active Roster</h2>
-                <p className="text-slate-400 mt-2">Manage your operator team and revoke access if necessary.</p>
+            <div className="mb-8 flex justify-between items-center">
+                <div>
+                    <h2 className="text-3xl font-extrabold text-white tracking-tight">Active Roster</h2>
+                    <p className="text-slate-400 mt-2">Manage your operator team and revoke access if necessary.</p>
+                </div>
+                <div>
+                    {isEditingShifts ? (
+                        <div className="flex items-center space-x-3">
+                            <button
+                                onClick={handleBulkSave}
+                                className="bg-emerald-600/20 text-emerald-500 cursor-pointer hover:bg-emerald-600 hover:text-white border border-emerald-600/50 px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                            >
+                                Save Changes
+                            </button>
+                            <button
+                                onClick={handleEditToggle}
+                                className="bg-gray-600/20 text-gray-400 cursor-pointer hover:bg-gray-600 hover:text-white border border-gray-600/50 px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={handleEditToggle}
+                            className="px-4 py-2 text-sm cursor-pointer font-semibold rounded-lg bg-blue-900/20 text-blue-500 hover:bg-blue-600 hover:text-white border border-blue-600/30 transition-colors"
+                        >
+                            Change Shifts
+                        </button>
+                    )}
+                </div>
             </div>
 
             {actionMessage && (
@@ -175,7 +218,20 @@ export default function ViewOperators() {
                                             {op.email}
                                         </td>
                                         <td className="p-4">
-                                            {op.shift ? (
+                                            {isEditingShifts ? (
+                                                <select
+                                                    className="bg-gray-800 text-sm text-slate-200 border border-gray-600 rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
+                                                    value={draftShifts[op._id] || ""}
+                                                    onChange={(e) => handleDraftChange(op._id, e.target.value)}
+                                                >
+                                                    <option value="">Unassigned</option>
+                                                    {allShifts.map((s) => (
+                                                        <option key={s._id} value={s._id}>
+                                                            {s.name} ({s.startTime} - {s.endTime})
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : op.shift ? (
                                                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-900/30 text-indigo-400 border border-indigo-700/50">
                                                     {op.shift.name} ({op.shift.startTime} - {op.shift.endTime})
                                                 </span>
@@ -187,52 +243,13 @@ export default function ViewOperators() {
                                             {new Date(op.createdAt).toLocaleDateString()}
                                         </td>
                                         <td className="p-4 text-right">
-                                            {editingOperatorId === op._id ? (
-                                                <div className="flex items-center justify-end space-x-2">
-                                                    <select
-                                                        className="bg-gray-800 text-sm text-slate-200 border cursor-pointer border-gray-600 rounded px-2 py-1.5 focus:outline-none focus:border-blue-500"
-                                                        value={newShiftId}
-                                                        onChange={(e) => setNewShiftId(e.target.value)}
-                                                    >
-                                                        <option value="" disabled>Select Shift</option>
-                                                        {allShifts.map((s) => (
-                                                            <option key={s._id} value={s._id}>
-                                                                {s.name} ({s.startTime} - {s.endTime})
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                    <button
-                                                        onClick={() => handleSaveShift(op._id)}
-                                                        className="bg-blue-600/20 text-blue-500 hover:bg-blue-600 hover:text-white border cursor-pointer border-blue-600/50 px-3 py-1.5 rounded text-sm font-semibold transition-colors"
-                                                    >
-                                                        Save
-                                                    </button>
-                                                    <button
-                                                        onClick={() => { setEditingOperatorId(null); setNewShiftId(""); }}
-                                                        className="bg-gray-600/20 text-gray-400 hover:bg-gray-600 hover:text-white border cursor-pointer border-gray-600/50 px-3 py-1.5 rounded text-sm font-semibold transition-colors"
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center justify-end space-x-3">
-                                                    <button
-                                                        onClick={() => {
-                                                            setEditingOperatorId(op._id);
-                                                            setNewShiftId(op.shift?._id || "");
-                                                        }}
-                                                        className="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-900/20 text-blue-500 hover:bg-blue-600 hover:text-white border border-blue-600/30 transition-colors cursor-pointer"
-                                                    >
-                                                        Change Shift
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(op._id)}
-                                                        className="px-4 py-2 text-sm font-semibold rounded-lg bg-red-900/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 transition-colors cursor-pointer"
-                                                    >
-                                                        Revoke Access
-                                                    </button>
-                                                </div>
-                                            )}
+                                            <button
+                                                onClick={() => handleDelete(op._id)}
+                                                disabled={isEditingShifts}
+                                                className="px-4 py-2 text-sm font-semibold cursor-pointer rounded-lg bg-red-900/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                Revoke Access
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -251,8 +268,8 @@ export default function ViewOperators() {
                     <div className="p-4 bg-gray-800/50 border-t border-gray-700 flex justify-between items-center">
                         <button
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            disabled={page === 1}
-                            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            disabled={page === 1 || isEditingShifts}
+                            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                         >
                             Previous
                         </button>
@@ -261,8 +278,8 @@ export default function ViewOperators() {
                         </span>
                         <button
                             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                            disabled={page === totalPages}
-                            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            disabled={page === totalPages || isEditingShifts}
+                            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                         >
                             Next
                         </button>

@@ -10,25 +10,35 @@ export async function getAllShifts(req, res) {
     }
 }
 
-export async function reassignShift(req, res) {
+export async function bulkReassignShifts(req, res) {
     try {
-        const { shiftId } = req.body
-        const operatorId = req.params.id
+        const { assignments } = req.body
 
-        const existingAssignment = await User.findOne({ shift: shiftId, _id: { $ne: operatorId }, status: 'Approved' })
-        if (existingAssignment) {
-            return res.status(400).json({ message: 'Shift overlap detected: This shift is currently assigned to another operator.' })
+        const shiftIds = assignments.map(a => a.shiftId).filter(id => id !== null)
+        const uniqueShiftIds = new Set(shiftIds)
+
+        if (shiftIds.length !== uniqueShiftIds.size) {
+            return res.status(400).json({ message: 'Duplicate shifts detected. Each shift can only be assigned to one operator.' })
         }
 
-        const operator = await User.findById(operatorId)
-        if (!operator || operator.role !== 'Operator') {
-            return res.status(404).json({ message: 'Operator not found' })
+        const operatorIds = assignments.map(a => a.operatorId)
+
+        for (const shiftId of uniqueShiftIds) {
+            const existingUser = await User.findOne({
+                shift: shiftId,
+                status: 'Approved',
+                _id: { $nin: operatorIds }
+            })
+            if (existingUser) {
+                return res.status(400).json({ message: 'Shift overlap detected with an operator not in this update.' })
+            }
         }
 
-        operator.shift = shiftId
-        await operator.save()
+        for (const { operatorId, shiftId } of assignments) {
+            await User.findByIdAndUpdate(operatorId, { shift: shiftId || null })
+        }
 
-        res.status(200).json({ message: 'Shift updated successfully' })
+        res.status(200).json({ message: 'Shifts updated successfully' })
     } catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }

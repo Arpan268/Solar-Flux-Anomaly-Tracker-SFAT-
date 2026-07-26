@@ -40,6 +40,7 @@ export default function Navbar() {
                                     <Link to="/operator" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Dashboard</Link>
                                     <Link to="/operator/view-anomalies" className="hover:text-white transition-colors hover:scale-105 transform duration-300">My Logs</Link>
                                     <Link to="/operator/view-instructions" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Instructions</Link>
+                                    <Link to="/operator/view-profile" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Profile</Link>
                                 </>
                             )}
 
@@ -48,7 +49,8 @@ export default function Navbar() {
                                     <Link to="/supervisor" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Dashboard</Link>
                                     <Link to="/supervisor/view-anomalies" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Review Anomalies</Link>
                                     <Link to="/supervisor/send-instructions" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Send Instructions</Link>
-                                    <Link to="/supervisor/view-operators" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Operators</Link>
+                                    <Link to="/supervisor/view-operators" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Manage Operators</Link>
+                                    <Link to="/supervisor/view-profile" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Profile</Link>
                                 </>
                             )}
 
@@ -58,6 +60,7 @@ export default function Navbar() {
                                     <Link to="/analyst/view-anomalies" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Review Anomalies</Link>
                                     <Link to="/analyst/view-live-data" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Live Data</Link>
                                     <Link to="/analyst/view-graphs" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Graphs</Link>
+                                    <Link to="/analyst/view-profile" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Profile</Link>
                                 </>
                             )}
 
@@ -65,6 +68,7 @@ export default function Navbar() {
                                 <>
                                     <Link to="/admin" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Admin Panel</Link>
                                     <Link to="/admin/manage-users" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Manage Users</Link>
+                                    <Link to="/admin/view-profile" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Profile</Link>
                                 </>
                             )}
 

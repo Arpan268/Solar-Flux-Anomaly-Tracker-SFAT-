@@ -3,6 +3,7 @@ import Navbar from './components/navbar';
 import PublicRoute from './components/publicRoute';
 import PrivateRoute from './components/privateRoute';
 import HomeRedirect from "./components/homeRedirect";
+import ViewProfile from './components/viewProfile';
 
 import Register from './pages/public/register';
 import Login from './pages/public/login';
@@ -26,6 +27,7 @@ import AnalystViewGraphs from './pages/analyst/viewGraphs';
 
 import AdminDashboard from './pages/admin/adminDashboard';
 import ManageUsers from './pages/admin/manageUsers';
+import UpdateProfile from './components/updateProfile';
 
 
 export default function App() {
@@ -81,6 +83,16 @@ export default function App() {
             <OperatorInstructions />
           </PrivateRoute>
         } />
+        <Route path="/operator/view-profile" element={
+          <PrivateRoute allowedRoles={['Operator']}>
+            <ViewProfile />
+          </PrivateRoute>
+        } />
+        <Route path="/operator/profile/update/:userId" element={
+          <PrivateRoute allowedRoles={['Operator']}>
+            <UpdateProfile />
+          </PrivateRoute>
+        } />
 
         {/* Supervisor Routes */}
         <Route path="/supervisor" element={
@@ -101,6 +113,16 @@ export default function App() {
         <Route path="/supervisor/view-operators" element={
           <PrivateRoute allowedRoles={['Supervisor']}>
             <SupervisorViewOperators />
+          </PrivateRoute>
+        } />
+        <Route path="/supervisor/view-profile" element={
+          <PrivateRoute allowedRoles={['Supervisor']}>
+            <ViewProfile />
+          </PrivateRoute>
+        } />
+        <Route path="/supervisor/profile/update/:userId" element={
+          <PrivateRoute allowedRoles={['Supervisor']}>
+            <UpdateProfile />
           </PrivateRoute>
         } />
 
@@ -125,6 +147,16 @@ export default function App() {
             <AnalystViewGraphs />
           </PrivateRoute>
         } />
+        <Route path="/analyst/view-profile" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <ViewProfile />
+          </PrivateRoute>
+        } />
+        <Route path="/analyst/profile/update/:userId" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <UpdateProfile />
+          </PrivateRoute>
+        } />
 
         {/* Admin Routes */}
         <Route path="/admin" element={
@@ -135,6 +167,16 @@ export default function App() {
         <Route path="/admin/manage-users" element={
           <PrivateRoute allowedRoles={['Admin']}>
             <ManageUsers />
+          </PrivateRoute>
+        } />
+        <Route path="/admin/view-profile" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <ViewProfile />
+          </PrivateRoute>
+        } />
+        <Route path="/admin/profile/update/:userId" element={
+          <PrivateRoute allowedRoles={['Admin']}>
+            <UpdateProfile />
           </PrivateRoute>
         } />
 

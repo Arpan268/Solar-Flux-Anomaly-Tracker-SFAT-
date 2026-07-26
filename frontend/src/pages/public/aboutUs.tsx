@@ -20,6 +20,7 @@ export default function AboutUs() {
                 <div className="flex flex-wrap justify-center gap-6 mt-8">
                     <a
                         href="mailto:arpanhalderah3@gmail.com"
+                        target='_blank'
                         className="px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors font-medium shadow-lg shadow-red-600/20"
                     >
                         Email Me

@@ -67,7 +67,7 @@ export async function login(req, res) {
     }
 
     try {
-        const user = await User.findOne({ userId })
+        const user = await User.findOne({ userId }).populate('shift')
 
         if (!user) {
             return res.status(400).json({ message: 'User not found' })
@@ -81,9 +81,39 @@ export async function login(req, res) {
 
         if (user.status === 'Pending') {
             return res.status(403).json({ message: 'Login failed. Your account is pending admin approval' })
-        }
-        else if (user.status === 'Rejected') {
+        } else if (user.status === 'Rejected') {
             return res.status(403).json({ message: 'Login failed. Your account approval is rejected by the admin' })
+        }
+
+        if (user.role === 'Operator' && user.shift) {
+            const { startTime, endTime } = user.shift
+            const now = new Date()
+
+            const currentHours = now.getHours()
+            const currentMinutes = now.getMinutes()
+            const currentAbsolute = currentHours + (currentMinutes / 60)
+
+            const [startH, startM] = startTime.split(':').map(Number)
+            const [endH, endM] = endTime.split(':').map(Number)
+
+            const startAbsolute = startH + (startM / 60)
+            const endAbsolute = endH + (endM / 60)
+
+            let isWithinShift = false
+
+            if (endAbsolute <= startAbsolute) {
+                if (currentAbsolute >= startAbsolute || currentAbsolute < endAbsolute) {
+                    isWithinShift = true
+                }
+            } else {
+                if (currentAbsolute >= startAbsolute && currentAbsolute < endAbsolute) {
+                    isWithinShift = true
+                }
+            }
+
+            if (!isWithinShift) {
+                return res.status(403).json({ message: `Access denied. Your assigned shift is ${startTime} to ${endTime}. Please log in during your time slot.` })
+            }
         }
 
         const tokenPayload = {
@@ -95,17 +125,13 @@ export async function login(req, res) {
         const accessToken = jwt.sign(
             tokenPayload,
             process.env.ACCESS_TOKEN_SECRET,
-            {
-                expiresIn: '15m'
-            }
+            { expiresIn: '15m' }
         )
 
         const refreshToken = jwt.sign(
             tokenPayload,
             process.env.REFRESH_TOKEN_SECRET,
-            {
-                expiresIn: '7d'
-            }
+            { expiresIn: '7d' }
         )
 
         res.cookie('accesstoken', accessToken, getCookieOptions())
@@ -117,11 +143,10 @@ export async function login(req, res) {
                 id: user.userId,
                 username: user.username,
                 role: user.role,
-            },
+            }
         })
-    }
 
-    catch (err) {
+    } catch (err) {
         console.error('Error logging in user:', err)
         return res.status(500).json({ message: 'Server error' })
     }

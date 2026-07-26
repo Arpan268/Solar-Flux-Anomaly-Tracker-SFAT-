@@ -1,5 +1,6 @@
 import User from '../models/users.js'
 import Shift from '../models/shifts.js'
+import bcrypt from 'bcryptjs'
 
 export async function getUsers(req, res) {
     try {
@@ -14,7 +15,9 @@ export async function getUsers(req, res) {
         res.status(200).json({
             users, total, totalPages: Math.ceil(total / limit), currentPage: page
         })
-    } catch (err) {
+    }
+
+    catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }
@@ -33,7 +36,9 @@ export async function deleteUser(req, res) {
         await User.findByIdAndDelete(req.params.id)
 
         res.status(200).json({ message: 'User deleted successfully' })
-    } catch (err) {
+    }
+
+    catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }
@@ -51,7 +56,9 @@ export async function getPendingUsers(req, res) {
         res.status(200).json({
             users, total, totalPages: Math.ceil(total / limit), currentPage: page
         })
-    } catch (err) {
+    }
+
+    catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }
@@ -64,7 +71,9 @@ export async function getAvailableShifts(req, res) {
         const availableShifts = allShifts.filter(s => !assignedShiftIds.includes(s._id.toString()))
 
         res.status(200).json(availableShifts)
-    } catch (err) {
+    }
+
+    catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }
@@ -100,19 +109,65 @@ export async function handleStatus(req, res) {
 
         return res.status(200).json({ message: 'User status updated' })
 
-    } catch (err) {
+    }
+
+    catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }
 
 export async function getProfile(req, res) {
     try {
-        const user = await User.findById({ _id: req.user.id }).select('-password').populate('shift')
+        const user = await User.findOne({ userId: req.user.id }).select('-password').populate('shift')
         if (!user) {
             return res.status(404).json({ message: 'User not found' })
         }
         res.status(200).json(user)
-    } catch (err) {
+    }
+
+    catch (err) {
+        return res.status(500).json({ message: 'Server error' })
+    }
+}
+
+export async function updateProfile(req, res) {
+    try {
+        const { username, email, password } = req.body
+        const user = await User.findOne({ userId: req.user.id })
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' })
+        }
+        if (username !== undefined && username !== user.username) user.username = username
+        if (email !== undefined && email !== user.email) user.email = email
+        if (password && !(await bcrypt.compare(password, user.password))) {
+            const hashedPassword = await bcrypt.hash(password, 10)
+            user.password = hashedPassword
+        }
+
+        await user.save()
+
+        res.status(200).json({ message: 'Profile updated successfully' })
+    }
+
+    catch (err) {
+        return res.status(500).json({ message: 'Server error' })
+    }
+}
+
+export async function deleteProfile(req, res) {
+    try {
+        const user = await User.findOne({ userId: req.user.id })
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' })
+        }
+
+        await user.deleteOne({ userId: req.user.id })
+
+        res.status(200).json({ message: 'Profile deleted successfully' })
+    }
+
+    catch (err) {
         return res.status(500).json({ message: 'Server error' })
     }
 }

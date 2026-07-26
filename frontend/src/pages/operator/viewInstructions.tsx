@@ -177,7 +177,7 @@ export default function OperatorInstructions() {
                                     <button
                                         key={index}
                                         onClick={() => setPage(index + 1)}
-                                        className={`w-10 h-10 rounded font-semibold transition-colors ${page === index + 1
+                                        className={`w-10 h-10 rounded cursor-pointer font-semibold transition-colors ${page === index + 1
                                                 ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
                                                 : "bg-gray-800 text-slate-400 hover:bg-gray-700 hover:text-white border border-gray-700"
                                             }`}

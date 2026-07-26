@@ -1,5 +1,6 @@
 import Instructions from '../../models/instructions.js'
 import User from '../../models/users.js'
+import { criticalEvent } from '../../events/addEvents.js'
 
 export async function sendInstructions(req, res) {
     try {
@@ -19,6 +20,8 @@ export async function sendInstructions(req, res) {
 
             await Instructions.insertMany(broadcastData)
 
+            criticalEvent.emit('new_instruction', { targetOperator: 'All' })
+
             res.status(201).json({ message: 'Broadcast sent successfully' })
         }
         else {
@@ -32,10 +35,11 @@ export async function sendInstructions(req, res) {
 
             await instruction.save()
 
+            criticalEvent.emit('new_instruction', { targetOperator: targetOperator })
+
             res.status(201).json({ message: 'Instruction saved successfully' })
         }
     }
-
     catch (err) {
         console.error('Error saving instruction: ', err)
         res.status(500).json({ message: 'Server error' })

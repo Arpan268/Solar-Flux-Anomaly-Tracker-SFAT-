@@ -24,8 +24,9 @@ interface ShiftDetails {
 }
 
 export default function OperatorDashboard() {
-    const { auth, logout } = useAuth();
+    const { auth } = useAuth();
     const navigate = useNavigate();
+
     const [liveData, setLiveData] = useState<LiveData[]>([]);
     const [anomalyData, setAnomalyData] = useState<AnomalyData | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -35,6 +36,8 @@ export default function OperatorDashboard() {
     const [shift, setShift] = useState<ShiftDetails | null>(null);
     const [shiftTimeRemaining, setShiftTimeRemaining] = useState<string>("");
 
+    const [hasUnreadInstructions, setHasUnreadInstructions] = useState<boolean>(false);
+
     useEffect(() => {
         async function fetchProfile() {
             if (!auth?.accessToken) return;
@@ -42,8 +45,9 @@ export default function OperatorDashboard() {
                 const res = await axios.get('/api/user/me', {
                     headers: { Authorization: `Bearer ${auth.accessToken}` }
                 });
-                if (res.data.shift) {
-                    setShift(res.data.shift);
+                const userData = res.data.user || res.data;
+                if (userData?.shift && typeof userData.shift === 'object' && userData.shift.startTime) {
+                    setShift(userData.shift);
                 }
             } catch (err) {
                 console.error("Failed to load profile/shift details:", err);
@@ -53,21 +57,40 @@ export default function OperatorDashboard() {
     }, [auth]);
 
     useEffect(() => {
+        async function checkUnreadInstructions() {
+            if (!auth?.accessToken) return;
+            try {
+                const res = await axios.get("/api/user/operator/unread-instructions", {
+                    headers: { Authorization: `Bearer ${auth.accessToken}` },
+                    withCredentials: true,
+                });
+
+                if (res.data.instructions && res.data.instructions.length > 0) {
+                    setHasUnreadInstructions(true);
+                }
+            } catch (err) {
+                console.error("Failed to fetch pending instructions:", err);
+            }
+        }
+        checkUnreadInstructions();
+    }, [auth]);
+
+    useEffect(() => {
         if (!shift) return;
 
-        const timer = setInterval(() => {
+        const updateTimer = () => {
             const now = new Date();
             const [startH, startM] = shift.startTime.split(':').map(Number);
             const [endH, endM] = shift.endTime.split(':').map(Number);
 
-            const startDate = new Date(now);
+            let startDate = new Date(now);
             startDate.setHours(startH, startM, 0, 0);
 
-            const endDate = new Date(now);
+            let endDate = new Date(now);
             endDate.setHours(endH, endM, 0, 0);
 
-            if (endDate <= startDate) {
-                if (now < startDate) {
+            if (endH < startH || (endH === startH && endM <= startM)) {
+                if (now.getHours() < endH || (now.getHours() === endH && now.getMinutes() < endM)) {
                     startDate.setDate(startDate.getDate() - 1);
                 } else {
                     endDate.setDate(endDate.getDate() + 1);
@@ -77,22 +100,20 @@ export default function OperatorDashboard() {
             const remainingMs = endDate.getTime() - now.getTime();
 
             if (remainingMs <= 0) {
-                clearInterval(timer);
-                if (logout) {
-                    logout();
-                } else {
-                    navigate("/login");
-                }
+                setShiftTimeRemaining("0h 0m 0s");
             } else {
                 const h = Math.floor(remainingMs / 3600000);
                 const m = Math.floor((remainingMs % 3600000) / 60000);
                 const s = Math.floor((remainingMs % 60000) / 1000);
                 setShiftTimeRemaining(`${h}h ${m}m ${s}s`);
             }
-        }, 1000);
+        };
+
+        updateTimer();
+        const timer = setInterval(updateTimer, 1000);
 
         return () => clearInterval(timer);
-    }, [shift, logout, navigate]);
+    }, [shift]);
 
     useEffect(() => {
         if (!auth?.accessToken) return;
@@ -124,6 +145,10 @@ export default function OperatorDashboard() {
             } catch (err) {
                 console.error(err);
             }
+        });
+
+        eventSource.addEventListener("new_instruction", () => {
+            setHasUnreadInstructions(true);
         });
 
         eventSource.onerror = () => {
@@ -207,9 +232,31 @@ export default function OperatorDashboard() {
 
                     <button
                         onClick={handleLogAnomaly}
-                        className="w-full sm:w-auto whitespace-nowrap bg-red-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors"
+                        className="w-full sm:w-auto cursor-pointer whitespace-nowrap bg-red-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors"
                     >
                         Log Anomaly
+                    </button>
+                </div>
+            )}
+
+            {hasUnreadInstructions && (
+                <div className="bg-blue-900/20 border border-blue-600/50 rounded-xl p-6 shadow-lg shadow-blue-900/20 flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
+                    <div className="flex items-center gap-4">
+                        <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
+                        <div>
+                            <h3 className="text-xl font-bold text-blue-400 mb-1">
+                                New Instruction Received
+                            </h3>
+                            <p className="text-blue-300/80 text-sm">
+                                A supervisor has assigned a new instruction. Please review it immediately.
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => navigate("/operator/view-instructions")}
+                        className="w-full sm:w-auto cursor-pointer whitespace-nowrap bg-blue-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-blue-600/30 hover:bg-blue-700 transition-colors"
+                    >
+                        View Instructions
                     </button>
                 </div>
             )}
