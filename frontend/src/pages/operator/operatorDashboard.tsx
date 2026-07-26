@@ -24,7 +24,7 @@ interface ShiftDetails {
 }
 
 export default function OperatorDashboard() {
-    const { auth } = useAuth();
+    const { auth, logout } = useAuth();
     const navigate = useNavigate();
 
     const [liveData, setLiveData] = useState<LiveData[]>([]);
@@ -101,6 +101,9 @@ export default function OperatorDashboard() {
 
             if (remainingMs <= 0) {
                 setShiftTimeRemaining("0h 0m 0s");
+
+                alert("Your shift has ended. You have been automatically logged out.");
+                logout()
             } else {
                 const h = Math.floor(remainingMs / 3600000);
                 const m = Math.floor((remainingMs % 3600000) / 60000);

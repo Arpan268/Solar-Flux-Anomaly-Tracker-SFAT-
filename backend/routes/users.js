@@ -4,6 +4,7 @@ import { deleteUser, getPendingUsers, getProfile, getUsers, handleStatus, update
 import handleOperator from '../routeHandlers/operator.js'
 import handleSupervisor from '../routeHandlers/supervisor.js'
 import handleAnalyst from '../routeHandlers/analyst.js'
+import sharedResources from '../routeHandlers/shared.js'
 
 const router = express.Router()
 
@@ -18,5 +19,6 @@ router.delete('/me/delete', verifyToken, deleteProfile)
 router.use('/operator', verifyToken, verifyRole('Operator'), handleOperator)
 router.use('/supervisor', verifyToken, verifyRole('Supervisor'), handleSupervisor)
 router.use('/analyst', verifyToken, verifyRole('Analyst'), handleAnalyst)
+router.use('/shared', verifyToken, sharedResources)
 
 export default router

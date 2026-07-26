@@ -1,0 +1,842 @@
+[
+    {
+        "satellite": 16,
+        "flux": 1.12e-8,
+        "observed_flux": 1.10e-8,
+        "electron_correction": 0.00012,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 2.45e-8,
+        "observed_flux": 2.40e-8,
+        "electron_correction": 0.00015,
+        "electron_contaminaton": false,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 5.67e-8,
+        "observed_flux": 5.61e-8,
+        "electron_correction": 0.00011,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 8.91e-8,
+        "observed_flux": 8.85e-8,
+        "electron_correction": 0.00018,
+        "electron_contaminaton": true,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 1.05e-7,
+        "observed_flux": 1.01e-7,
+        "electron_correction": 0.00022,
+        "electron_contaminaton": false,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 3.34e-7,
+        "observed_flux": 3.30e-7,
+        "electron_correction": 0.00014,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 6.78e-7,
+        "observed_flux": 6.71e-7,
+        "electron_correction": 0.00019,
+        "electron_contaminaton": true,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 9.12e-7,
+        "observed_flux": 9.05e-7,
+        "electron_correction": 0.00021,
+        "electron_contaminaton": false,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 1.23e-6,
+        "observed_flux": 1.20e-6,
+        "electron_correction": 0.00025,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 2.87e-6,
+        "observed_flux": 2.81e-6,
+        "electron_correction": 0.00013,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 4.55e-6,
+        "observed_flux": 4.50e-6,
+        "electron_correction": 0.00031,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 6.12e-6,
+        "observed_flux": 6.05e-6,
+        "electron_correction": 0.00027,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 8.44e-6,
+        "observed_flux": 8.35e-6,
+        "electron_correction": 0.00016,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 1.15e-5,
+        "observed_flux": 1.10e-5,
+        "electron_correction": 0.00041,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 2.34e-5,
+        "observed_flux": 2.29e-5,
+        "electron_correction": 0.00035,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 4.67e-5,
+        "observed_flux": 4.60e-5,
+        "electron_correction": 0.00022,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 5.88e-5,
+        "observed_flux": 5.80e-5,
+        "electron_correction": 0.00019,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 7.91e-5,
+        "observed_flux": 7.82e-5,
+        "electron_correction": 0.00045,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 9.33e-5,
+        "observed_flux": 9.25e-5,
+        "electron_correction": 0.00051,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 1.45e-4,
+        "observed_flux": 1.40e-4,
+        "electron_correction": 0.00062,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 2.76e-4,
+        "observed_flux": 2.70e-4,
+        "electron_correction": 0.00055,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 3.12e-4,
+        "observed_flux": 3.05e-4,
+        "electron_correction": 0.00048,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 4.89e-4,
+        "observed_flux": 4.80e-4,
+        "electron_correction": 0.00071,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 1.02e-8,
+        "observed_flux": 1.00e-8,
+        "electron_correction": 0.00011,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 2.15e-8,
+        "observed_flux": 2.10e-8,
+        "electron_correction": 0.00014,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 4.33e-8,
+        "observed_flux": 4.25e-8,
+        "electron_correction": 0.00017,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 6.75e-8,
+        "observed_flux": 6.70e-8,
+        "electron_correction": 0.00012,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 8.99e-8,
+        "observed_flux": 8.90e-8,
+        "electron_correction": 0.00015,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 1.45e-7,
+        "observed_flux": 1.41e-7,
+        "electron_correction": 0.00019,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 3.66e-7,
+        "observed_flux": 3.60e-7,
+        "electron_correction": 0.00021,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 5.82e-7,
+        "observed_flux": 5.75e-7,
+        "electron_correction": 0.00024,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 7.19e-7,
+        "observed_flux": 7.10e-7,
+        "electron_correction": 0.00028,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 9.88e-7,
+        "observed_flux": 9.80e-7,
+        "electron_correction": 0.00016,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 2.05e-6,
+        "observed_flux": 2.00e-6,
+        "electron_correction": 0.00033,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 4.15e-6,
+        "observed_flux": 4.10e-6,
+        "electron_correction": 0.00029,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 6.77e-6,
+        "observed_flux": 6.70e-6,
+        "electron_correction": 0.00035,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 8.92e-6,
+        "observed_flux": 8.85e-6,
+        "electron_correction": 0.00038,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 1.66e-5,
+        "observed_flux": 1.60e-5,
+        "electron_correction": 0.00042,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 3.45e-5,
+        "observed_flux": 3.40e-5,
+        "electron_correction": 0.00047,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 5.12e-5,
+        "observed_flux": 5.05e-5,
+        "electron_correction": 0.00031,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 7.88e-5,
+        "observed_flux": 7.80e-5,
+        "electron_correction": 0.00055,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 9.45e-5,
+        "observed_flux": 9.38e-5,
+        "electron_correction": 0.00061,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 1.11e-4,
+        "observed_flux": 1.05e-4,
+        "electron_correction": 0.00065,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 2.56e-4,
+        "observed_flux": 2.50e-4,
+        "electron_correction": 0.00072,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 4.18e-4,
+        "observed_flux": 4.10e-4,
+        "electron_correction": 0.00085,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 1.08e-8,
+        "observed_flux": 1.05e-8,
+        "electron_correction": 0.00012,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 3.22e-8,
+        "observed_flux": 3.15e-8,
+        "electron_correction": 0.00014,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 5.95e-8,
+        "observed_flux": 5.88e-8,
+        "electron_correction": 0.00018,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 7.66e-8,
+        "observed_flux": 7.60e-8,
+        "electron_correction": 0.00015,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 9.92e-8,
+        "observed_flux": 9.85e-8,
+        "electron_correction": 0.00021,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 2.14e-7,
+        "observed_flux": 2.10e-7,
+        "electron_correction": 0.00025,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 4.55e-7,
+        "observed_flux": 4.50e-7,
+        "electron_correction": 0.00022,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 6.89e-7,
+        "observed_flux": 6.82e-7,
+        "electron_correction": 0.00029,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 8.34e-7,
+        "observed_flux": 8.28e-7,
+        "electron_correction": 0.00017,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 1.75e-6,
+        "observed_flux": 1.70e-6,
+        "electron_correction": 0.00034,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 3.92e-6,
+        "observed_flux": 3.85e-6,
+        "electron_correction": 0.00038,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 5.44e-6,
+        "observed_flux": 5.38e-6,
+        "electron_correction": 0.00031,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 7.81e-6,
+        "observed_flux": 7.75e-6,
+        "electron_correction": 0.00042,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 9.95e-6,
+        "observed_flux": 9.88e-6,
+        "electron_correction": 0.00046,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 2.22e-5,
+        "observed_flux": 2.15e-5,
+        "electron_correction": 0.00052,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 5.43e-8,
+        "observed_flux": 5.40e-8,
+        "electron_correction": 0.00012,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 7.21e-8,
+        "observed_flux": 7.15e-8,
+        "electron_correction": 0.00015,
+        "electron_contaminaton": false,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 9.88e-8,
+        "observed_flux": 9.80e-8,
+        "electron_correction": 0.00011,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 1.15e-7,
+        "observed_flux": 1.10e-7,
+        "electron_correction": 0.00013,
+        "electron_contaminaton": true,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 3.45e-7,
+        "observed_flux": 3.41e-7,
+        "electron_correction": 0.00018,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 4.67e-7,
+        "observed_flux": 4.60e-7,
+        "electron_correction": 0.00014,
+        "electron_contaminaton": false,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 6.88e-7,
+        "observed_flux": 6.82e-7,
+        "electron_correction": 0.00019,
+        "electron_contaminaton": true,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 7.34e-7,
+        "observed_flux": 7.30e-7,
+        "electron_correction": 0.00021,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 8.12e-7,
+        "observed_flux": 8.05e-7,
+        "electron_correction": 0.00016,
+        "electron_contaminaton": false,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 8.95e-7,
+        "observed_flux": 8.90e-7,
+        "electron_correction": 0.00022,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 9.15e-7,
+        "observed_flux": 9.10e-7,
+        "electron_correction": 0.00017,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 9.45e-7,
+        "observed_flux": 9.40e-7,
+        "electron_correction": 0.00019,
+        "electron_contaminaton": true,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 9.77e-7,
+        "observed_flux": 9.72e-7,
+        "electron_correction": 0.00015,
+        "electron_contaminaton": false,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 9.88e-7,
+        "observed_flux": 9.81e-7,
+        "electron_correction": 0.00023,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 9.95e-7,
+        "observed_flux": 9.90e-7,
+        "electron_correction": 0.00018,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 1.25e-6,
+        "observed_flux": 1.20e-6,
+        "electron_correction": 0.00025,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 2.34e-6,
+        "observed_flux": 2.30e-6,
+        "electron_correction": 0.00028,
+        "electron_contaminaton": true,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 3.45e-6,
+        "observed_flux": 3.40e-6,
+        "electron_correction": 0.00022,
+        "electron_contaminaton": false,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 4.56e-6,
+        "observed_flux": 4.50e-6,
+        "electron_correction": 0.00031,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 5.67e-6,
+        "observed_flux": 5.61e-6,
+        "electron_correction": 0.00029,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 6.78e-6,
+        "observed_flux": 6.72e-6,
+        "electron_correction": 0.00035,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 7.89e-6,
+        "observed_flux": 7.85e-6,
+        "electron_correction": 0.00033,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 8.12e-6,
+        "observed_flux": 8.05e-6,
+        "electron_correction": 0.00038,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 9.23e-6,
+        "observed_flux": 9.18e-6,
+        "electron_correction": 0.00041,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 9.88e-6,
+        "observed_flux": 9.82e-6,
+        "electron_correction": 0.00039,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 1.15e-5,
+        "observed_flux": 1.10e-5,
+        "electron_correction": 0.00045,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 1.56e-5,
+        "observed_flux": 1.50e-5,
+        "electron_correction": 0.00042,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 2.34e-5,
+        "observed_flux": 2.29e-5,
+        "electron_correction": 0.00048,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 2.88e-5,
+        "observed_flux": 2.82e-5,
+        "electron_correction": 0.00044,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 3.45e-5,
+        "observed_flux": 3.40e-5,
+        "electron_correction": 0.00051,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 4.12e-5,
+        "observed_flux": 4.05e-5,
+        "electron_correction": 0.00055,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 4.77e-5,
+        "observed_flux": 4.70e-5,
+        "electron_correction": 0.00059,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 5.34e-5,
+        "observed_flux": 5.28e-5,
+        "electron_correction": 0.00062,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 5.99e-5,
+        "observed_flux": 5.91e-5,
+        "electron_correction": 0.00058,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 6.45e-5,
+        "observed_flux": 6.40e-5,
+        "electron_correction": 0.00065,
+        "electron_contaminaton": false,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 7.12e-5,
+        "observed_flux": 7.05e-5,
+        "electron_correction": 0.00061,
+        "electron_contaminaton": true,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 7.88e-5,
+        "observed_flux": 7.81e-5,
+        "electron_correction": 0.00068,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 8.34e-5,
+        "observed_flux": 8.29e-5,
+        "electron_correction": 0.00072,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 9.15e-5,
+        "observed_flux": 9.10e-5,
+        "electron_correction": 0.00075,
+        "electron_contaminaton": false,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 9.85e-5,
+        "observed_flux": 9.80e-5,
+        "electron_correction": 0.00071,
+        "electron_contaminaton": true,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 1.15e-4,
+        "observed_flux": 1.10e-4,
+        "electron_correction": 0.00085,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 1.45e-4,
+        "observed_flux": 1.40e-4,
+        "electron_correction": 0.00081,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 2.12e-4,
+        "observed_flux": 2.05e-4,
+        "electron_correction": 0.00092,
+        "electron_contaminaton": true,
+        "energy": "0.05-0.4nm"
+    },
+    {
+        "satellite": 18,
+        "flux": 3.45e-4,
+        "observed_flux": 3.40e-4,
+        "electron_correction": 0.00095,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    },
+    {
+        "satellite": 16,
+        "flux": 4.55e-4,
+        "observed_flux": 4.50e-4,
+        "electron_correction": 0.00099,
+        "electron_contaminaton": false,
+        "energy": "0.1-0.8nm"
+    }
+]

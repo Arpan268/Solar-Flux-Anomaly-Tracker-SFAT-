@@ -1,9 +1,12 @@
 import axios from 'axios'
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/authContext"
+import { useEffect, useState } from 'react'
 
 export default function Navbar() {
     const { auth, setAuth } = useAuth()
+    const [dataSource, setDataSource] = useState('')
+    const [error, setError] = useState('')
     const navigate = useNavigate()
 
     async function handleLogout() {
@@ -16,13 +19,48 @@ export default function Navbar() {
         }
     }
 
+    useEffect(() => {
+        if (!(auth as any)?.accessToken) return;
+
+        async function fetchDataSource() {
+            try {
+                const res = await axios.get('/api/user/shared/data-source', {
+                    headers: { Authorization: `Bearer ${(auth as any).accessToken}` },
+                    withCredentials: true
+                });
+                setDataSource(res.data.dataSource);
+                setError('');
+            } catch (err) {
+                console.error('Failed to fetch data source:', err);
+                setError('Failed to fetch data source');
+            }
+        }
+
+        fetchDataSource();
+    }, [auth]);
+
     return (
         <nav className="bg-gray-900 py-5 px-6 text-slate-200">
             <div className="container mx-auto flex justify-between items-center">
 
-                <Link to="/" className="text-xl font-bold text-white tracking-widest">
-                    SFAT
-                </Link>
+                <div className="flex items-center gap-6">
+                    <Link to="/" className="text-xl font-bold text-white tracking-widest">
+                        SFAT
+                    </Link>
+
+                    {(auth?.accessToken && error) ? (
+                        <div className="flex items-center gap-1.5 text-sm font-medium text-red-500">
+                            <span className="animate-pulse text-lg">•</span>
+                            <span>{error}</span>
+                        </div>
+                    ) : (auth?.accessToken && dataSource) && (
+                        <div className={`flex items-center gap-1.5 text-sm font-medium uppercase tracking-widest ${dataSource === 'live' ? 'text-emerald-400' : 'text-yellow-400'
+                            }`}>
+                            <span className="animate-pulse text-lg">•</span>
+                            <span>data source: {dataSource}</span>
+                        </div>
+                    )}
+                </div>
 
                 <div className="flex items-center gap-10 mr-5">
 

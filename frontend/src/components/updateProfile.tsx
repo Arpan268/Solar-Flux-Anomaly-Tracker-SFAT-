@@ -135,7 +135,7 @@ export default function UpdateProfile() {
                         </button>
                         <button
                             type="button"
-                            onClick={() => navigate("/profile")}
+                            onClick={() => navigate(`/${auth?.role}/view-profile`)}
                             className="bg-gray-800 cursor-pointer text-slate-300 border border-gray-700 font-semibold px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
                         >
                             Cancel
