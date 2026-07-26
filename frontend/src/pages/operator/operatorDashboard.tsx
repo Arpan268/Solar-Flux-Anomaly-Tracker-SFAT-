@@ -102,8 +102,10 @@ export default function OperatorDashboard() {
             if (remainingMs <= 0) {
                 setShiftTimeRemaining("0h 0m 0s");
 
-                alert("Your shift has ended. You have been automatically logged out.");
-                logout()
+                setTimeout(() => {
+                    alert("Your shift has ended. You have been automatically logged out.");
+                    logout()
+                }, 100)
             } else {
                 const h = Math.floor(remainingMs / 3600000);
                 const m = Math.floor((remainingMs % 3600000) / 60000);
