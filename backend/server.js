@@ -16,6 +16,11 @@ app.use(cors({
 }))
 app.use(cookieParser())
 
+app.use(cors({
+    origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
+    credentials: true
+}))     //for deployment
+
 app.get('/api/health', (req, res) => res.status(200).send('OK'))
 
 app.use('/api/auth', authRoutes)
