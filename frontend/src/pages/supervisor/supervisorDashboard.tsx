@@ -7,6 +7,7 @@ export default function SupervisorDashboard() {
     const { auth } = useAuth();
     const navigate = useNavigate();
     const [summary, setSummary] = useState<any>(null);
+    const [isStreamActive, setIsStreamActive] = useState<boolean>(false);
 
     const supervisorName = (auth as any)?.username || "Supervisor";
 
@@ -25,6 +26,27 @@ export default function SupervisorDashboard() {
         fetchSummary();
     }, [auth]);
 
+    useEffect(() => {
+        if (!auth?.accessToken) return;
+        const eventSource = new EventSource(`/api/user/supervisor/live-data?token=${auth.accessToken}`);
+
+        eventSource.onopen = () => {
+            setIsStreamActive(true);
+        };
+
+        eventSource.onmessage = () => {
+            setIsStreamActive(true);
+        };
+
+        eventSource.onerror = () => {
+            setIsStreamActive(false);
+        };
+
+        return () => {
+            eventSource.close();
+        };
+    }, [auth]);
+
     return (
         <div className="max-w-7xl mx-auto mt-12 p-6">
             <div className="mb-12">
@@ -35,10 +57,15 @@ export default function SupervisorDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                 <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
                     <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Telemetry Stream</p>
-                    <div className="flex items-center gap-2">
+                    {isStreamActive ? <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         <p className="text-emerald-400 font-bold">ONLINE & NOMINAL</p>
                     </div>
+                        :
+                        <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                            <p className="text-red-400 font-bold">OFFLINE & INACTIVE</p>
+                        </div>}
                 </div>
                 <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
                     <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Database Connection</p>

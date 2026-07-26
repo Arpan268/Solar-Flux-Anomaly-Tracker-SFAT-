@@ -7,6 +7,7 @@ import { sendInstructions } from '../utility/supervisor/sendInstructions.js'
 import { deleteOperator } from '../utility/supervisor/deleteOperators.js'
 import { viewInstructions } from '../utility/supervisor/viewInstructions.js'
 import { getAllShifts, bulkReassignShifts } from '../utility/supervisor/manageShifts.js'
+import { handleLiveData } from '../utility/operator/handleLiveData.js'
 
 const router = express.Router()
 
@@ -20,5 +21,6 @@ router.post('/send-instruction', sendInstructions)
 router.get('/view-instructions', viewInstructions)
 router.get('/shifts', getAllShifts)
 router.put('/bulk-reassign-shifts', bulkReassignShifts)
+router.get('/live-data', handleLiveData)
 
 export default router
