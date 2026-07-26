@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://REPLACE_WITH_RENDER_URL.onrender.com/api/:path*"
+            "destination": "https://solar-flux-anomaly-tracker-sfat.onrender.com/api/:path*"
         },
         {
             "source": "/(.*)",
