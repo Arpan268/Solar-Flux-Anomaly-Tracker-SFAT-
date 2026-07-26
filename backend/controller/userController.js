@@ -1,6 +1,15 @@
 import User from '../models/users.js'
 import Shift from '../models/shifts.js'
 import bcrypt from 'bcryptjs'
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'sfat.notification@gmail.com',
+        pass: process.env.PASS
+    }
+});
 
 export async function getUsers(req, res) {
     try {
@@ -169,5 +178,50 @@ export async function deleteProfile(req, res) {
 
     catch (err) {
         return res.status(500).json({ message: 'Server error' })
+    }
+}
+
+export async function adminSendEmail(data) {
+    const newUser = data.userWithoutPassword
+    console.log(`🔔 Registration event received for: ${newUser.username}`);
+
+    try {
+        const admins = await User.find({
+            role: 'Admin',
+            email: { $exists: true, $ne: null }
+        });
+
+        if (admins.length === 0) {
+            console.log('No admins found to receive the registration alert.');
+            return;
+        }
+
+        const adminEmails = admins.map(admin => admin.email);
+
+        const mailOptions = {
+            from: 'sfat.notification@gmail.com',
+            bcc: adminEmails,
+            subject: `🔔 Action Required: New ${newUser.role} Registration`,
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #3b82f6; border-radius: 8px;">
+                    <h2 style="color: #3b82f6;">New User Registration Pending Approval</h2>
+                    <p>A new user has registered and is currently in <strong>Pending</strong> status. They require admin approval to access the system.</p>
+                    <h3>User Details:</h3>
+                    <ul>
+                        <li><strong>Username:</strong> ${newUser.username}</li>
+                        <li><strong>Email:</strong> ${newUser.email}</li>
+                        <li><strong>Role Requested:</strong> ${newUser.role}</li>
+                        <li><strong>System ID:</strong> ${newUser.userId}</li>
+                    </ul>
+                    <p>Please log in to the SFAT Admin Dashboard to approve or reject this request.</p>
+                </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log('✅ Admin registration alert email sent successfully to:', adminEmails);
+
+    } catch (error) {
+        console.error('❌ Error sending admin registration email:', error);
     }
 }

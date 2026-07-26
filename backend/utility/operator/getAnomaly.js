@@ -15,12 +15,19 @@ export async function getAnomaly(data) {
         classification = 'C-Class Flare'
     }
 
-    if (classification !== 'Normal' && classification !== currentFlareClass) {
-        currentFlareClass = classification
-        criticalEvent.emit('critical-event', { ...data, classification })
-    }
+    if (process.env.DATA_SOURCE === 'mock') {
+        if (classification !== 'Normal') {
+            criticalEvent.emit('critical-event', { ...data, classification });
+        }
 
-    else if (classification === 'Normal' && currentFlareClass !== 'Normal') {
-        currentFlareClass = 'Normal'
+    } else {
+
+        if (classification !== 'Normal' && classification !== currentFlareClass) {
+            currentFlareClass = classification;
+            criticalEvent.emit('critical-event', { ...data, classification });
+        } else if (classification === 'Normal' && currentFlareClass !== 'Normal') {
+            currentFlareClass = 'Normal';
+        }
+
     }
 }

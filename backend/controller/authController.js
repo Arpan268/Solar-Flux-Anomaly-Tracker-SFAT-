@@ -1,6 +1,7 @@
 import User from '../models/users.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import { criticalEvent } from '../events/addEvents.js'
 
 function getCookieOptions(maxAge) {
     return {
@@ -33,6 +34,10 @@ export async function register(req, res) {
             password: hashedPassword
         })
         await user.save()
+
+        const { password: dbPassword, ...userWithoutPassword } = user.toObject()
+        criticalEvent.emit('admin-email', { userWithoutPassword })
+
         res.status(201).json({
             message: 'User successfully registered',
             userId: user.userId,

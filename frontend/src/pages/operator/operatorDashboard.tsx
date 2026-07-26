@@ -144,7 +144,12 @@ export default function OperatorDashboard() {
         eventSource.addEventListener("anomaly_alert", (event) => {
             try {
                 const alertData = JSON.parse(event.data);
-                setAnomalyData(alertData);
+
+                if (alertData._doc) {
+                    setAnomalyData({ ...alertData._doc, classification: alertData.classification });
+                } else {
+                    setAnomalyData(alertData);
+                }
             } catch (err) {
                 console.error(err);
             }

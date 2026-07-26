@@ -3,7 +3,7 @@ import logo from '../../assets/logo.png';
 
 export default function Landing() {
     return (
-        <div className="min-h-screen bg-gray-900 text-slate-200 flex flex-col items-center pt-10 px-8">
+        <div className="min-h-screen bg-gray-900 text-slate-200 flex flex-col items-center pt-10 px-8 pb-10">
             <div className="max-w-5xl w-full text-center space-y-8">
 
                 <img src={logo} alt="SFAT Logo" className="mx-auto w-92 h-48 hover:drop-shadow-[0_0_12px_rgba(59,130,246,0.5)] transition-all ease-out hover:scale-105 transform duration-300" />
