@@ -1,5 +1,5 @@
 import express from 'express'
-import { viewLiveData } from '../utility/analyst/viewLivedata.js'
+import { viewLiveData } from '../utility/analyst/viewLiveData.js'
 import { viewAnomalies } from '../utility/analyst/viewAnomalies.js'
 import { downloadData } from '../utility/analyst/downloadData.js'
 import { viewDiagrams } from '../utility/analyst/viewDiagrams.js'
