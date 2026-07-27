@@ -8,6 +8,7 @@ export default function SupervisorDashboard() {
     const navigate = useNavigate();
     const [summary, setSummary] = useState<any>(null);
     const [isStreamActive, setIsStreamActive] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null)
 
     const supervisorName = (auth as any)?.username || "Supervisor";
 
@@ -32,14 +33,17 @@ export default function SupervisorDashboard() {
 
         eventSource.onopen = () => {
             setIsStreamActive(true);
+            setError(null)
         };
 
         eventSource.onmessage = () => {
             setIsStreamActive(true);
+            setError(null)
         };
 
         eventSource.onerror = () => {
             setIsStreamActive(false);
+            setError('OFFLINE & INACTIVE')
         };
 
         return () => {
@@ -57,15 +61,19 @@ export default function SupervisorDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                 <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
                     <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Telemetry Stream</p>
-                    {isStreamActive ? <div className="flex items-center gap-2">
+                    {error && (<div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                        <p className="text-red-400 font-bold">{error}</p>
+                    </div>)}
+                    {isStreamActive ? (<div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         <p className="text-emerald-400 font-bold">ONLINE & NOMINAL</p>
-                    </div>
+                    </div>)
                         :
-                        <div className="flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-                            <p className="text-red-400 font-bold">OFFLINE & INACTIVE</p>
-                        </div>}
+                        !error && (<div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 animate-pulse"></span>
+                            <p className="text-yellow-400 font-bold">LOADING STATUS...</p>
+                        </div>)}
                 </div>
                 <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
                     <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Database Connection</p>

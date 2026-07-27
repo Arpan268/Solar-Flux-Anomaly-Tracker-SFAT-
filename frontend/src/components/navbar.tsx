@@ -43,7 +43,7 @@ export default function Navbar() {
         <nav className="bg-gray-900 py-5 px-6 text-slate-200">
             <div className="container mx-auto flex justify-between items-center">
 
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-6 mr-8">
                     <Link to="/" className="text-xl font-bold text-white tracking-widest">
                         SFAT
                     </Link>
