@@ -51,10 +51,10 @@ SFAT is engineered using a decoupled client-server architecture designed for hig
 ┌────────────────────────────────────────────────────────────────────────┐
 │                        BACKEND (Render Node.js)                        │
 │                                                                        │
-│   ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐   │
-│   │ Auth Controller  │  │ User Controller  │  │ Anomaly Streamer │   │
-│   │ (JWT / Cookies)  │  │ (RBAC Management)│  │ (SSE Event Loop) │   │
-│   └────────┬─────────┘  └────────┬─────────┘  └────────┬─────────┘   │
+│   ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐     │
+│   │ Auth Controller  │  │ User Controller  │  │ Anomaly Streamer │     │
+│   │ (JWT / Cookies)  │  │ (RBAC Management)│  │ (SSE Event Loop) │     │
+│   └────────┬─────────┘  └────────┬─────────┘  └────────┬─────────┘     │
 └────────────┼─────────────────────┼─────────────────────┼───────────────┘
              │                     │                     │
              ▼                     ▼                     ▼
