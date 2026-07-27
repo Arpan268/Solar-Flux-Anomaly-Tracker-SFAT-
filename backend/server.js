@@ -1,4 +1,4 @@
-require('dns').setDefaultResultOrder('ipv4first');
+import dns from 'dns';
 import express from 'express'
 import 'dotenv/config'
 import { connectDB } from './config/db.js'
@@ -7,14 +7,12 @@ import cookieParser from 'cookie-parser'
 import authRoutes from './routes/auth.js'
 import userRoutes from './routes/users.js'
 
+dns.setDefaultResultOrder('ipv4first');
+
 const app = express()
 const PORT = process.env.PORT || 5000
 
 app.use(express.json())
-app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true
-}))
 app.use(cookieParser())
 
 app.use(cors({
