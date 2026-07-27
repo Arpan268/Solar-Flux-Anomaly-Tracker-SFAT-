@@ -1,13 +1,7 @@
-import nodemailer from 'nodemailer';
 import User from '../../models/users.js';
+import sgMail from '@sendgrid/mail'
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'sfat.notification@gmail.com',
-        pass: process.env.PASS
-    }
-});
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 export async function createAlert(data) {
     console.log('🚨 Solar Flare detected with details: ', data);
@@ -49,7 +43,7 @@ export async function createAlert(data) {
 
         const mailOptions = {
             from: 'sfat.notification@gmail.com',
-            bcc: emailList,
+            to: emailList,
             subject: `🚨 URGENT: ${data.classification} Solar Flare Detected!`,
             html: `
                 <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #ff4d4d; border-radius: 8px;">
@@ -67,7 +61,7 @@ export async function createAlert(data) {
             `
         };
 
-        await transporter.sendMail(mailOptions);
+        await sgMail.send(mailOptions);
         console.log('✅ Alert email sent successfully to active operators:', emailList);
 
     } catch (error) {

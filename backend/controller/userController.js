@@ -1,15 +1,9 @@
 import User from '../models/users.js'
 import Shift from '../models/shifts.js'
 import bcrypt from 'bcryptjs'
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail'
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'sfat.notification@gmail.com',
-        pass: process.env.PASS
-    }
-});
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 export async function getUsers(req, res) {
     try {
@@ -200,7 +194,7 @@ export async function adminSendEmail(data) {
 
         const mailOptions = {
             from: 'sfat.notification@gmail.com',
-            bcc: adminEmails,
+            to: adminEmails,
             subject: `🔔 Action Required: New ${newUser.role} Registration`,
             html: `
                 <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #3b82f6; border-radius: 8px;">
@@ -219,7 +213,7 @@ export async function adminSendEmail(data) {
             `
         };
 
-        await transporter.sendMail(mailOptions);
+        await sgMail.send(mailOptions);
         console.log('✅ Admin registration alert email sent successfully to:', adminEmails);
 
     } catch (error) {
