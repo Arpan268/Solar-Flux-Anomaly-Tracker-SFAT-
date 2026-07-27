@@ -19,6 +19,7 @@ Built on the **MERN** stack (MongoDB, Express, React, Node.js), SFAT provides se
 * **Role-Based Access Control (RBAC):**
   * **Admin:** Manages platform security, reviews pending user registrations, and grants operational access.
   * **Supervisor:** Monitors telemetry streams, analyzes solar trends, tracks active anomaly alerts, and oversees operator shifts.
+  * **Analyst:** Examines historical telemetry logs, evaluates space weather data trends, and generates detailed anomaly reports.
   * **Operator:** Logs ground observations, registers critical solar flare thresholds, and manages real-time telemetry inputs.
 * **Automated Email Alert System:** Built-in SendGrid API integration sends instant notifications for:
   * Admin authorization requests upon new user registrations.
