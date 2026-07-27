@@ -120,7 +120,7 @@ export default function AnalystDashboard() {
 
             <h2 className="text-xl font-bold text-white mb-6">Analytical Tools</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div onClick={() => navigate('/analyst/view-livedata')} className="bg-gray-800/40 border border-gray-700 rounded-xl p-8 hover:bg-gray-800 hover:border-emerald-500/50 transition-all cursor-pointer shadow-lg group">
+                <div onClick={() => navigate('/analyst/view-live-data')} className="bg-gray-800/40 border border-gray-700 rounded-xl p-8 hover:bg-gray-800 hover:border-emerald-500/50 transition-all cursor-pointer shadow-lg group">
                     <div className="mb-4">
                         <span className="bg-emerald-900/30 text-emerald-400 p-3 rounded-lg inline-block">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
