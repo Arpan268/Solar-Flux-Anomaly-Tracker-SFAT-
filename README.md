@@ -129,7 +129,7 @@ ACCESS_TOKEN_SECRET=your_jwt_access_secret_key
 REFRESH_TOKEN_SECRET=your_jwt_refresh_secret_key
 PASS=your_email_app_password
 DATA_SOURCE=live
-FRONTEND_URL=[https://solar-flux-anomaly-tracker-sfat.vercel.app](https://solar-flux-anomaly-tracker-sfat.vercel.app)
+FRONTEND_URL=https://solar-flux-anomaly-tracker-sfat.vercel.app
 ```
 
 ### Render Dashboard Environment Variables
