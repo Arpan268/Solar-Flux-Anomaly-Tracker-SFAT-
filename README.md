@@ -20,7 +20,7 @@ Built on the **MERN** stack (MongoDB, Express, React, Node.js), SFAT provides se
   * **Admin:** Manages platform security, reviews pending user registrations, and grants operational access.
   * **Supervisor:** Monitors telemetry streams, analyzes solar trends, tracks active anomaly alerts, and oversees operator shifts.
   * **Operator:** Logs ground observations, registers critical solar flare thresholds, and manages real-time telemetry inputs.
-* **Automated Email Alert System:** Built-in Nodemailer integration sends instant notifications for:
+* **Automated Email Alert System:** Built-in SendGrid API integration sends instant notifications for:
   * Admin authorization requests upon new user registrations.
   * Critical solar flare triggers exceeding safety thresholds (W/m²).
 * **Cold-Start Resilient UX:** Custom health-check ping mechanisms (`/api/health`) seamlessly display backend boot states while free-tier cloud instances wake up.
@@ -59,7 +59,7 @@ SFAT is engineered using a decoupled client-server architecture designed for hig
              │                     │                     │
              ▼                     ▼                     ▼
 ┌──────────────────────┐  ┌──────────────────┐  ┌────────────────────────┐
-│ MongoDB Atlas        │  │ Nodemailer SMTP  │  │ Dynamic Web Links      │
+│ MongoDB Atlas        │  │ SendGrid API     │  │ Dynamic Web Links      │
 │ - Users & Roles      │  │ - Admin Alerts   │  │ - process.env          │
 │ - Anomaly Logs       │  │ - Flare Warnings │  │   FRONTEND_URL         │
 └──────────────────────┘  └──────────────────┘  └────────────────────────┘
@@ -70,7 +70,7 @@ SFAT is engineered using a decoupled client-server architecture designed for hig
 1. **Frontend Layer (Vercel):** Built with React, TypeScript/Vite, and Tailwind CSS. Static assets are served globally via Vercel’s Edge Network. Single-page app routing is managed by `vercel.json` rewrite rules to prevent `404` errors on deep route refreshes.
 2. **Backend API Layer (Render):** Express.js app running on Node.js hosting secure RESTful endpoints and real-time SSE stream outputs.
 3. **Database Layer (MongoDB Atlas):** Document storage for users, operational logs, and solar flare telemetry history.
-4. **Notification Engine:** SMTP transporter integration pushing dynamic HTML email alerts directly to admins and operators on shift.
+4. **Notification Engine:** SendGrid API integration pushing dynamic HTML email alerts directly to admins and operators on shift.
 
 ---
 
@@ -81,7 +81,7 @@ SFAT is engineered using a decoupled client-server architecture designed for hig
 | **Frontend** | React, Vite, TypeScript/JavaScript, Tailwind CSS, Axios, Lucide Icons |
 | **Backend** | Node.js, Express.js, JSON Web Tokens (JWT), Cookie-Parser, Cors, Dotenv |
 | **Database** | MongoDB, Mongoose ODM |
-| **Notifications** | Nodemailer (SMTP Transporter with dynamic HTML templating) |
+| **Notifications** | SendGrid (@sendgrid/mail API with dynamic HTML templating) |
 | **Hosting & DevOps** | Vercel (Frontend), Render (Backend), GitHub |
 
 ---
@@ -127,7 +127,7 @@ PORT=5000
 MONGO_URI=your_mongodb_cluster_connection_string
 ACCESS_TOKEN_SECRET=your_jwt_access_secret_key
 REFRESH_TOKEN_SECRET=your_jwt_refresh_secret_key
-PASS=your_email_app_password
+SENDGRID_API_KEY=your_sendgrid_api_key
 DATA_SOURCE=live
 FRONTEND_URL=https://solar-flux-anomaly-tracker-sfat.vercel.app
 ```
@@ -137,7 +137,7 @@ Ensure the following variables are configured under your Render service **Enviro
 * `ACCESS_TOKEN_SECRET`
 * `REFRESH_TOKEN_SECRET`
 * `MONGO_URI`
-* `PASS`
+* `SENDGRID_API_KEY`
 * `DATA_SOURCE`
 * `FRONTEND_URL` = `https://solar-flux-anomaly-tracker-sfat.vercel.app` *(no trailing slash)*
 
@@ -206,7 +206,7 @@ The frontend will launch at `http://localhost:5173`.
 ## 🔒 Security Best Practices Implemented
 
 * **Dynamic Origin Matching:** CORS policy dynamically targets `process.env.FRONTEND_URL` while allowing local fallback (`http://localhost:5173`) during development.
-* **Separation of Secrets:** API keys, database credentials, and SMTP authentication passwords are fully isolated inside environment configurations.
+* **Separation of Secrets:** API keys, database credentials, and SendGrid API keys are fully isolated inside environment configurations.
 * **Protected Routes:** Frontend routes verify JWT access token claims before mounting privileged admin or operator dashboard interfaces.
 
 ---
