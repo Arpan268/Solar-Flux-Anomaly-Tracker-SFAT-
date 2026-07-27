@@ -56,7 +56,11 @@ export async function createAlert(data) {
                         <li><strong>Time (UTC):</strong> ${data.time_tag}</li>
                     </ul>
                     <p>Please log this anomaly in the SFAT Dashboard immediately.</p>
-                    <p><a href='${process.env.FRONTEND_URL}' target='_blank>Click here to open the website</a></p>
+                    <p style="margin-top: 30px;">
+                        <a href="${process.env.FRONTEND_URL}" target="_blank" style="background-color: #1a1a1a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; border: 1px solid #333333; font-weight: bold; display: inline-block; letter-spacing: 0.5px;">
+                            Open SFAT Dashboard
+                        </a>
+                    </p>
                 </div>
             `
         };

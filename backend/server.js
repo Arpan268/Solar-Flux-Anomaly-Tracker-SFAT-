@@ -1,4 +1,3 @@
-import dns from 'dns';
 import express from 'express'
 import 'dotenv/config'
 import { connectDB } from './config/db.js'
@@ -6,8 +5,6 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import authRoutes from './routes/auth.js'
 import userRoutes from './routes/users.js'
-
-dns.setDefaultResultOrder('ipv4first');
 
 const app = express()
 const PORT = process.env.PORT || 5000
