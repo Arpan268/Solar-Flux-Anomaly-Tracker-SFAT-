@@ -55,7 +55,7 @@ export default function AnalystDashboard() {
         <div className="max-w-7xl mx-auto mt-12 p-6">
             <div className="mb-12">
                 <h1 className="text-4xl font-extrabold text-white tracking-tight">Analysis Center</h1>
-                <p className="text-slate-400 mt-2 text-lg">Welcome back, {analystName}. Telemetry processing and visualization tools are online.</p>
+                <p className="text-slate-400 mt-2 text-lg">Welcome back, {analystName}. Telemetry data and visualization tools are ready for analysis.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
