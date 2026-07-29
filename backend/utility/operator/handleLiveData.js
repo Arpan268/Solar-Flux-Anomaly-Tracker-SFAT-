@@ -25,6 +25,10 @@ export async function handleLiveData(req, res) {
         }
         criticalEvent.on('new_instruction', instructionListener)
 
+        if (initialData) {
+            getAnomaly(initialData)
+        }
+
         const intervalId = setInterval(async () => {
             const latestData = await liveData()
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Outlet } from 'react-router-dom';
 import Navbar from './components/navbar';
 import PublicRoute from './components/publicRoute';
 import PrivateRoute from './components/privateRoute';
@@ -29,6 +29,7 @@ import AnalystViewGraphs from './pages/analyst/viewGraphs';
 import AdminDashboard from './pages/admin/adminDashboard';
 import ManageUsers from './pages/admin/manageUsers';
 import UpdateProfile from './components/updateProfile';
+import { AnomalyProvider } from './context/anomalyProvider';
 
 export default function App() {
   const [isServerAwake, setIsServerAwake] = useState(false);
@@ -83,41 +84,47 @@ export default function App() {
         } />
 
         {/* Operator Routes */}
-        <Route path="/operator" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <OperatorDashboard />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/view-anomalies" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <OperatorViewAnomalies />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/log-anomaly" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <OperatorLogAnomalies />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/update-anomaly/:id" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <UpdateAnomaly />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/view-instructions" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <OperatorInstructions />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/view-profile" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <ViewProfile />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/profile/update/:userId" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <UpdateProfile />
-          </PrivateRoute>
-        } />
+        <Route element={
+          <AnomalyProvider>
+            <Outlet />
+          </AnomalyProvider>
+        }>
+          <Route path="/operator" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <OperatorDashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/view-anomalies" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <OperatorViewAnomalies />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/log-anomaly" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <OperatorLogAnomalies />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/update-anomaly/:id" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <UpdateAnomaly />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/view-instructions" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <OperatorInstructions />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/view-profile" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <ViewProfile />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/profile/update/:userId" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <UpdateProfile />
+            </PrivateRoute>
+          } />
+        </Route>
 
         {/* Supervisor Routes */}
         <Route path="/supervisor" element={

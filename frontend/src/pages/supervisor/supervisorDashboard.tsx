@@ -88,35 +88,47 @@ export default function SupervisorDashboard() {
                 </div>
             </div>
 
-            <p className="text-slate-400 mt-2 text-lg mb-5">Summary of recent activities of last 24 hours and key metrics.</p>
-            {summary && (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-                    <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
-                        <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Total Anomalies</p>
-                        <p className="text-2xl text-white font-bold">{summary.totalAnomalies}</p>
-                    </div>
-                    <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
-                        <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Peak Flux (24h)</p>
-                        <p className="text-2xl text-blue-400 font-bold">
-                            {summary.peakFlux ? summary.peakFlux.toExponential(2) : "0"}
-                        </p>
-                    </div>
-                    <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
-                        <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Max Severity</p>
-                        <p className={`text-xl font-bold ${summary.maxSeverity.includes('X') ? 'text-red-500' : summary.maxSeverity.includes('M') ? 'text-orange-400' : 'text-emerald-400'}`}>
-                            {summary.maxSeverity}
-                        </p>
-                    </div>
-                    <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
-                        <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Breakdown</p>
-                        <div className="flex gap-3 text-sm font-semibold mt-1">
-                            <span className="text-emerald-400">C: {summary.breakdown.cClass}</span>
-                            <span className="text-orange-400">M: {summary.breakdown.mClass}</span>
-                            <span className="text-red-500">X: {summary.breakdown.xClass}</span>
+            {summary &&
+                <div>
+                    <p className="text-slate-400 mt-2 text-lg mb-5">Summary of recent activities of last 24 hours and key metrics.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                        <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
+                            <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Total Anomalies</p>
+                            <p className="text-2xl text-white font-bold">{summary.totalAnomalies}</p>
+                            {summary.pendingCount > 0 ? (
+                                <span className="text-sm font-medium text-amber-500/90 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 flex items-center gap-1 mt-1.75">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
+                                    {summary.pendingCount} Pending {summary.pendingCount === 1 ? 'Review' : 'Reviews'}
+                                </span>
+                            ) : (
+                                <span className="text-sm font-medium text-emerald-500/90 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1 mt-1.75">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    Acknowledged
+                                </span>
+                            )}
+                        </div>
+                        <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
+                            <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Peak Flux (24h)</p>
+                            <p className="text-2xl text-blue-400 font-bold">
+                                {summary.peakFlux ? summary.peakFlux.toExponential(2) : "0"}
+                            </p>
+                        </div>
+                        <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
+                            <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Max Severity</p>
+                            <p className={`text-xl font-bold ${summary.maxSeverity.includes('X') ? 'text-red-500' : summary.maxSeverity.includes('M') ? 'text-orange-400' : 'text-emerald-400'}`}>
+                                {summary.maxSeverity}
+                            </p>
+                        </div>
+                        <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
+                            <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Breakdown</p>
+                            <div className="flex gap-3 text-sm font-semibold mt-1">
+                                <span className="text-emerald-400">C: {summary.breakdown.cClass}</span>
+                                <span className="text-orange-400">M: {summary.breakdown.mClass}</span>
+                                <span className="text-red-500">X: {summary.breakdown.xClass}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                </div>}
 
             <h2 className="text-xl font-bold text-white mb-6">Quick Actions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

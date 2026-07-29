@@ -8,15 +8,10 @@ export async function viewUnacknowledgedAnomalies(req, res) {
 
     const fetchAndSend = async () => {
         try {
-            const page = parseInt(req.query.page) || 1
-            const limit = parseInt(req.query.limit) || 6
-            const skip = (page - 1) * limit
-
             const filter = { isAcknowledged: false, source: process.env.DATA_SOURCE }
-            const total = await Anomaly.countDocuments(filter)
-            const anomalies = await Anomaly.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 })
+            const anomalies = await Anomaly.find(filter).sort({ createdAt: -1 })
 
-            res.write(`data: ${JSON.stringify({ anomalies, total, totalPages: Math.ceil(total / limit), currentPage: page })}\n\n`)
+            res.write(`data: ${JSON.stringify({ anomalies })}\n\n`)
         } catch (err) {
             console.error(err)
         }

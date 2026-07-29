@@ -2,21 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../context/authContext";
-
-interface LiveData {
-    _id: string;
-    time_tag: string;
-    satellite: number;
-    flux: number;
-    observed_flux: number;
-    electron_correction: number;
-    electron_contaminaton: boolean;
-    energy: string;
-}
-
-interface AnomalyData extends LiveData {
-    classification: string;
-}
+import { useAnomaly, type AnomalyData } from "../../context/anomalyProvider";
 
 interface ShiftDetails {
     startTime: string;
@@ -27,11 +13,7 @@ export default function OperatorDashboard() {
     const { auth, logout } = useAuth();
     const navigate = useNavigate();
 
-    const [liveData, setLiveData] = useState<LiveData[]>([]);
-    const [anomalyData, setAnomalyData] = useState<AnomalyData | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [countdown, setCountdown] = useState<number>(60);
-    const [currentTime, setCurrentTime] = useState<Date>(new Date());
+    const { liveData, anomalyData, error, countdown, currentTime, removeAnomaly } = useAnomaly();
 
     const [shift, setShift] = useState<ShiftDetails | null>(null);
     const [shiftTimeRemaining, setShiftTimeRemaining] = useState<string>("");
@@ -73,6 +55,11 @@ export default function OperatorDashboard() {
             }
         }
         checkUnreadInstructions();
+
+        const handleNewInstruction = () => setHasUnreadInstructions(true);
+        window.addEventListener("new_instruction_alert", handleNewInstruction);
+
+        return () => window.removeEventListener("new_instruction_alert", handleNewInstruction);
     }, [auth]);
 
     useEffect(() => {
@@ -101,11 +88,10 @@ export default function OperatorDashboard() {
 
             if (remainingMs <= 0) {
                 setShiftTimeRemaining("0h 0m 0s");
-
                 setTimeout(() => {
                     alert("Your shift has ended. You have been automatically logged out.");
-                    logout()
-                }, 100)
+                    logout();
+                }, 100);
             } else {
                 const h = Math.floor(remainingMs / 3600000);
                 const m = Math.floor((remainingMs % 3600000) / 60000);
@@ -120,71 +106,7 @@ export default function OperatorDashboard() {
         return () => clearInterval(timer);
     }, [shift]);
 
-    useEffect(() => {
-        if (!auth?.accessToken) return;
-
-        const eventSource = new EventSource(`/api/user/operator/live-data?token=${auth.accessToken}`);
-
-        eventSource.onmessage = (event) => {
-            try {
-                const payload = JSON.parse(event.data);
-                const parsedData = Array.isArray(payload) ? payload : [payload];
-
-                setLiveData(parsedData);
-                setError(null);
-                setCountdown(60);
-                setCurrentTime(new Date());
-
-                if (parsedData.length > 0 && parsedData[0].flux < 0.000001) {
-                    setAnomalyData(null);
-                }
-            } catch (err) {
-                setError("Failed to parse live telemetry stream.");
-            }
-        };
-
-        eventSource.addEventListener("anomaly_alert", (event) => {
-            try {
-                const alertData = JSON.parse(event.data);
-
-                if (alertData._doc) {
-                    setAnomalyData({ ...alertData._doc, classification: alertData.classification });
-                } else {
-                    setAnomalyData(alertData);
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        });
-
-        eventSource.addEventListener("new_instruction", () => {
-            setHasUnreadInstructions(true);
-        });
-
-        eventSource.onerror = () => {
-            setError("Connection to live telemetry lost. Attempting to reconnect...");
-        };
-
-        return () => {
-            eventSource.close();
-        };
-    }, [auth]);
-
     const latestData = liveData.length > 0 ? liveData[0] : null;
-
-    useEffect(() => {
-        if (!latestData) {
-            setCountdown(60);
-            return;
-        }
-
-        const timer = setInterval(() => {
-            setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
-            setCurrentTime(new Date());
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [latestData]);
 
     const getDataAge = () => {
         if (!latestData) return 0;
@@ -193,15 +115,15 @@ export default function OperatorDashboard() {
         return Math.floor(ageMs / 1000);
     };
 
-    function handleLogAnomaly() {
-        if (!anomalyData) return;
-
+    function handleLogAnomaly(anomaly: AnomalyData) {
         const anomalyPayload = {
-            time_tag: anomalyData.time_tag,
-            flux: anomalyData.flux,
-            classification: anomalyData.classification,
-            electron_contamination: anomalyData.electron_contaminaton,
+            time_tag: anomaly.time_tag,
+            flux: anomaly.flux,
+            classification: anomaly.classification,
+            electron_contaminaton: anomaly.electron_contaminaton,
         };
+
+        removeAnomaly(anomaly.time_tag);
 
         navigate("/operator/log-anomaly", {
             state: anomalyPayload
@@ -226,26 +148,6 @@ export default function OperatorDashboard() {
             {error && (
                 <div className="bg-red-900/30 border border-red-500/50 text-red-400 p-4 rounded-lg mb-6">
                     {error}
-                </div>
-            )}
-
-            {anomalyData && (
-                <div className="bg-red-900/20 border border-red-600/50 rounded-xl p-6 shadow-lg shadow-red-900/20 flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
-                    <div>
-                        <h3 className="text-xl font-bold text-red-500 mb-2">
-                            Critical {anomalyData.classification} Detected
-                        </h3>
-                        <p className="text-red-400/80 text-sm">
-                            Telemetry recorded a flux level of {anomalyData.flux.toExponential(2)} at {new Date(anomalyData.time_tag).toLocaleTimeString()}. This requires immediate logging.
-                        </p>
-                    </div>
-
-                    <button
-                        onClick={handleLogAnomaly}
-                        className="w-full sm:w-auto cursor-pointer whitespace-nowrap bg-red-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors"
-                    >
-                        Log Anomaly
-                    </button>
                 </div>
             )}
 
@@ -281,22 +183,22 @@ export default function OperatorDashboard() {
                         <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
                             <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Observation Time (IST)</p>
                             <p className="text-slate-200 font-medium">{new Date(latestData.time_tag).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
-                            <p className="text-xs text-yellow-400 mt-1">Data age: {getDataAge()}s</p>
+                            <p className="text-yellow-400 mt-1 text-xs">Data age: {getDataAge()}s</p>
                         </div>
 
                         <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50 lg:col-span-2 text-center">
                             <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Primary Flux</p>
-                            <p className="text-blue-400 font-bold text-xl">{latestData.flux.toExponential(2)}</p>
+                            <p className="text-blue-400 font-bold text-xl">{latestData.flux ? Number(latestData.flux).toExponential(2) : "N/A"}</p>
                         </div>
 
                         <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
                             <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Observed Flux</p>
-                            <p className="text-slate-300 font-medium">{latestData.observed_flux ? latestData.observed_flux.toExponential(2) : "N/A"}</p>
+                            <p className="text-slate-300 font-medium">{latestData.observed_flux ? Number(latestData.observed_flux).toExponential(2) : "N/A"}</p>
                         </div>
 
                         <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
                             <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Electron Correction</p>
-                            <p className="text-slate-300 font-medium">{latestData.electron_correction ? latestData.electron_correction.toExponential(2) : "N/A"}</p>
+                            <p className="text-slate-300 font-medium">{latestData.electron_correction ? Number(latestData.electron_correction).toExponential(2) : "N/A"}</p>
                         </div>
 
                         <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
@@ -324,6 +226,26 @@ export default function OperatorDashboard() {
                     </div>
                 )
             )}
+
+            {anomalyData.map((anomaly) => (
+                <div key={anomaly.time_tag} className="bg-red-900/20 border border-red-600/50 rounded-xl p-6 shadow-lg shadow-red-900/20 flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
+                    <div>
+                        <h3 className="text-xl font-bold text-red-500 mb-2">
+                            Critical {anomaly.classification} Detected
+                        </h3>
+                        <p className="text-red-400/80 text-sm">
+                            Telemetry recorded a flux level of {anomaly.flux ? Number(anomaly.flux).toExponential(2) : "N/A"} at {new Date(anomaly.time_tag).toLocaleTimeString()}. This requires immediate logging.
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={() => handleLogAnomaly(anomaly)}
+                        className="w-full sm:w-auto cursor-pointer whitespace-nowrap bg-red-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-red-600/30 hover:bg-red-700 transition-colors"
+                    >
+                        Log Anomaly
+                    </button>
+                </div>
+            ))}
         </div>
     );
 }
