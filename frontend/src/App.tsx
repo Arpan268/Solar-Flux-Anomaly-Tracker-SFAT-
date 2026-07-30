@@ -10,6 +10,7 @@ import Register from './pages/public/register';
 import Login from './pages/public/login';
 import AboutUs from './pages/public/aboutUs';
 
+import { AnomalyProvider } from './context/anomalyProvider';
 import OperatorDashboard from './pages/operator/operatorDashboard';
 import OperatorViewAnomalies from './pages/operator/viewAnomalies';
 import OperatorLogAnomalies from './pages/operator/logAnomalies';
@@ -25,11 +26,12 @@ import AnalystDashboard from './pages/analyst/analystDashboard';
 import AnalystViewAnomalies from './pages/analyst/viewAnomalies';
 import AnalystViewLiveData from './pages/analyst/viewLiveData';
 import AnalystViewGraphs from './pages/analyst/viewGraphs';
+import MicroAnalysis from './pages/analyst/microAnalysis';
+import MacroAnalysis from './pages/analyst/macroAnalysis';
 
 import AdminDashboard from './pages/admin/adminDashboard';
 import ManageUsers from './pages/admin/manageUsers';
 import UpdateProfile from './components/updateProfile';
-import { AnomalyProvider } from './context/anomalyProvider';
 
 export default function App() {
   const [isServerAwake, setIsServerAwake] = useState(false);
@@ -187,6 +189,16 @@ export default function App() {
         <Route path="/analyst/profile/update/:userId" element={
           <PrivateRoute allowedRoles={['Analyst']}>
             <UpdateProfile />
+          </PrivateRoute>
+        } />
+        <Route path="/analyst/micro-analysis/:id" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <MicroAnalysis />
+          </PrivateRoute>
+        } />
+        <Route path="/analyst/macro-analysis" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <MacroAnalysis />
           </PrivateRoute>
         } />
 

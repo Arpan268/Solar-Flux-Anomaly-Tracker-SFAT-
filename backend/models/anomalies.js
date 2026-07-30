@@ -9,7 +9,8 @@ const anomalySchema = new mongoose.Schema({
     acknowledgedBy: { type: String, default: null },
     notes: { type: String, default: '' },
     loggedBy: { type: String, required: true },
-    source: { type: String, enum: ['live', 'mock'], required: true }
+    source: { type: String, enum: ['live', 'mock'], required: true },
+    analysis: { type: String, default: null }
 }, { timestamps: true })
 
 export default mongoose.model('Anomaly', anomalySchema)
