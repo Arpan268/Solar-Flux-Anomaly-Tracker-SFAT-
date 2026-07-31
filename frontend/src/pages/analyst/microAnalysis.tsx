@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import axios from "axios";
 import { useAuth } from "../../context/authContext";
 import DownloadPdf from "../../components/downloadpdf";
@@ -62,6 +65,8 @@ export default function MicroAnalysis() {
                 <div className="bg-gray-900 border border-gray-700 rounded-xl p-8 shadow-2xl">
                     <div className="text-slate-300 leading-relaxed">
                         <ReactMarkdown
+                            remarkPlugins={[remarkMath]}
+                            rehypePlugins={[rehypeKatex]}
                             components={{
                                 h2: ({ node, ...props }) => <h2 className="text-2xl font-bold text-white mt-8 mb-4 border-b border-gray-700 pb-2" {...props} />,
                                 p: ({ node, ...props }) => <p className="mb-4" {...props} />,
