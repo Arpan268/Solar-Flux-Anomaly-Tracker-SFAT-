@@ -5,11 +5,33 @@ export async function analyzeData(req, res) {
     try {
         const currentSource = process.env.DATA_SOURCE || 'live';
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        let recentAnomalies = []
+        let pendingCount = 0
 
-        const recentAnomalies = await Anomaly.find({
+        if (req.user.role === 'Supervisor') {
+            recentAnomalies = await Anomaly.find({
+                source: currentSource,
+                time_tag: { $gte: twentyFourHoursAgo }
+            });
+        }
+
+        else if (req.user.role === 'Analyst') {
+            recentAnomalies = await Anomaly.find({
+                source: currentSource,
+                time_tag: { $gte: twentyFourHoursAgo },
+                isAcknowledged: true
+            });
+        }
+
+        else {
+            return res.status(403).json({ message: 'Unauthorized access' })
+        }
+
+        pendingCount = await Anomaly.countDocuments({
             source: currentSource,
-            time_tag: { $gte: twentyFourHoursAgo }
-        });
+            time_tag: { $gte: twentyFourHoursAgo },
+            isAcknowledged: false
+        })
 
         const peakReading = await LiveData.findOne({
             source: currentSource,
@@ -53,7 +75,8 @@ export async function analyzeData(req, res) {
                 totalAnomalies,
                 peakFlux,
                 maxSeverity,
-                breakdown
+                breakdown,
+                pendingCount
             }
         });
 

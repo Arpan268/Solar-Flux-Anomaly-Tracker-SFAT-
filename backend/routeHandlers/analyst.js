@@ -4,6 +4,8 @@ import { viewAnomalies } from '../utility/analyst/viewAnomalies.js'
 import { downloadData } from '../utility/analyst/downloadData.js'
 import { viewDiagrams } from '../utility/analyst/viewDiagrams.js'
 import { handleLiveData } from '../utility/operator/handleLiveData.js'
+import { microAnalysis } from '../utility/analyst/microAnalysis.js'
+import { macroAnalysis } from '../utility/analyst/macroAnalysis.js'
 
 const router = express.Router()
 
@@ -12,5 +14,7 @@ router.get('/view-anomalies', viewAnomalies)
 router.get('/download-data', downloadData)
 router.get('/view-diagrams', viewDiagrams)
 router.get('/live-data', handleLiveData)
+router.get('/micro-analysis/:id', microAnalysis)
+router.get('/macro-analysis', macroAnalysis)
 
 export default router

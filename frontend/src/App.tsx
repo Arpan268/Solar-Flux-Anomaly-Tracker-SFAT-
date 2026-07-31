@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Outlet } from 'react-router-dom';
 import Navbar from './components/navbar';
 import PublicRoute from './components/publicRoute';
 import PrivateRoute from './components/privateRoute';
@@ -10,6 +10,7 @@ import Register from './pages/public/register';
 import Login from './pages/public/login';
 import AboutUs from './pages/public/aboutUs';
 
+import { AnomalyProvider } from './context/anomalyProvider';
 import OperatorDashboard from './pages/operator/operatorDashboard';
 import OperatorViewAnomalies from './pages/operator/viewAnomalies';
 import OperatorLogAnomalies from './pages/operator/logAnomalies';
@@ -25,6 +26,8 @@ import AnalystDashboard from './pages/analyst/analystDashboard';
 import AnalystViewAnomalies from './pages/analyst/viewAnomalies';
 import AnalystViewLiveData from './pages/analyst/viewLiveData';
 import AnalystViewGraphs from './pages/analyst/viewGraphs';
+import MicroAnalysis from './pages/analyst/microAnalysis';
+import MacroAnalysis from './pages/analyst/macroAnalysis';
 
 import AdminDashboard from './pages/admin/adminDashboard';
 import ManageUsers from './pages/admin/manageUsers';
@@ -83,41 +86,47 @@ export default function App() {
         } />
 
         {/* Operator Routes */}
-        <Route path="/operator" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <OperatorDashboard />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/view-anomalies" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <OperatorViewAnomalies />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/log-anomaly" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <OperatorLogAnomalies />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/update-anomaly/:id" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <UpdateAnomaly />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/view-instructions" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <OperatorInstructions />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/view-profile" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <ViewProfile />
-          </PrivateRoute>
-        } />
-        <Route path="/operator/profile/update/:userId" element={
-          <PrivateRoute allowedRoles={['Operator']}>
-            <UpdateProfile />
-          </PrivateRoute>
-        } />
+        <Route element={
+          <AnomalyProvider>
+            <Outlet />
+          </AnomalyProvider>
+        }>
+          <Route path="/operator" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <OperatorDashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/view-anomalies" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <OperatorViewAnomalies />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/log-anomaly" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <OperatorLogAnomalies />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/update-anomaly/:id" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <UpdateAnomaly />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/view-instructions" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <OperatorInstructions />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/view-profile" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <ViewProfile />
+            </PrivateRoute>
+          } />
+          <Route path="/operator/profile/update/:userId" element={
+            <PrivateRoute allowedRoles={['Operator']}>
+              <UpdateProfile />
+            </PrivateRoute>
+          } />
+        </Route>
 
         {/* Supervisor Routes */}
         <Route path="/supervisor" element={
@@ -180,6 +189,16 @@ export default function App() {
         <Route path="/analyst/profile/update/:userId" element={
           <PrivateRoute allowedRoles={['Analyst']}>
             <UpdateProfile />
+          </PrivateRoute>
+        } />
+        <Route path="/analyst/micro-analysis/:id" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <MicroAnalysis />
+          </PrivateRoute>
+        } />
+        <Route path="/analyst/macro-analysis" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <MacroAnalysis />
           </PrivateRoute>
         } />
 

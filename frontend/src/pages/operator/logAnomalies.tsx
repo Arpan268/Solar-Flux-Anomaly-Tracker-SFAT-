@@ -166,7 +166,7 @@ export default function LogAnomaly() {
                             <button
                                 type="button"
                                 onClick={() => navigate("/operator")}
-                                className="flex-1 bg-gray-800 text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 border border-gray-600 transition-colors"
+                                className="flex-1 bg-gray-800 text-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 border border-gray-600 transition-colors cursor-pointer"
                             >
                                 Cancel
                             </button>

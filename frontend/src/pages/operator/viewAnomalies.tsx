@@ -106,8 +106,10 @@ export default function OperatorViewAnomalies() {
                                                 </span>
                                             )}
                                         </td>
-                                        <td className="p-4 text-slate-400 max-w-xs truncate">
-                                            {anomaly.notes || "None"}
+                                        <td className="p-4 text-slate-400 max-w-xs">
+                                            <span className="block truncate" title={anomaly.notes}>
+                                                {anomaly.notes || "-"}
+                                            </span>
                                         </td>
                                         <td className="p-4 text-right">
                                             {!anomaly.isAcknowledged ? (
@@ -140,8 +142,8 @@ export default function OperatorViewAnomalies() {
                                     key={index}
                                     onClick={() => setPage(index + 1)}
                                     className={`w-10 h-10 rounded cursor-pointer font-semibold transition-colors ${page === index + 1
-                                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                                            : "bg-gray-800 text-slate-400 hover:bg-gray-700 hover:text-white border border-gray-700"
+                                        ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+                                        : "bg-gray-800 text-slate-400 hover:bg-gray-700 hover:text-white border border-gray-700"
                                         }`}
                                 >
                                     {index + 1}

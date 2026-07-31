@@ -58,7 +58,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     useEffect(() => {
         if (auth?.role !== 'Operator') return;
 
-        let intervalId: ReturnType<typeof setInterval>;
+        let timeoutId: ReturnType<typeof setTimeout>;
 
         const enforceShiftTime = async () => {
             try {
@@ -69,33 +69,46 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 const shift = res.data.shift;
                 if (!shift) return;
 
-                intervalId = setInterval(() => {
-                    const now = new Date();
-                    const [startH, startM] = shift.startTime.split(':').map(Number);
-                    const [endH, endM] = shift.endTime.split(':').map(Number);
+                const now = new Date();
+                const [startH, startM] = shift.startTime.split(':').map(Number);
+                const [endH, endM] = shift.endTime.split(':').map(Number);
 
-                    const currentAbsolute = now.getHours() + (now.getMinutes() / 60);
-                    const startAbsolute = startH + (startM / 60);
-                    const endAbsolute = endH + (endM / 60);
+                const currentAbsolute = now.getHours() + (now.getMinutes() / 60) + (now.getSeconds() / 3600);
+                const startAbsolute = startH + (startM / 60);
+                const endAbsolute = endH + (endM / 60);
 
-                    let isWithinShift = false;
-
-                    if (endAbsolute <= startAbsolute) {
-                        if (currentAbsolute >= startAbsolute || currentAbsolute < endAbsolute) {
-                            isWithinShift = true;
-                        }
-                    } else {
-                        if (currentAbsolute >= startAbsolute && currentAbsolute < endAbsolute) {
-                            isWithinShift = true;
-                        }
+                let isWithinShift = false;
+                if (endAbsolute <= startAbsolute) {
+                    if (currentAbsolute >= startAbsolute || currentAbsolute < endAbsolute) {
+                        isWithinShift = true;
                     }
+                } else {
+                    if (currentAbsolute >= startAbsolute && currentAbsolute < endAbsolute) {
+                        isWithinShift = true;
+                    }
+                }
 
-                    if (!isWithinShift) {
-                        clearInterval(intervalId);
-                        logout();
+                if (!isWithinShift) {
+                    logout().finally(() => {
                         alert("Your shift has ended. You have been automatically logged out.");
-                    }
-                }, 60000);
+                    });
+                    return;
+                }
+
+                const endDate = new Date(now);
+                endDate.setHours(endH, endM, 0, 0);
+
+                if (endAbsolute <= startAbsolute && currentAbsolute >= startAbsolute) {
+                    endDate.setDate(endDate.getDate() + 1);
+                }
+
+                const msUntilEnd = Math.max(0, endDate.getTime() - Date.now());
+
+                timeoutId = setTimeout(() => {
+                    logout().finally(() => {
+                        alert("Your shift has ended. You have been automatically logged out.");
+                    });
+                }, msUntilEnd);
 
             } catch (err) {
                 console.error("Failed to fetch shift for timer", err);
@@ -105,7 +118,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         enforceShiftTime();
 
         return () => {
-            if (intervalId) clearInterval(intervalId);
+            if (timeoutId) clearTimeout(timeoutId);
         };
     }, [auth]);
 

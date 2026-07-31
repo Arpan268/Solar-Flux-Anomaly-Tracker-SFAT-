@@ -53,7 +53,7 @@ export async function createAlert(data) {
                     <ul>
                         <li><strong>Classification:</strong> ${data.classification}</li>
                         <li><strong>Peak Flux:</strong> ${data.flux} W/m²</li>
-                        <li><strong>Time (UTC):</strong> ${data.time_tag}</li>
+                        <li><strong>Time (IST):</strong> ${new Date(data.time_tag).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</li>
                     </ul>
                     <p>Please log this anomaly in the SFAT Dashboard immediately.</p>
                     <p style="margin-top: 30px;">

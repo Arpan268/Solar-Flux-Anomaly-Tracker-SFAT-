@@ -17,14 +17,14 @@ export async function getAnomaly(data) {
 
     if (process.env.DATA_SOURCE === 'mock') {
         if (classification !== 'Normal') {
-            criticalEvent.emit('critical-event', { ...data, classification });
+            criticalEvent.emit('critical-event', { time_tag: data.time_tag, flux: data.flux, classification });
         }
 
     } else {
 
         if (classification !== 'Normal' && classification !== currentFlareClass) {
             currentFlareClass = classification;
-            criticalEvent.emit('critical-event', { ...data, classification });
+            criticalEvent.emit('critical-event', { time_tag: data.time_tag, flux: data.flux, classification });
         } else if (classification === 'Normal' && currentFlareClass !== 'Normal') {
             currentFlareClass = 'Normal';
         }
