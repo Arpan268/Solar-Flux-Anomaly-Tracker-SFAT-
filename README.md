@@ -7,7 +7,7 @@
 
 A full-stack, enterprise-grade space weather monitoring application designed for real-time detection, tracking, and incident handling of solar flux anomalies and solar flare events. 
 
-Built on the **MERN** stack (MongoDB, Express, React, Node.js), SFAT provides secure, role-based command centers, live data streams, automated email notification pipelines, and robust cloud deployment configurations.
+Built on the **MERN** stack (MongoDB, Express, React, Node.js), SFAT provides secure, role-based command centers, live data streams, automated email notification pipelines, AI-powered analysis, and robust cloud deployment configurations.
 
 🌐 **Live Application:** [https://solar-flux-anomaly-tracker-sfat.vercel.app/](https://solar-flux-anomaly-tracker-sfat.vercel.app/)
 
@@ -15,15 +15,18 @@ Built on the **MERN** stack (MongoDB, Express, React, Node.js), SFAT provides se
 
 ## 🚀 Key Features
 
-* **Real-Time Data Streaming:** Leverages Server-Sent Events (SSE) to push live telemetry data and anomaly signals to connected supervisor dashboards without polling overhead.
+* **Real-Time Data Streaming:** Leverages Server-Sent Events (SSE) to push live telemetry data and anomaly signals to connected supervisor and analyst dashboards without polling overhead.
+* **Event-Driven Emergency Bypass (X-Class Protocol):** Critical X-Class solar flares automatically bypass the standard supervisor queue, triggering immediate SSE dashboard banners and direct email pipelines to Analysts to eliminate organizational latency during planetary-scale events.
+* **AI-Powered Anomaly Triage:** Integrates Google's Gemini API to automatically generate comprehensive, actionable analysis reports for logged solar events.
 * **Role-Based Access Control (RBAC):**
   * **Admin:** Manages platform security, reviews pending user registrations, and grants operational access.
-  * **Supervisor:** Monitors telemetry streams, analyzes solar trends, tracks active anomaly alerts, and oversees operator shifts.
-  * **Analyst:** Examines historical telemetry logs, evaluates space weather data trends, and generates detailed anomaly reports.
-  * **Operator:** Logs ground observations, registers critical solar flare thresholds, and manages real-time telemetry inputs.
+  * **Supervisor:** Monitors telemetry streams, oversees operator shifts, and verifies standard/moderate (C-Class, M-Class) solar anomalies.
+  * **Analyst:** Examines historical telemetry logs, evaluates space weather data trends, and generates AI-assisted anomaly reports.
+  * **Operator:** Logs ground observations, registers solar flare thresholds, and manages real-time telemetry inputs.
 * **Automated Email Alert System:** Built-in SendGrid API integration sends instant notifications for:
   * Admin authorization requests upon new user registrations.
-  * Critical solar flare triggers exceeding safety thresholds (W/m²).
+  * Standard anomaly alerts to active Supervisors on shift.
+  * Emergency X-Class flare bypass alerts directly to Analysts.
 * **Cold-Start Resilient UX:** Custom health-check ping mechanisms (`/api/health`) seamlessly display backend boot states while free-tier cloud instances wake up.
 * **Production-Grade Security:**
   * JWT (JSON Web Tokens) with short-lived access tokens and refresh token workflows.
@@ -37,41 +40,36 @@ Built on the **MERN** stack (MongoDB, Express, React, Node.js), SFAT provides se
 SFAT is engineered using a decoupled client-server architecture designed for high availability, low-latency telemetry updates, and secure cloud distribution.
 
 ```text
-┌────────────────────────────────────────────────────────────────────────┐
-│                        CLIENT (Vercel CDN)                             │
-│                                                                        │
-│   ┌────────────────────────────────────────────────────────────────┐   │
-│   │               React Single Page Application (SPA)              │   │
-│   │    - Tailwind CSS Dashboard Interfaces                         │   │
-│   │    - React Router DOM Navigation                               │   │
-│   │    - EventSource SSE Live Data Listeners                       │   │
-│   └───────────────────────────────┬────────────────────────────────┘   │
-└───────────────────────────────────┼────────────────────────────────────┘
-                                    │ HTTPS / REST / SSE
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                        BACKEND (Render Node.js)                        │
-│                                                                        │
-│   ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐     │
-│   │ Auth Controller  │  │ User Controller  │  │ Anomaly Streamer │     │
-│   │ (JWT / Cookies)  │  │ (RBAC Management)│  │ (SSE Event Loop) │     │
-│   └────────┬─────────┘  └────────┬─────────┘  └────────┬─────────┘     │
-└────────────┼─────────────────────┼─────────────────────┼───────────────┘
-             │                     │                     │
-             ▼                     ▼                     ▼
-┌──────────────────────┐  ┌──────────────────┐  ┌────────────────────────┐
-│ MongoDB Atlas        │  │ SendGrid API     │  │ Dynamic Web Links      │
-│ - Users & Roles      │  │ - Admin Alerts   │  │ - process.env          │
-│ - Anomaly Logs       │  │ - Flare Warnings │  │   FRONTEND_URL         │
-└──────────────────────┘  └──────────────────┘  └────────────────────────┘
+                  CLIENT (Vercel CDN)
+ ┌────────────────────────────────────────────────────────┐
+ │            React Single Page Application (SPA)         │
+ │            - Tailwind CSS Dashboard Interfaces         │
+ │            - React Router DOM Navigation               │
+ │            - EventSource SSE Live Data Listeners       │
+ └──────────────────────────┬─────────────────────────────┘
+                            │
+                    HTTPS / REST / SSE
+                            │
+                 BACKEND (Render Node.js)
+ ┌────────────────────────────────────────────────────────┐
+ │                                                        │
+ │   Auth Controller    User Controller   Anomaly Streamer│
+ │   (JWT / Cookies)    (RBAC Management) (SSE Event Loop)│
+ │                                                        │
+ └────────┬─────────────────┬───────────────────┬─────────┘
+          │                 │                   │
+  MongoDB Atlas       SendGrid API        Gemini API
+  - Users & Roles     - Admin Alerts      - AI Reports
+  - Anomaly Logs      - Flare Warnings    - Data Triage
 ```
 
 ### Architecture Breakdown
 
-1. **Frontend Layer (Vercel):** Built with React, TypeScript/Vite, and Tailwind CSS. Static assets are served globally via Vercel’s Edge Network. Single-page app routing is managed by `vercel.json` rewrite rules to prevent `404` errors on deep route refreshes.
+1. **Frontend Layer (Vercel):** Built with React, TypeScript/Vite, and Tailwind CSS. Static assets are served globally via Vercel's Edge Network. Single-page app routing is managed by `vercel.json` rewrite rules to prevent `404` errors on deep route refreshes.
 2. **Backend API Layer (Render):** Express.js app running on Node.js hosting secure RESTful endpoints and real-time SSE stream outputs.
 3. **Database Layer (MongoDB Atlas):** Document storage for users, operational logs, and solar flare telemetry history.
 4. **Notification Engine:** SendGrid API integration pushing dynamic HTML email alerts directly to admins and operators on shift.
+5. **AI Analysis Layer:** Google Gemini API integration for automated report generation based on raw telemetry data.
 
 ---
 
@@ -82,7 +80,8 @@ SFAT is engineered using a decoupled client-server architecture designed for hig
 | **Frontend** | React, Vite, TypeScript/JavaScript, Tailwind CSS, Axios, Lucide Icons |
 | **Backend** | Node.js, Express.js, JSON Web Tokens (JWT), Cookie-Parser, Cors, Dotenv |
 | **Database** | MongoDB, Mongoose ODM |
-| **Notifications** | SendGrid (@sendgrid/mail API with dynamic HTML templating) |
+| **Notifications** | SendGrid (`@sendgrid/mail` API with dynamic HTML templating) |
+| **AI Analysis** | Google Gemini API (`@google/generative-ai`) |
 | **Hosting & DevOps** | Vercel (Frontend), Render (Backend), GitHub |
 
 ---
@@ -91,28 +90,26 @@ SFAT is engineered using a decoupled client-server architecture designed for hig
 
 ```text
 Solar-Flux-Anomaly-Tracker-SFAT/
-├── frontend/                     # React / Vite Client Application
+├── frontend/             # React / Vite Client Application
 │   ├── src/
-│   │   ├── assets/               # Images, logos, static assets
-│   │   ├── components/           # Reusable UI components & loaders
-│   │   ├── context/              # Authentication & global state
-│   │   ├── pages/                # Admin, Supervisor, Operator dashboards
-│   │   └── App.tsx               # Main routing & cold-start health check
-│   ├── index.html                # Application entry HTML
-│   ├── vite.config.ts            # Vite configuration
-│   ├── package.json
-│   └── vercel.json               # Vercel SPA routing & API proxy rules
+│   │   ├── assets/       # Images, logos, static assets
+│   │   ├── components/   # Reusable UI components & loaders
+│   │   ├── context/      # Authentication & global state
+│   │   ├── pages/        # Admin, Supervisor, Analyst, Operator dashboards
+│   │   └── App.tsx       # Main routing & cold-start health check
+│   ├── index.html        # Application entry HTML
+│   ├── vite.config.ts    # Vite configuration
+│   └── vercel.json       # Vercel SPA routing & API proxy rules
 │
-├── backend/                      # Express.js API Server
-│   ├── config/                   # Database connection scripts (`db.js`)
-│   ├── controllers/              # Route handling logic (`userController.js`)
-│   ├── models/                   # Mongoose schemas (`User.js`, `Anomaly.js`)
-│   ├── routes/                   # API endpoint routers
-│   ├── utility/                  # Alert utilities (`createAlert.js`)
-│   ├── server.js                 # Express server bootstrap & middleware
-│   └── package.json
+├── backend/              # Express.js API Server
+│   ├── config/           # Database connection scripts (`db.js`)
+│   ├── controllers/      # Route handling logic (`userController.js`)
+│   ├── models/           # Mongoose schemas (`User.js`, `Anomaly.js`)
+│   ├── routes/           # API endpoint routers
+│   ├── utility/          # Alert utilities, AI report generation, SSE manager
+│   └── server.js         # Express server bootstrap & middleware
 │
-└── README.md                     # Project documentation
+└── README.md             # Project documentation
 ```
 
 ---
@@ -129,8 +126,9 @@ MONGO_URI=your_mongodb_cluster_connection_string
 ACCESS_TOKEN_SECRET=your_jwt_access_secret_key
 REFRESH_TOKEN_SECRET=your_jwt_refresh_secret_key
 SENDGRID_API_KEY=your_sendgrid_api_key
+GEMINI_API_KEY=your_gemini_api_key
 DATA_SOURCE=live
-FRONTEND_URL=https://solar-flux-anomaly-tracker-sfat.vercel.app
+FRONTEND_URL=[https://solar-flux-anomaly-tracker-sfat.vercel.app](https://solar-flux-anomaly-tracker-sfat.vercel.app)
 ```
 
 ### Render Dashboard Environment Variables
@@ -139,12 +137,13 @@ Ensure the following variables are configured under your Render service **Enviro
 * `REFRESH_TOKEN_SECRET`
 * `MONGO_URI`
 * `SENDGRID_API_KEY`
+* `GEMINI_API_KEY`
 * `DATA_SOURCE`
 * `FRONTEND_URL` = `https://solar-flux-anomaly-tracker-sfat.vercel.app` *(no trailing slash)*
 
 ---
 
-## 🚦 Local Development Setup
+## 💻 Local Development Setup
 
 Follow these steps to run the complete SFAT system locally on your machine.
 
@@ -152,6 +151,7 @@ Follow these steps to run the complete SFAT system locally on your machine.
 * [Node.js](https://nodejs.org/) (v18+ recommended)
 * [Git](https://git-scm.com/)
 * [MongoDB Community Server](https://www.mongodb.com/try/download/community) or a free [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster account.
+* API Keys for [SendGrid](https://sendgrid.com/) and [Google Gemini](https://ai.google.dev/).
 
 ### 1. Clone the Repository
 ```bash
@@ -191,7 +191,7 @@ The frontend will launch at `http://localhost:5173`.
 
 ---
 
-## 🛰️ API Endpoints Summary
+## 🔌 API Endpoints Summary
 
 | Method | Endpoint | Access Level | Description |
 | :--- | :--- | :--- | :--- |
@@ -199,16 +199,17 @@ The frontend will launch at `http://localhost:5173`.
 | `POST` | `/api/auth/register` | Public | Registers new user; triggers email alert to admins |
 | `POST` | `/api/auth/login` | Public | Authenticates credentials; issues access/refresh tokens |
 | `GET` | `/api/user/shared/supervisor/analyze` | Supervisor / Admin | Fetches telemetry analysis summaries |
-| `GET` | `/api/user/supervisor/live-data` | Supervisor | Establishes SSE pipeline for real-time solar data |
-| `POST` | `/api/user/operator/alert` | Operator | Logs an anomaly and fires urgent shift alerts |
+| `GET` | `/api/user/shared/notifications/stream`| Analyst / Supervisor | Establishes SSE pipeline for real-time emergency alerts |
+| `POST` | `/api/user/operator/alert` | Operator | Logs an anomaly and fires role-specific urgent shift alerts |
+| `POST` | `/api/user/analyst/generate-report` | Analyst | Triggers Gemini API to generate AI anomaly analysis |
 
 ---
 
 ## 🔒 Security Best Practices Implemented
 
 * **Dynamic Origin Matching:** CORS policy dynamically targets `process.env.FRONTEND_URL` while allowing local fallback (`http://localhost:5173`) during development.
-* **Separation of Secrets:** API keys, database credentials, and SendGrid API keys are fully isolated inside environment configurations.
-* **Protected Routes:** Frontend routes verify JWT access token claims before mounting privileged admin or operator dashboard interfaces.
+* **Separation of Secrets:** API keys (Gemini, SendGrid) and database credentials are fully isolated inside environment configurations.
+* **Protected Routes:** Frontend routes verify JWT access token claims before mounting privileged admin, analyst, or operator dashboard interfaces.
 
 ---
 
