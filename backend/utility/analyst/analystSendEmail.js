@@ -38,7 +38,7 @@ export async function analystSendEmail(anomaly) {
                         <ul style="list-style-type: none; padding-left: 0; margin: 0; color: #4b5563; line-height: 2;">
                             <li><strong>Classification:</strong> <span style="color: #dc2626; font-weight: bold;">${anomaly.classification}</span></li>
                             <li><strong>Peak Flux:</strong> ${anomaly.flux} W/m²</li>
-                            <li><strong>Time Tag (UTC):</strong> ${anomaly.time_tag}</li>
+                            <li><strong>Time Tag (IST):</strong> ${new Date(anomaly.time_tag).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</li>
                             <li><strong>Contamination:</strong> ${anomaly.electron_contaminaton ? 'Detected' : 'Clean'}</li>
                         </ul>
                     </div>
