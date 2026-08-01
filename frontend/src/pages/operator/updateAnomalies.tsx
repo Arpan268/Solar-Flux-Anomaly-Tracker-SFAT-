@@ -10,6 +10,7 @@ export default function UpdateAnomaly() {
     const { auth } = useAuth();
 
     const anomalyData = location.state?.anomaly;
+    const page = location.state?.page || 1;
 
     const [notes, setNotes] = useState(anomalyData?.notes || "");
     const [error, setError] = useState<string | null>(null);
@@ -45,7 +46,7 @@ export default function UpdateAnomaly() {
 
             setSuccess(true);
             setTimeout(() => {
-                navigate(-1);
+                navigate('/operator/view-anomalies', { state: { page } });
             }, 2000);
         } catch (err) {
             const message = axios.isAxiosError(err) && err.response?.data?.message

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/authContext";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 interface Anomaly {
     _id: string;
@@ -17,10 +18,12 @@ interface Anomaly {
 }
 
 export default function OperatorViewAnomalies() {
+    const location = useLocation();
+    const initialPage = location.state?.page || 1;
     const { auth } = useAuth();
     const navigate = useNavigate();
     const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(initialPage);
     const [totalPages, setTotalPages] = useState(1);
     const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +31,7 @@ export default function OperatorViewAnomalies() {
         async function fetchAnomalies() {
             if (!auth?.accessToken) return;
             try {
-                const res = await axios.get(`/api/user/operator/view-anomalies?page=${page}&limit=6`, {
+                const res = await axios.get(`/api/user/operator/view-anomalies?page=${page}&limit=10`, {
                     headers: { Authorization: `Bearer ${auth.accessToken}` },
                     withCredentials: true,
                 });
@@ -43,7 +46,7 @@ export default function OperatorViewAnomalies() {
     }, [auth, page]);
 
     function handleUpdateClick(anomaly: Anomaly) {
-        navigate(`/operator/update-anomaly/${anomaly._id}`, { state: { anomaly } });
+        navigate(`/operator/update-anomaly/${anomaly._id}`, { state: { anomaly, page } });
     }
 
     return (

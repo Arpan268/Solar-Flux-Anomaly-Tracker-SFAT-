@@ -7,12 +7,15 @@ import 'katex/dist/katex.min.css';
 import axios from "axios";
 import { useAuth } from "../../context/authContext";
 import DownloadPdf from "../../components/downloadpdf";
+import { useLocation } from "react-router-dom";
 
 export default function MicroAnalysis() {
     const { id } = useParams<{ id: string }>();
     const { auth } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
+    const { page } = location.state || {};
     const [report, setReport] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -43,7 +46,7 @@ export default function MicroAnalysis() {
                 </div>
                 <div className="flex gap-4">
                     <button
-                        onClick={() => navigate('/analyst/view-anomalies')}
+                        onClick={() => navigate('/analyst/view-anomalies', { state: { page } })}
                         className="bg-gray-700 hover:bg-gray-600 cursor-pointer text-white font-bold py-2 px-6 rounded-lg transition-colors"
                     >
                         Back

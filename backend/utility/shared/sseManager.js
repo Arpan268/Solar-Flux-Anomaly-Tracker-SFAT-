@@ -64,12 +64,12 @@ export function clearXClassAlert(req, res) {
 
     if (isSupervisor) {
         supervisorAlertMemory = null;
-        console.log('✅ Supervisor acknowledged the X-Class alert. (Analyst alert remains active)');
+        console.log('✅ Supervisor acknowledged the X-Class alert');
     }
 
     if (isAnalyst) {
         analystAlertMemory = null;
-        console.log('✅ Analyst reviewed the X-Class alert. (Supervisor alert remains active)');
+        console.log('✅ Analyst reviewed the X-Class alert');
     }
 
     return res.status(200).json({ message: 'Alert memory cleared for specific role.' });
