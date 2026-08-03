@@ -27,6 +27,7 @@ Built on the **MERN** stack (MongoDB, Express, React, Node.js), SFAT provides se
   * Admin authorization requests upon new user registrations.
   * Standard anomaly alerts to active Supervisors on shift.
   * Emergency X-Class flare bypass alerts directly to Analysts.
+* **Email Verification & OTP:** Real-time email deliverability checks integrated with OTP generation to ensure valid inbox registration before account activation.
 * **Cold-Start Resilient UX:** Custom health-check ping mechanisms (`/api/health`) seamlessly display backend boot states while free-tier cloud instances wake up.
 * **Production-Grade Security:**
   * JWT (JSON Web Tokens) with short-lived access tokens and refresh token workflows.
@@ -128,6 +129,7 @@ REFRESH_TOKEN_SECRET=your_jwt_refresh_secret_key
 SENDGRID_API_KEY=your_sendgrid_api_key
 GEMINI_API_KEY=your_gemini_api_key
 DATA_SOURCE=live
+ABSTRACT_API_KEY=your_abstract_api_key
 FRONTEND_URL=[https://solar-flux-anomaly-tracker-sfat.vercel.app](https://solar-flux-anomaly-tracker-sfat.vercel.app)
 ```
 
@@ -139,6 +141,7 @@ Ensure the following variables are configured under your Render service **Enviro
 * `SENDGRID_API_KEY`
 * `GEMINI_API_KEY`
 * `DATA_SOURCE`
+* `ABSTRACT_API_KEY`
 * `FRONTEND_URL` = `https://solar-flux-anomaly-tracker-sfat.vercel.app` *(no trailing slash)*
 
 ---
