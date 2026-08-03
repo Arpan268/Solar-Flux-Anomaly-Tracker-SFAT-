@@ -246,14 +246,6 @@ export async function generateOtp(req, res) {
         return res.status(400).json({ message: 'Email is required' })
     }
     try {
-        const apikey = process.env.ABSTRACT_API_KEY
-        const validationResponse = await fetch(`https://emailvalidation.abstractapi.com/v1/?api_key=${apikey}&email=${email}`)
-        const validationData = await validationResponse.json()
-
-        if (validationData.email_deliverability?.status === 'undeliverable') {
-            return res.status(400).json({ message: 'This email inbox does not exist. Please enter a valid email address.' })
-        }
-
         const otp = Math.floor(100000 + Math.random() * 900000).toString()
         const expiresAt = new Date()
         expiresAt.setMinutes(expiresAt.getMinutes() + 15) // OTP expires in 15 minutes
