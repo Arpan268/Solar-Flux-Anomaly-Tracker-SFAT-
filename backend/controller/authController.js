@@ -2,6 +2,8 @@ import User from '../models/users.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { criticalEvent } from '../events/addEvents.js'
+import EmailVerification from '../models/emailVerification.js'
+import { sendOtp } from './sendOtp.js'
 
 function getCookieOptions(maxAge) {
     return {
@@ -24,6 +26,12 @@ export async function register(req, res) {
         const randomDigits = Math.floor(1000 + Math.random() * 9000)
         const customUserId = `${prefix}-${randomDigits}`
 
+        const verificationRecord = await EmailVerification.findOne({ email })
+
+        if (!verificationRecord || !verificationRecord.isVerified) {
+            return res.status(400).json({ message: 'Email not verified. Please verify your email before registering.' })
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10)
 
         const user = new User({
@@ -34,6 +42,8 @@ export async function register(req, res) {
             password: hashedPassword
         })
         await user.save()
+
+        await EmailVerification.findOneAndDelete({ email })
 
         const { password: dbPassword, ...userWithoutPassword } = user.toObject()
         criticalEvent.emit('admin-email', { userWithoutPassword })
@@ -87,7 +97,7 @@ export async function login(req, res) {
         if (user.status === 'Pending') {
             return res.status(403).json({ message: 'Login failed. Your account is pending admin approval' })
         } else if (user.status === 'Rejected') {
-            return res.status(403).json({ message: 'Login failed. Your account approval is rejected by the admin' })
+            return res.status(403).json({ message: 'Login failed. Your account approval is rejected by the admin. You can try registering again after 7 days' })
         }
 
         if (user.role === 'Operator' && user.shift) {
@@ -225,6 +235,66 @@ export async function logout(req, res) {
 
     catch (err) {
         console.error('Error logging out user:', err)
+        return res.status(500).json({ message: 'Server error' })
+    }
+}
+
+export async function generateOtp(req, res) {
+    const { email } = req.body
+
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required' })
+    }
+    try {
+        const apikey = process.env.ABSTRACT_API_KEY
+        const validationResponse = await fetch(`https://emailvalidation.abstractapi.com/v1/?api_key=${apikey}&email=${email}`)
+        const validationData = await validationResponse.json()
+
+        if (validationData.email_deliverability?.status === 'undeliverable') {
+            return res.status(400).json({ message: 'This email inbox does not exist. Please enter a valid email address.' })
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        const expiresAt = new Date()
+        expiresAt.setMinutes(expiresAt.getMinutes() + 15) // OTP expires in 15 minutes
+
+        await EmailVerification.findOneAndUpdate(
+            { email },
+            { otp, expiresAt },
+            { upsert: true, returnDocument: 'after' }
+        )
+
+        const sent = await sendOtp({ email, otp })
+
+        if (!sent) {
+            return res.status(500).json({ message: 'Failed to send OTP' })
+        }
+
+        res.status(200).json({ message: 'OTP generated successfully' })
+    } catch (err) {
+        console.error('Error generating OTP:', err)
+        return res.status(500).json({ message: 'Server error' })
+    }
+}
+
+export async function verifyOtp(req, res) {
+    const { email, otp } = req.body
+
+    if (!email || !otp) {
+        return res.status(400).json({ message: 'Email and OTP are required' })
+    }
+
+    try {
+        const user = await EmailVerification.findOne({ email })
+        if (!user || user.otp !== otp || user.expiresAt < new Date()) {
+            return res.status(400).json({ message: 'Invalid OTP' })
+        }
+        user.isVerified = true
+        await user.save()
+
+        res.status(200).json({ message: 'OTP verified successfully' })
+    } catch (err) {
+        console.error('Error verifying OTP:', err)
         return res.status(500).json({ message: 'Server error' })
     }
 }
