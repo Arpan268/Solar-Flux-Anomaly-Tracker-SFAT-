@@ -151,6 +151,12 @@ export default function OperatorDashboard() {
                 </div>
             )}
 
+            {(latestData && (latestData.flux === 0 || latestData.observed_flux === 0)) && (
+                <div className="bg-yellow-900/30 border border-yellow-600/50 p-4 rounded-lg mb-6 text-yellow-200 text-sm">
+                    <span className="font-semibold">⚠️ Notice:</span> Primary and observed flux data are temporarily unavailable due to electron contamination affecting satellite telemetry. Normal reporting will resume shortly.
+                </div>
+            )}
+
             {hasUnreadInstructions && (
                 <div className="bg-blue-900/20 border border-blue-600/50 rounded-xl p-6 shadow-lg shadow-blue-900/20 flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
                     <div className="flex items-center gap-4">

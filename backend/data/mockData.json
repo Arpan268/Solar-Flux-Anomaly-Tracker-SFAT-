@@ -25,8 +25,8 @@
     },
     {
         "satellite": 16,
-        "flux": 8.91e-8,
-        "observed_flux": 8.85e-8,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00018,
         "electron_contaminaton": true,
         "energy": "0.1-0.8nm"
@@ -49,8 +49,8 @@
     },
     {
         "satellite": 18,
-        "flux": 6.78e-7,
-        "observed_flux": 6.71e-7,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00019,
         "electron_contaminaton": true,
         "energy": "0.1-0.8nm"
@@ -81,8 +81,8 @@
     },
     {
         "satellite": 16,
-        "flux": 4.55e-6,
-        "observed_flux": 4.50e-6,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00031,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -105,8 +105,8 @@
     },
     {
         "satellite": 16,
-        "flux": 1.15e-5,
-        "observed_flux": 1.10e-5,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00041,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -129,8 +129,8 @@
     },
     {
         "satellite": 18,
-        "flux": 5.88e-5,
-        "observed_flux": 5.80e-5,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00019,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -153,8 +153,8 @@
     },
     {
         "satellite": 18,
-        "flux": 1.45e-4,
-        "observed_flux": 1.40e-4,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00062,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -177,8 +177,8 @@
     },
     {
         "satellite": 18,
-        "flux": 4.89e-4,
-        "observed_flux": 4.80e-4,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00071,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -201,8 +201,8 @@
     },
     {
         "satellite": 16,
-        "flux": 4.33e-8,
-        "observed_flux": 4.25e-8,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00017,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -225,8 +225,8 @@
     },
     {
         "satellite": 16,
-        "flux": 1.45e-7,
-        "observed_flux": 1.41e-7,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00019,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -249,8 +249,8 @@
     },
     {
         "satellite": 16,
-        "flux": 7.19e-7,
-        "observed_flux": 7.10e-7,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00028,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -273,8 +273,8 @@
     },
     {
         "satellite": 18,
-        "flux": 4.15e-6,
-        "observed_flux": 4.10e-6,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00029,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -297,8 +297,8 @@
     },
     {
         "satellite": 18,
-        "flux": 1.66e-5,
-        "observed_flux": 1.60e-5,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00042,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -321,8 +321,8 @@
     },
     {
         "satellite": 18,
-        "flux": 7.88e-5,
-        "observed_flux": 7.80e-5,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00055,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -345,8 +345,8 @@
     },
     {
         "satellite": 16,
-        "flux": 2.56e-4,
-        "observed_flux": 2.50e-4,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00072,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -369,8 +369,8 @@
     },
     {
         "satellite": 16,
-        "flux": 3.22e-8,
-        "observed_flux": 3.15e-8,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00014,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -393,8 +393,8 @@
     },
     {
         "satellite": 16,
-        "flux": 9.92e-8,
-        "observed_flux": 9.85e-8,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00021,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -417,8 +417,8 @@
     },
     {
         "satellite": 16,
-        "flux": 6.89e-7,
-        "observed_flux": 6.82e-7,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00029,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -441,8 +441,8 @@
     },
     {
         "satellite": 16,
-        "flux": 3.92e-6,
-        "observed_flux": 3.85e-6,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00038,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -465,8 +465,8 @@
     },
     {
         "satellite": 18,
-        "flux": 9.95e-6,
-        "observed_flux": 9.88e-6,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00046,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -505,8 +505,8 @@
     },
     {
         "satellite": 18,
-        "flux": 1.15e-7,
-        "observed_flux": 1.10e-7,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00013,
         "electron_contaminaton": true,
         "energy": "0.1-0.8nm"
@@ -529,8 +529,8 @@
     },
     {
         "satellite": 16,
-        "flux": 6.88e-7,
-        "observed_flux": 6.82e-7,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00019,
         "electron_contaminaton": true,
         "energy": "0.1-0.8nm"
@@ -569,8 +569,8 @@
     },
     {
         "satellite": 18,
-        "flux": 9.45e-7,
-        "observed_flux": 9.40e-7,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00019,
         "electron_contaminaton": true,
         "energy": "0.1-0.8nm"
@@ -609,8 +609,8 @@
     },
     {
         "satellite": 16,
-        "flux": 2.34e-6,
-        "observed_flux": 2.30e-6,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00028,
         "electron_contaminaton": true,
         "energy": "0.1-0.8nm"
@@ -641,8 +641,8 @@
     },
     {
         "satellite": 16,
-        "flux": 6.78e-6,
-        "observed_flux": 6.72e-6,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00035,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -673,8 +673,8 @@
     },
     {
         "satellite": 16,
-        "flux": 9.88e-6,
-        "observed_flux": 9.82e-6,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00039,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -697,8 +697,8 @@
     },
     {
         "satellite": 18,
-        "flux": 2.34e-5,
-        "observed_flux": 2.29e-5,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00048,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -729,8 +729,8 @@
     },
     {
         "satellite": 18,
-        "flux": 4.77e-5,
-        "observed_flux": 4.70e-5,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00059,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
@@ -761,8 +761,8 @@
     },
     {
         "satellite": 18,
-        "flux": 7.12e-5,
-        "observed_flux": 7.05e-5,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00061,
         "electron_contaminaton": true,
         "energy": "0.1-0.8nm"
@@ -793,8 +793,8 @@
     },
     {
         "satellite": 18,
-        "flux": 9.85e-5,
-        "observed_flux": 9.80e-5,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00071,
         "electron_contaminaton": true,
         "energy": "0.1-0.8nm"
@@ -817,8 +817,8 @@
     },
     {
         "satellite": 16,
-        "flux": 2.12e-4,
-        "observed_flux": 2.05e-4,
+        "flux": 0,
+        "observed_flux": 0,
         "electron_correction": 0.00092,
         "electron_contaminaton": true,
         "energy": "0.05-0.4nm"
