@@ -15,12 +15,34 @@ interface LiveDataRecord {
 
 export default function AnalystViewLiveData() {
     const { auth } = useAuth();
+
+    const getFormattedDate = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     const [liveData, setLiveData] = useState<LiveDataRecord[]>([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const today = getFormattedDate(new Date());
+
+    const [startDate, setStartDate] = useState(() => {
+        const d = new Date();
+        d.setDate(d.getDate() - 7);
+        return getFormattedDate(d);
+    });
+
+    const [endDate, setEndDate] = useState(() => {
+        return getFormattedDate(new Date());
+    });
+
+    const isInvalidDateRange = new Date(startDate) > new Date(endDate);
 
     const formatSciNum = (val: number | undefined | null) => {
         if (val == null) return "-";
@@ -42,7 +64,6 @@ export default function AnalystViewLiveData() {
                     headers: { Authorization: `Bearer ${auth.accessToken}` },
                     withCredentials: true,
                 });
-
                 setLiveData(res.data.liveData);
                 setTotalPages(res.data.totalPages);
                 setError(null);
@@ -52,31 +73,41 @@ export default function AnalystViewLiveData() {
                 setLoading(false);
             }
         }
-
         fetchLiveData();
     }, [auth, page]);
 
     async function handleDownload() {
-        if (!auth?.accessToken) return;
+        if (!auth?.accessToken || isInvalidDateRange) return;
         setDownloading(true);
 
         try {
-            const res = await axios.get('/api/user/analyst/download-data', {
+            let url = '/api/user/analyst/download-data';
+
+            if (startDate && endDate) {
+                url += `?startDate=${startDate}&endDate=${endDate}`;
+            }
+
+            const res = await axios.get(url, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` },
                 responseType: 'blob',
                 withCredentials: true,
             });
 
-            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const downloadUrl = window.URL.createObjectURL(new Blob([res.data]));
             const link = document.createElement('a');
-            link.href = url;
+            link.href = downloadUrl;
             link.setAttribute('download', 'solar_flux_data.csv');
             document.body.appendChild(link);
             link.click();
             link.remove();
-            window.URL.revokeObjectURL(url);
-        } catch (err) {
-            setError("Failed to download CSV data.");
+            window.URL.revokeObjectURL(downloadUrl);
+        } catch (err: any) {
+            if (err.response && err.response.status === 404) {
+                setError("No data available for the selected date range.");
+            }
+            else {
+                setError("Failed to download CSV data.");
+            }
         } finally {
             setDownloading(false);
         }
@@ -84,32 +115,64 @@ export default function AnalystViewLiveData() {
 
     return (
         <div className="max-w-7xl mx-auto mt-12 p-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                <div>
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
+                <div className="mb-2 md:mb-0">
                     <h2 className="text-3xl font-extrabold text-white tracking-tight">Live Telemetry Data</h2>
                     <p className="text-slate-400 mt-2">Raw solar flux readings currently stored in the system.</p>
                 </div>
 
-                <button
-                    onClick={handleDownload}
-                    disabled={downloading || liveData.length === 0}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-colors shadow-lg cursor-pointer ${downloading || liveData.length === 0
-                        ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/20"
-                        }`}
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    {downloading ? "Exporting CSV..." : "Export to CSV"}
-                </button>
+                <div className="bg-gray-800/40 p-4 rounded-xl border border-gray-700 shadow-inner flex flex-col gap-3 min-w-[320px]">
+                    <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">CSV Export Range</span>
+                        {isInvalidDateRange && (
+                            <span className="text-[10px] font-bold text-red-400 bg-red-900/20 px-2 py-1 rounded border border-red-800/50">
+                                PLEASE ENTER VALID DATES
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span className="text-slate-500 font-medium text-sm">From:</span>
+                        <input
+                            type="date"
+                            value={startDate}
+                            max={today}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="bg-gray-900 text-slate-300 px-3 py-2 rounded-lg border border-gray-600 outline-none focus:border-blue-500 transition-colors cursor-pointer text-sm w-36"
+                        />
+                        <span className="text-slate-500 font-medium text-sm">to:</span>
+                        <input
+                            type="date"
+                            value={endDate}
+                            max={today}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="bg-gray-900 text-slate-300 px-3 py-2 rounded-lg border border-gray-600 outline-none focus:border-blue-500 transition-colors cursor-pointer text-sm w-36"
+                        />
+                        <button
+                            onClick={handleDownload}
+                            disabled={downloading || liveData.length === 0 || isInvalidDateRange}
+                            className={`flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-bold transition-colors shadow-lg cursor-pointer text-sm ${downloading || liveData.length === 0 || isInvalidDateRange
+                                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                                : "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/20"
+                                }`}
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            {downloading ? "Exporting..." : "Export"}
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            {error && (
+            {(error && error === "No data available for the selected date range.") ? (
+                <div className="bg-yellow-900/30 border border-yellow-400/50 text-yellow-300 p-4 rounded-lg mb-6 shadow-lg">
+                    {error}
+                </div>
+            ) : (error && error !== "No data available for the selected date range.") ? (
                 <div className="bg-red-900/30 border border-red-500/50 text-red-400 p-4 rounded-lg mb-6 shadow-lg">
                     {error}
                 </div>
-            )}
+            ) : null}
 
             <div className="bg-gray-900 rounded-xl shadow-2xl border border-gray-700 overflow-hidden">
                 <div className="overflow-x-auto">
@@ -121,7 +184,7 @@ export default function AnalystViewLiveData() {
                                 <th className="p-4 font-semibold">Satellite</th>
                                 <th className="p-4 font-semibold">Energy</th>
                                 <th className="p-4 font-semibold">E-Contamination</th>
-                                <th className="p-4 font-semibold">E-Correction</th>
+                                <th className="p-4 font-semibold text-right">E-Correction</th>
                                 <th className="p-4 font-semibold text-right">Observed Flux</th>
                                 <th className="p-4 font-semibold text-right">Final Flux</th>
                             </tr>

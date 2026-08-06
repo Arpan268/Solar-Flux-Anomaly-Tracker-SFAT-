@@ -4,12 +4,13 @@ import { getAnomaly } from "./getAnomaly.js"
 
 export async function handleLiveData(req, res) {
     try {
+        const role = req.user?.role || req.user?.userRole;
         res.statusCode = 200
         res.setHeader('Content-Type', 'text/event-stream')
         res.setHeader('Cache-Control', 'no-cache')
         res.setHeader('Connection', 'keep-alive')
 
-        const initialData = await liveData()
+        const initialData = await liveData(role)
         res.write(`data: ${JSON.stringify(initialData)}\n\n`)
 
         const alertListener = (alertData) => {
@@ -30,7 +31,7 @@ export async function handleLiveData(req, res) {
         }
 
         const intervalId = setInterval(async () => {
-            const latestData = await liveData()
+            const latestData = await liveData(role)
 
             if (!latestData) {
                 console.warn('Skipping interval: No data received from NOAA')
