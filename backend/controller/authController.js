@@ -47,6 +47,7 @@ export async function register(req, res) {
 
         const { password: dbPassword, ...userWithoutPassword } = user.toObject()
         criticalEvent.emit('admin-email', { userWithoutPassword })
+        criticalEvent.emit('registration-email', { userWithoutPassword })
 
         res.status(201).json({
             message: 'User successfully registered',
