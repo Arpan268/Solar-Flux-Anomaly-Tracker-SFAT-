@@ -21,7 +21,7 @@ export async function sendRegistrationEmail(data) {
                             <li><strong>Role:</strong> ${newUser.role}</li>
                         </ul>
                         <p>Note: Your account is currently in <strong>Pending</strong> status. An admin will review your registration and approve it if everything is in order</p>
-                        <p>Please note the user ID as it will be required for logging in once your account is approved. We appreciate your patience!</p>
+                        <p>Please note the user ID, as it will be required for logging in once your account is approved. We appreciate your patience!</p>
                         <p>Thank you for joining us!</p>
                     </div>
                 `
