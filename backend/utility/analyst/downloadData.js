@@ -1,4 +1,4 @@
-import LiveData from '../../models/LiveData.js'
+import LiveData from '../../models/liveData.js'
 
 export async function downloadData(req, res) {
     try {
