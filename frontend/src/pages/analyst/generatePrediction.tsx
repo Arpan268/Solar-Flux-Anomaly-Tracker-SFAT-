@@ -17,7 +17,7 @@ interface SinglePrediction {
 interface PredictionResponse {
     status: string;
     total_records_analyzed: number;
-    ml_results: SinglePrediction; // Changed from array to single object to match backend
+    ml_results: SinglePrediction;
     message?: string;
 }
 
@@ -27,6 +27,14 @@ export default function GeneratePrediction() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
+
+    const getFormattedDate = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    const today = getFormattedDate(new Date());
 
     const handlePredict = async () => {
         if (!startDate || !endDate) {
@@ -39,7 +47,6 @@ export default function GeneratePrediction() {
         setPrediction(null);
 
         try {
-            // Keep your exact API route from your screenshot
             const response = await axios.get<PredictionResponse>('/api/user/analyst/generate-prediction', {
                 params: { startDate, endDate },
                 withCredentials: true,
@@ -80,6 +87,8 @@ export default function GeneratePrediction() {
         </div>
     );
 
+    const isInvalidDateRange = new Date(startDate) > new Date(endDate);
+
     return (
         <div className="w-full p-8 text-white min-h-screen">
 
@@ -87,7 +96,7 @@ export default function GeneratePrediction() {
                 <div>
                     <h1 className="text-3xl font-extrabold tracking-wide mb-1">AI Hazard Prediction</h1>
                     <p className="text-slate-400 text-sm">
-                        Forecast upcoming solar hazards using the Machine Learning microservice.
+                        Relative flare-risk estimates for the next <span className="font-bold text-blue-400">24 hours</span> based on the submitted telemetry using the Machine Learning microservice.
                     </p>
                 </div>
 
@@ -97,6 +106,7 @@ export default function GeneratePrediction() {
                         <input
                             type="date"
                             value={startDate}
+                            max={today}
                             onChange={(e) => setStartDate(e.target.value)}
                             className="bg-slate-800 text-white text-sm border border-slate-500 rounded-md px-3 py-1.5 focus:outline-none focus:border-cyan-400"
                         />
@@ -106,13 +116,14 @@ export default function GeneratePrediction() {
                         <input
                             type="date"
                             value={endDate}
+                            max={today}
                             onChange={(e) => setEndDate(e.target.value)}
                             className="bg-slate-800 text-white text-sm border border-slate-500 rounded-md px-3 py-1.5 focus:outline-none focus:border-cyan-400"
                         />
                     </div>
                     <button
                         onClick={handlePredict}
-                        disabled={loading}
+                        disabled={loading || isInvalidDateRange}
                         className="bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 cursor-pointer text-white text-sm font-bold px-5 py-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                     >
                         {loading ? 'Predicting...' : 'AI Prediction'}
@@ -167,10 +178,13 @@ export default function GeneratePrediction() {
                             <div>
                                 <h4 className="text-sm font-bold text-slate-200 mb-1">Operational Model Advisory</h4>
                                 <p className="text-xs text-slate-400 leading-relaxed">
-                                    This predictive engine serves as an advanced decision-support tool designed to augment analyst capabilities. Due to the highly volatile nature of solar magnetic fields, short-term predictions may not achieve absolute certainty. However, the underlying XGBoost model maintains robust baseline accuracy and exhibits a high-performance recall rate for extreme events, successfully predicting approximately 2 out of 3 (65.1%) severe X-Class flares based on historical telemetry patterns and achieving an overall accuracy of 81.2% in predicting flare classes.
+                                    This predictive engine serves as an advanced decision-support tool designed to augment analyst capabilities. The underlying XGBoost model achieves 90.7% overall accuracy on historical test data and demonstrates an 83.4% recall for X-Class flares, successfully identifying approximately 4 out of every 5 actual X-Class events. Due to the highly volatile nature of solar magnetic fields, short-term predictions may not achieve absolute certainty, and the model is designed to prioritize the early identification of potentially significant flare activity.
                                 </p>
                                 <p className="text-xs text-slate-400 leading-relaxed mt-2">
-                                    The displayed class probabilities represent the model’s relative prediction across flare classes. As the predicted likelihood of a higher-intensity flare increases, the model may assign comparatively lower likelihood to lower-intensity classes due to its multiclass classification approach; this should not be interpreted as confirmation that lower-class activity will not occur during the same period. Analysts should therefore interpret these probabilities as decision-support indicators rather than definitive forecasts, and use them in conjunction with active satellite monitoring and established operational protocols.
+                                    The displayed class scores represent relative flare-risk estimates for the next 24 hours based on the submitted telemetry. As the model uses multiclass classification, higher-intensity flare signals may receive greater model confidence while comparatively reducing the scores assigned to lower-intensity classes. These scores should therefore be interpreted as model-based risk indicators rather than independent probabilities or definitive forecasts.
+                                </p>
+                                <p className="text-xs text-slate-400 leading-relaxed mt-2">
+                                    Due to the model's emphasis on detecting potentially severe events, elevated X-Class risk indications may occasionally result in false positives. Analysts should use such indications as an early-warning signal, verify them against current telemetry and satellite observations, and adjust monitoring or operational procedures accordingly.
                                 </p>
                             </div>
                         </div>
