@@ -97,6 +97,7 @@ export default function Navbar() {
                                     <Link to="/analyst" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Dashboard</Link>
                                     <Link to="/analyst/view-anomalies" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Review Anomalies</Link>
                                     <Link to="/analyst/view-live-data" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Live Data</Link>
+                                    <Link to="/analyst/predict-anomalies" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Predict</Link>
                                     <Link to="/analyst/view-graphs" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Graphs</Link>
                                     <Link to="/analyst/view-profile" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Profile</Link>
                                 </>

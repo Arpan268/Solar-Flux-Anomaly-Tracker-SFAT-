@@ -6,6 +6,7 @@ import { viewDiagrams } from '../utility/analyst/viewDiagrams.js'
 import { handleLiveData } from '../utility/operator/handleLiveData.js'
 import { microAnalysis } from '../utility/analyst/microAnalysis.js'
 import { macroAnalysis } from '../utility/analyst/macroAnalysis.js'
+import { predictionHandler } from '../utility/analyst/predictionHandler.js'
 
 const router = express.Router()
 
@@ -16,5 +17,6 @@ router.get('/view-diagrams', viewDiagrams)
 router.get('/live-data', handleLiveData)
 router.get('/micro-analysis/:id', microAnalysis)
 router.get('/macro-analysis', macroAnalysis)
+router.get('/generate-prediction', predictionHandler)
 
 export default router

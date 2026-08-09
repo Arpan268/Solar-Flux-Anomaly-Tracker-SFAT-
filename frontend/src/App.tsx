@@ -25,6 +25,7 @@ import SupervisorViewOperators from './pages/supervisor/viewOperators';
 import AnalystDashboard from './pages/analyst/analystDashboard';
 import AnalystViewAnomalies from './pages/analyst/viewAnomalies';
 import AnalystViewLiveData from './pages/analyst/viewLiveData';
+import GeneratePrediction from './pages/analyst/generatePrediction';
 import AnalystViewGraphs from './pages/analyst/viewGraphs';
 import MicroAnalysis from './pages/analyst/microAnalysis';
 import MacroAnalysis from './pages/analyst/macroAnalysis';
@@ -174,6 +175,11 @@ export default function App() {
         <Route path="/analyst/view-live-data" element={
           <PrivateRoute allowedRoles={['Analyst']}>
             <AnalystViewLiveData />
+          </PrivateRoute>
+        } />
+        <Route path="/analyst/predict-anomalies" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <GeneratePrediction />
           </PrivateRoute>
         } />
         <Route path="/analyst/view-graphs" element={
