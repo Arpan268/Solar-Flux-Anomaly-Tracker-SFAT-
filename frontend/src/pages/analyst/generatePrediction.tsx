@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface HazardRisk {
@@ -27,6 +28,7 @@ export default function GeneratePrediction() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
+    const navigate = useNavigate();
 
     const getFormattedDate = (date: Date) => {
         const year = date.getFullYear();
@@ -90,7 +92,7 @@ export default function GeneratePrediction() {
     const isInvalidDateRange = new Date(startDate) > new Date(endDate);
 
     return (
-        <div className="w-full p-8 text-white min-h-screen">
+        <div className="w-full p-8 text-white min-h-screen mt-8 px-50">
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                 <div>
@@ -168,6 +170,37 @@ export default function GeneratePrediction() {
                             {renderRiskBar('X-Class', getForecastRisk('x_class_risk'), 'bg-red-500')}
                         </div>
 
+                    </div>
+
+                    <div className="mt-8 flex justify-end">
+                        <button
+                            onClick={() => {
+                                navigate('/analyst/create-advisory', {
+                                    state: {
+                                        cclass: getForecastRisk('c_class_risk'),
+                                        mclass: getForecastRisk('m_class_risk'),
+                                        xclass: getForecastRisk('x_class_risk'),
+                                    },
+                                });
+                            }}
+                            className="flex items-center cursor-pointer gap-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-bold py-2.5 px-6 rounded-lg shadow-md border border-indigo-400/50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                        >
+                            <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                />
+                            </svg>
+                            Create Advisory
+                        </button>
                     </div>
 
                     <div className="mt-4 bg-slate-800/60 border-l-4 border-indigo-500 rounded-r-xl p-5 shadow-md">

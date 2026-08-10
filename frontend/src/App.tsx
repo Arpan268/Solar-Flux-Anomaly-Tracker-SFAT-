@@ -20,12 +20,15 @@ import OperatorInstructions from './pages/operator/viewInstructions';
 import SupervisorDashboard from './pages/supervisor/supervisorDashboard';
 import SupervisorViewAnomalies from './pages/supervisor/viewAnomalies';
 import SupervisorSendInstructions from './pages/supervisor/sendInstructions';
+import SupervisorViewAdvisories from './pages/supervisor/viewAdvisories';
 import SupervisorViewOperators from './pages/supervisor/viewOperators';
 
 import AnalystDashboard from './pages/analyst/analystDashboard';
 import AnalystViewAnomalies from './pages/analyst/viewAnomalies';
 import AnalystViewLiveData from './pages/analyst/viewLiveData';
 import GeneratePrediction from './pages/analyst/generatePrediction';
+import CreateAdvisory from './pages/analyst/createAdvisory';
+import ViewAdvisories from './pages/analyst/viewAdvisories';
 import AnalystViewGraphs from './pages/analyst/viewGraphs';
 import MicroAnalysis from './pages/analyst/microAnalysis';
 import MacroAnalysis from './pages/analyst/macroAnalysis';
@@ -145,6 +148,11 @@ export default function App() {
             <SupervisorSendInstructions />
           </PrivateRoute>
         } />
+        <Route path="/supervisor/view-advisories" element={
+          <PrivateRoute allowedRoles={['Supervisor']}>
+            <SupervisorViewAdvisories />
+          </PrivateRoute>
+        } />
         <Route path="/supervisor/view-operators" element={
           <PrivateRoute allowedRoles={['Supervisor']}>
             <SupervisorViewOperators />
@@ -180,6 +188,16 @@ export default function App() {
         <Route path="/analyst/predict-anomalies" element={
           <PrivateRoute allowedRoles={['Analyst']}>
             <GeneratePrediction />
+          </PrivateRoute>
+        } />
+        <Route path="/analyst/create-advisory" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <CreateAdvisory />
+          </PrivateRoute>
+        } />
+        <Route path="/analyst/view-advisories" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <ViewAdvisories />
           </PrivateRoute>
         } />
         <Route path="/analyst/view-graphs" element={

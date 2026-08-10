@@ -131,7 +131,7 @@ export default function AnalystViewLiveData() {
                         )}
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="text-slate-500 font-medium text-sm">From:</span>
+                        <span className="text-slate-500 font-medium text-sm">FROM:</span>
                         <input
                             type="date"
                             value={startDate}
@@ -139,7 +139,7 @@ export default function AnalystViewLiveData() {
                             onChange={(e) => setStartDate(e.target.value)}
                             className="bg-gray-900 text-slate-300 px-3 py-2 rounded-lg border border-gray-600 outline-none focus:border-blue-500 transition-colors cursor-pointer text-sm w-36"
                         />
-                        <span className="text-slate-500 font-medium text-sm">to:</span>
+                        <span className="text-slate-500 font-medium text-sm">TO:</span>
                         <input
                             type="date"
                             value={endDate}
