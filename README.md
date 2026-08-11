@@ -7,21 +7,23 @@
 
 A full-stack, enterprise-grade space weather monitoring application designed for real-time detection, tracking, and incident handling of solar flux anomalies and solar flare events. 
 
-Built on the **MERN** stack (MongoDB, Express, React, Node.js), SFAT provides secure, role-based command centers, live data streams, automated email notification pipelines, AI-powered analysis, and robust cloud deployment configurations.
+Built on the **MERN** stack (MongoDB, Express, React, Node.js) alongside a **Python/FastAPI** Machine Learning microservice. SFAT provides secure, role-based command centers, live data streams, automated email notification pipelines, AI-powered analysis, predictive risk forecasting, and robust cloud deployment configurations.
 
-🌐 **Live Application:** [https://solar-flux-anomaly-tracker-sfat.vercel.app/](https://solar-flux-anomaly-tracker-sfat.vercel.app/)
+**Live Application:** [https://solar-flux-anomaly-tracker-sfat.vercel.app/](https://solar-flux-anomaly-tracker-sfat.vercel.app/)
 
 ---
 
-## 🚀 Key Features
+## 🌟 Key Features
 
 * **Real-Time Data Streaming:** Leverages Server-Sent Events (SSE) to push live telemetry data and anomaly signals to connected supervisor and analyst dashboards without polling overhead.
+* **Machine Learning Predictive Engine (New):** Integrates a custom XGBoost model via a FastAPI microservice to forecast the probability of C-Class, M-Class, and X-Class solar flares within a 24-hour window.
+* **Operational Advisory Workflow (New):** Analysts utilize ML predictions to issue formal threat advisories. Supervisors review these pending advisories to deploy operational instructions to the team.
 * **Event-Driven Emergency Bypass (X-Class Protocol):** Critical X-Class solar flares automatically bypass the standard supervisor queue, triggering immediate SSE dashboard banners and direct email pipelines to Analysts to eliminate organizational latency during planetary-scale events.
 * **AI-Powered Anomaly Triage:** Integrates Google's Gemini API to automatically generate comprehensive, actionable analysis reports for logged solar events.
 * **Role-Based Access Control (RBAC):**
   * **Admin:** Manages platform security, reviews pending user registrations, and grants operational access.
-  * **Supervisor:** Monitors telemetry streams, oversees operator shifts, and verifies standard/moderate (C-Class, M-Class) solar anomalies.
-  * **Analyst:** Examines historical telemetry logs, evaluates space weather data trends, and generates AI-assisted anomaly reports.
+  * **Supervisor:** Monitors telemetry streams, oversees operator shifts, verifies standard/moderate (C-Class, M-Class) solar anomalies, and acts on analyst advisories.
+  * **Analyst:** Examines historical telemetry logs, evaluates space weather data trends, triggers ML risk predictions, and generates AI-assisted anomaly reports.
   * **Operator:** Logs ground observations, registers solar flare thresholds, and manages real-time telemetry inputs.
 * **Automated Email Alert System:** Built-in SendGrid API integration sends instant notifications for:
   * Admin authorization requests upon new user registrations.
@@ -41,27 +43,28 @@ Built on the **MERN** stack (MongoDB, Express, React, Node.js), SFAT provides se
 SFAT is engineered using a decoupled client-server architecture designed for high availability, low-latency telemetry updates, and secure cloud distribution.
 
 ```text
-                  CLIENT (Vercel CDN)
- ┌────────────────────────────────────────────────────────┐
- │            React Single Page Application (SPA)         │
- │            - Tailwind CSS Dashboard Interfaces         │
- │            - React Router DOM Navigation               │
- │            - EventSource SSE Live Data Listeners       │
- └──────────────────────────┬─────────────────────────────┘
-                            │
-                    HTTPS / REST / SSE
-                            │
-                 BACKEND (Render Node.js)
- ┌────────────────────────────────────────────────────────┐
- │                                                        │
- │   Auth Controller    User Controller   Anomaly Streamer│
- │   (JWT / Cookies)    (RBAC Management) (SSE Event Loop)│
- │                                                        │
- └────────┬─────────────────┬───────────────────┬─────────┘
-          │                 │                   │
-  MongoDB Atlas       SendGrid API        Gemini API
-  - Users & Roles     - Admin Alerts      - AI Reports
-  - Anomaly Logs      - Flare Warnings    - Data Triage
+               CLIENT (Vercel CDN)
+                       |
+                       |
+          React Single Page Application (SPA)
+          - Tailwind CSS Dashboard Interfaces
+          - React Router DOM Navigation
+          - EventSource SSE Live Data Listeners
+                       |
+                       |
+               HTTPS / REST / SSE
+                       |
+                       |
+               BACKEND (Render Node.js)
+                       |
+                       |
+      Auth Controller    User Controller   Anomaly Streamer
+      (JWT / Cookies)   (RBAC Management)  (SSE Event Loop)
+         /                 |                 |                \
+        /                  |                 |                 \
+    MongoDB Atlas     SendGrid API       Gemini API        ML Microservice
+    - Users & Roles   - Admin Alerts     - AI Reports      - Python/FastAPI
+    - Anomaly Logs    - Flare Warnings   - Data Triage     - XGBoost Model
 ```
 
 ### Architecture Breakdown
@@ -71,6 +74,7 @@ SFAT is engineered using a decoupled client-server architecture designed for hig
 3. **Database Layer (MongoDB Atlas):** Document storage for users, operational logs, and solar flare telemetry history.
 4. **Notification Engine:** SendGrid API integration pushing dynamic HTML email alerts directly to admins and operators on shift.
 5. **AI Analysis Layer:** Google Gemini API integration for automated report generation based on raw telemetry data.
+6. **Machine Learning Layer:** Python/FastAPI microservice serving a serialized XGBoost model artifact (`model.pkl`) to calculate predictive risk probabilities.
 
 ---
 
@@ -83,34 +87,41 @@ SFAT is engineered using a decoupled client-server architecture designed for hig
 | **Database** | MongoDB, Mongoose ODM |
 | **Notifications** | SendGrid (`@sendgrid/mail` API with dynamic HTML templating) |
 | **AI Analysis** | Google Gemini API (`@google/generative-ai`) |
-| **Hosting & DevOps** | Vercel (Frontend), Render (Backend), GitHub |
+| **Machine Learning** | Python, FastAPI, XGBoost, Pandas, Numpy, Joblib |
+| **Hosting & DevOps** | Vercel (Frontend), Render (Backend & ML API), GitHub |
 
 ---
 
-## 📁 Repository Structure
+## 📂 Repository Structure
 
 ```text
 Solar-Flux-Anomaly-Tracker-SFAT/
-├── frontend/             # React / Vite Client Application
+├── frontend/               # React / Vite Client Application
 │   ├── src/
-│   │   ├── assets/       # Images, logos, static assets
-│   │   ├── components/   # Reusable UI components & loaders
-│   │   ├── context/      # Authentication & global state
-│   │   ├── pages/        # Admin, Supervisor, Analyst, Operator dashboards
-│   │   └── App.tsx       # Main routing & cold-start health check
-│   ├── index.html        # Application entry HTML
-│   ├── vite.config.ts    # Vite configuration
-│   └── vercel.json       # Vercel SPA routing & API proxy rules
+│   │   ├── assets/         # Images, logos, static assets
+│   │   ├── components/     # Reusable UI components & loaders
+│   │   ├── context/        # Authentication & global state
+│   │   ├── pages/          # Admin, Supervisor, Analyst, Operator dashboards
+│   │   ├── App.tsx         # Main routing & cold-start health check
+│   ├── index.html          # Application entry HTML
+│   ├── vite.config.ts      # Vite configuration
+│   └── vercel.json         # Vercel SPA routing & API proxy rules
 │
-├── backend/              # Express.js API Server
-│   ├── config/           # Database connection scripts (`db.js`)
-│   ├── controllers/      # Route handling logic (`userController.js`)
-│   ├── models/           # Mongoose schemas (`User.js`, `Anomaly.js`)
-│   ├── routes/           # API endpoint routers
-│   ├── utility/          # Alert utilities, AI report generation, SSE manager
-│   └── server.js         # Express server bootstrap & middleware
+├── backend/                # Express.js API Server
+│   ├── config/             # Database connection scripts ('db.js')
+│   ├── controllers/        # Route handling logic ('userController.js')
+│   ├── models/             # Mongoose schemas ('User.js', 'Anomaly.js', 'Advisory.js')
+│   ├── routes/             # API endpoint routers
+│   ├── utility/            # Alert utilities, AI report generation, SSE manager
+│   └── server.js           # Express server bootstrap & middleware
 │
-└── README.md             # Project documentation
+├── mlmodel/                # Python FastAPI Prediction Service
+│   ├── server.py           # API endpoints & data preprocessing logic
+│   ├── train.py            # XGBoost model training & generation script
+│   ├── model.pkl           # Serialized model artifact
+│   └── requirements.txt    # Python dependencies
+│
+└── README.md               # Project documentation
 ```
 
 ---
@@ -130,6 +141,7 @@ SENDGRID_API_KEY=your_sendgrid_api_key
 GEMINI_API_KEY=your_gemini_api_key
 DATA_SOURCE=live
 FRONTEND_URL=[https://solar-flux-anomaly-tracker-sfat.vercel.app](https://solar-flux-anomaly-tracker-sfat.vercel.app)
+ML_SERVER_URL=[https://solar-flux-anomaly-tracker-sfat-1.onrender.com](https://solar-flux-anomaly-tracker-sfat-1.onrender.com)
 ```
 
 ### Render Dashboard Environment Variables
@@ -141,6 +153,7 @@ Ensure the following variables are configured under your Render service **Enviro
 * `GEMINI_API_KEY`
 * `DATA_SOURCE`
 * `FRONTEND_URL` = `https://solar-flux-anomaly-tracker-sfat.vercel.app` *(no trailing slash)*
+* `ML_SERVER_URL` = `https://solar-flux-anomaly-tracker-sfat-1.onrender.com`
 
 ---
 
@@ -150,6 +163,7 @@ Follow these steps to run the complete SFAT system locally on your machine.
 
 ### Prerequisites
 * [Node.js](https://nodejs.org/) (v18+ recommended)
+* [Python 3](https://www.python.org/downloads/) (For the ML microservice)
 * [Git](https://git-scm.com/)
 * [MongoDB Community Server](https://www.mongodb.com/try/download/community) or a free [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster account.
 * API Keys for [SendGrid](https://sendgrid.com/) and [Google Gemini](https://ai.google.dev/).
@@ -173,10 +187,26 @@ cp .env.example .env  # Add your environment variables inside .env
 
 # Start local backend server
 npm run dev
-```
-The backend server will launch at `http://localhost:5000`.
 
-### 3. Setup Frontend
+# The backend server will launch at 'http://localhost:5000'.
+```
+
+### 3. Setup ML Microservice
+Open a new terminal window:
+```bash
+# Navigate to the ML directory
+cd mlmodel
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Start local FastAPI server
+uvicorn server:app --reload --port 8000
+
+# The ML API will launch at 'http://localhost:8000'.
+```
+
+### 4. Setup Frontend
 Open a new terminal window:
 ```bash
 # Navigate to the frontend directory
@@ -187,9 +217,9 @@ npm install
 
 # Start local frontend development server
 npm run dev
-```
-The frontend will launch at `http://localhost:5173`.
 
+# The frontend will launch at 'http://localhost:5173'.
+```
 ---
 
 ## 🔌 API Endpoints Summary
@@ -197,12 +227,14 @@ The frontend will launch at `http://localhost:5173`.
 | Method | Endpoint | Access Level | Description |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/health` | Public | System status ping for cold-start UI handling |
+| `GET` | `ML_URL/health` | Public | ML Microservice status ping |
 | `POST` | `/api/auth/register` | Public | Registers new user; triggers email alert to admins |
 | `POST` | `/api/auth/login` | Public | Authenticates credentials; issues access/refresh tokens |
 | `GET` | `/api/user/shared/supervisor/analyze` | Supervisor / Admin | Fetches telemetry analysis summaries |
-| `GET` | `/api/user/shared/notifications/stream`| Analyst / Supervisor | Establishes SSE pipeline for real-time emergency alerts |
+| `GET` | `/api/user/shared/notifications/stream` | Analyst / Supervisor | Establishes SSE pipeline for real-time emergency alerts |
 | `POST` | `/api/user/operator/alert` | Operator | Logs an anomaly and fires role-specific urgent shift alerts |
 | `POST` | `/api/user/analyst/generate-report` | Analyst | Triggers Gemini API to generate AI anomaly analysis |
+| `POST` | `ML_URL/predict` | Analyst | Processes telemetry payload through XGBoost to forecast 24h flare risk probabilities |
 
 ---
 
