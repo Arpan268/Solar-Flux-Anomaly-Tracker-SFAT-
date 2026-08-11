@@ -140,9 +140,8 @@ REFRESH_TOKEN_SECRET=your_jwt_refresh_secret_key
 SENDGRID_API_KEY=your_sendgrid_api_key
 GEMINI_API_KEY=your_gemini_api_key
 DATA_SOURCE=live
-FRONTEND_URL=[https://solar-flux-anomaly-tracker-sfat.vercel.app](https://solar-flux-anomaly-tracker-sfat.vercel.app)
-ML_SERVER_URL=[https://solar-flux-anomaly-tracker-sfat-1.onrender.com](https://solar-flux-anomaly-tracker-sfat-1.onrender.com)
-```
+FRONTEND_URL=https://solar-flux-anomaly-tracker-sfat.vercel.app
+ML_SERVER_URL=https://solar-flux-anomaly-tracker-sfat-1.onrender.com
 
 ### Render Dashboard Environment Variables
 Ensure the following variables are configured under your Render service **Environment** tab:
