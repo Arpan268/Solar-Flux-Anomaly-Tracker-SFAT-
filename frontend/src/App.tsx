@@ -45,7 +45,7 @@ export default function App() {
       try {
         await Promise.all([
           fetch('/api/health'),
-          fetch('http://localhost:8000/health', { mode: 'no-cors' })
+          fetch('https://solar-flux-anomaly-tracker-sfat-1.onrender.com/health', { mode: 'no-cors' })
         ]);
 
         setIsServerAwake(true);
