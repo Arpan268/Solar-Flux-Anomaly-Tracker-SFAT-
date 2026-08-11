@@ -138,7 +138,7 @@ export default function SupervisorDashboard() {
                             <h3 className="text-white font-bold text-sm tracking-wide uppercase">New Advisory Received</h3>
                         </div>
                         <button onClick={() => setShowAdvisoryToast(false)} className="text-indigo-400 hover:text-white transition-colors">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            <svg className="w-4 h-4 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
                     <p className="text-indigo-200 text-xs mb-4">
@@ -208,10 +208,10 @@ export default function SupervisorDashboard() {
                         <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
                             <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Total Anomalies</p>
                             <p className="text-2xl text-white font-bold">{summary.totalAnomalies}</p>
-                            {summary.pendingCount > 0 ? (
+                            {summary.anomalyPendingCount > 0 ? (
                                 <span className="text-sm font-medium text-amber-500/90 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 flex items-center gap-1 mt-1.5">
                                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                                    {summary.pendingCount} Pending {summary.pendingCount === 1 ? 'Review' : 'Reviews'}
+                                    {summary.anomalyPendingCount} Pending {summary.anomalyPendingCount === 1 ? 'Review' : 'Reviews'}
                                 </span>
                             ) : (
                                 <span className="text-sm font-medium text-emerald-500/90 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1 mt-1.5">
@@ -223,16 +223,25 @@ export default function SupervisorDashboard() {
 
                         <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
                             <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Peak Flux (24H)</p>
-                            <p className="text-2xl text-blue-400 font-bold">
+                            <p className="text-2xl text-white font-bold">
                                 {summary.peakFlux > 0 ? summary.peakFlux.toExponential(3) : "0"}
                             </p>
                         </div>
 
                         <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
-                            <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Max Severity</p>
-                            <p className={`text-xl font-bold ${summary.maxSeverity.includes('X') ? 'text-red-500' : summary.maxSeverity.includes('M') ? 'text-orange-400' : 'text-emerald-400'}`}>
-                                {summary.maxSeverity}
-                            </p>
+                            <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">Advisories Issued</p>
+                            <p className="text-2xl text-white font-bold">{summary.advisoryCount}</p>
+                            {summary.advisoryPendingCount > 0 ? (
+                                <span className="text-sm font-medium text-amber-500/90 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 flex items-center gap-1 mt-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                    {summary.advisoryPendingCount} Pending {summary.advisoryPendingCount === 1 ? 'Review' : 'Reviews'}
+                                </span>
+                            ) : (
+                                <span className="text-sm font-medium text-emerald-500/90 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1 mt-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Acknowledged
+                                </span>
+                            )}
                         </div>
 
                         <div className="bg-gray-900 border border-gray-700/50 rounded-lg p-5 shadow-sm">
