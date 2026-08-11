@@ -20,11 +20,15 @@ import OperatorInstructions from './pages/operator/viewInstructions';
 import SupervisorDashboard from './pages/supervisor/supervisorDashboard';
 import SupervisorViewAnomalies from './pages/supervisor/viewAnomalies';
 import SupervisorSendInstructions from './pages/supervisor/sendInstructions';
+import SupervisorViewAdvisories from './pages/supervisor/viewAdvisories';
 import SupervisorViewOperators from './pages/supervisor/viewOperators';
 
 import AnalystDashboard from './pages/analyst/analystDashboard';
 import AnalystViewAnomalies from './pages/analyst/viewAnomalies';
 import AnalystViewLiveData from './pages/analyst/viewLiveData';
+import GeneratePrediction from './pages/analyst/generatePrediction';
+import CreateAdvisory from './pages/analyst/createAdvisory';
+import ViewAdvisories from './pages/analyst/viewAdvisories';
 import AnalystViewGraphs from './pages/analyst/viewGraphs';
 import MicroAnalysis from './pages/analyst/microAnalysis';
 import MacroAnalysis from './pages/analyst/macroAnalysis';
@@ -37,23 +41,29 @@ export default function App() {
   const [isServerAwake, setIsServerAwake] = useState(false);
 
   useEffect(() => {
-    const wakeUpServer = async () => {
+    const wakeUpServers = async () => {
       try {
-        await fetch('/api/health');
+        await Promise.all([
+          fetch('/api/health'),
+          fetch('http://localhost:8000/health', { mode: 'no-cors' })
+        ]);
+
         setIsServerAwake(true);
       } catch (error) {
-        setTimeout(wakeUpServer, 3000);
+        console.error("Waking servers...");
+        setTimeout(wakeUpServers, 3000);
       }
     };
-    wakeUpServer();
+
+    wakeUpServers();
   }, []);
 
   if (!isServerAwake) {
     return (
-      <div className='min-h-screen bg-linear-to-b from-zinc-950 via-slate-900 to-gray-900 flex flex-col items-center justify-center text-white font-sans'>
+      <div className="min-h-screen bg-linear-to-b from-zinc-950 via-slate-900 to-gray-900 flex flex-col items-center justify-center text-white font-sans">
         <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-emerald-500 mb-6"></div>
-        <h2 className="text-2xl font-bold mb-2">Connecting to Secure Server...</h2>
-        <p className="text-gray-400">Waking up the data pipeline. Please allow up to 45 seconds.</p>
+        <h2 className="text-2xl font-bold mb-2">Connecting to Secure Servers...</h2>
+        <p className="text-gray-400">Waking up the data pipeline & ML microservice. Please allow up to 45 seconds.</p>
       </div>
     );
   }
@@ -144,6 +154,11 @@ export default function App() {
             <SupervisorSendInstructions />
           </PrivateRoute>
         } />
+        <Route path="/supervisor/view-advisories" element={
+          <PrivateRoute allowedRoles={['Supervisor']}>
+            <SupervisorViewAdvisories />
+          </PrivateRoute>
+        } />
         <Route path="/supervisor/view-operators" element={
           <PrivateRoute allowedRoles={['Supervisor']}>
             <SupervisorViewOperators />
@@ -174,6 +189,21 @@ export default function App() {
         <Route path="/analyst/view-live-data" element={
           <PrivateRoute allowedRoles={['Analyst']}>
             <AnalystViewLiveData />
+          </PrivateRoute>
+        } />
+        <Route path="/analyst/predict-anomalies" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <GeneratePrediction />
+          </PrivateRoute>
+        } />
+        <Route path="/analyst/create-advisory" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <CreateAdvisory />
+          </PrivateRoute>
+        } />
+        <Route path="/analyst/view-advisories" element={
+          <PrivateRoute allowedRoles={['Analyst']}>
+            <ViewAdvisories />
           </PrivateRoute>
         } />
         <Route path="/analyst/view-graphs" element={

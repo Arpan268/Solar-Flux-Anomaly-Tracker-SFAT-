@@ -8,6 +8,8 @@ import { deleteOperator } from '../utility/supervisor/deleteOperators.js'
 import { viewInstructions } from '../utility/supervisor/viewInstructions.js'
 import { getAllShifts, bulkReassignShifts } from '../utility/supervisor/manageShifts.js'
 import { handleLiveData } from '../utility/operator/handleLiveData.js'
+import { viewPendingAdvisories, viewAcknowledgedAdvisories } from '../utility/supervisor/viewAdvisories.js'
+import { advisorySSEHandler } from '../utility/supervisor/advisoryStream.js'
 
 const router = express.Router()
 
@@ -22,5 +24,8 @@ router.get('/view-instructions', viewInstructions)
 router.get('/shifts', getAllShifts)
 router.put('/bulk-reassign-shifts', bulkReassignShifts)
 router.get('/live-data', handleLiveData)
+router.get('/pending-advisories', viewPendingAdvisories)
+router.get('/acknowledged-advisories', viewAcknowledgedAdvisories)
+router.get('/advisory-stream', advisorySSEHandler)
 
 export default router

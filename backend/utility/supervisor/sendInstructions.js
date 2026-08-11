@@ -1,47 +1,68 @@
-import Instructions from '../../models/instructions.js'
-import User from '../../models/users.js'
-import { criticalEvent } from '../../events/addEvents.js'
+import Instructions from '../../models/instructions.js';
+import User from '../../models/users.js';
+import Advisory from '../../models/advisories.js';
+import { criticalEvent } from '../../events/addEvents.js';
 
 export async function sendInstructions(req, res) {
     try {
-        const { targetOperator, message } = req.body
-        const supervisorId = req.user.userId
+        const { targetOperator, message, advisoryId } = req.body;
+        const supervisorId = req.user.userId;
+
+        let isAdvisoryDerived = false;
+        let expiresAt = null;
+
+        if (advisoryId) {
+            isAdvisoryDerived = true;
+            expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        }
 
         if (targetOperator === 'All') {
-            const operators = await User.find({ role: 'Operator', status: 'Approved' })
+            const operators = await User.find({ role: 'Operator', status: 'Approved' });
 
             const broadcastData = operators.map(op => ({
                 message: message,
                 isRead: false,
                 supervisorId: supervisorId,
                 targetOperatorId: op.userId,
-                source: process.env.DATA_SOURCE
-            }))
+                source: process.env.DATA_SOURCE,
+                advisoryId: advisoryId || null,
+                isAdvisoryDerived: isAdvisoryDerived,
+                expiresAt: expiresAt
+            }));
 
-            await Instructions.insertMany(broadcastData)
+            await Instructions.insertMany(broadcastData);
+            criticalEvent.emit('new_instruction', { targetOperator: 'All' });
 
-            criticalEvent.emit('new_instruction', { targetOperator: 'All' })
-
-            res.status(201).json({ message: 'Broadcast sent successfully' })
         }
+
         else {
             const instruction = new Instructions({
                 message: message,
                 isRead: false,
                 supervisorId: supervisorId,
                 targetOperatorId: targetOperator,
-                source: process.env.DATA_SOURCE
-            })
+                source: process.env.DATA_SOURCE,
+                advisoryId: advisoryId || null,
+                isAdvisoryDerived: isAdvisoryDerived,
+                expiresAt: expiresAt
+            });
 
-            await instruction.save()
-
-            criticalEvent.emit('new_instruction', { targetOperator: targetOperator })
-
-            res.status(201).json({ message: 'Instruction saved successfully' })
+            await instruction.save();
+            criticalEvent.emit('new_instruction', { targetOperator: targetOperator });
         }
-    }
-    catch (err) {
-        console.error('Error saving instruction: ', err)
-        res.status(500).json({ message: 'Server error' })
+
+        if (advisoryId) {
+            await Advisory.findByIdAndUpdate(advisoryId, {
+                status: 'Acknowledged',
+                acknowledgedBySupervisorId: supervisorId
+            });
+            criticalEvent.emit('advisory_acknowledged');
+        }
+
+        res.status(201).json({ message: 'Instruction processed successfully' });
+
+    } catch (err) {
+        console.error('Error saving instruction:', err);
+        res.status(500).json({ message: 'Server error' });
     }
 }

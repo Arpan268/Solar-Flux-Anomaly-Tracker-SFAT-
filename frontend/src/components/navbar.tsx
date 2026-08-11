@@ -1,23 +1,13 @@
 import axios from 'axios'
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { useAuth } from "../context/authContext"
 import { useEffect, useState } from 'react'
+import ProfileMenu from './profileMenu'
 
 export default function Navbar() {
-    const { auth, setAuth } = useAuth()
+    const { auth } = useAuth()
     const [dataSource, setDataSource] = useState('')
     const [error, setError] = useState('')
-    const navigate = useNavigate()
-
-    async function handleLogout() {
-        try {
-            await axios.post('/api/auth/logout', {}, { withCredentials: true });
-            setAuth(null);
-            navigate('/login');
-        } catch (err) {
-            console.error('Logout failed:', err);
-        }
-    }
 
     useEffect(() => {
         if (!(auth as any)?.accessToken) return;
@@ -40,7 +30,7 @@ export default function Navbar() {
     }, [auth]);
 
     return (
-        <nav className="bg-gray-900 py-5 px-18 text-slate-200">
+        <nav className="bg-gray-900 py-5 px-12 text-slate-200">
             <div className="mx-auto flex justify-between items-center">
 
                 <div className="flex items-center gap-6 mr-8">
@@ -78,7 +68,6 @@ export default function Navbar() {
                                     <Link to="/operator" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Dashboard</Link>
                                     <Link to="/operator/view-anomalies" className="hover:text-white transition-colors hover:scale-105 transform duration-300">My Logs</Link>
                                     <Link to="/operator/view-instructions" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Instructions</Link>
-                                    <Link to="/operator/view-profile" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Profile</Link>
                                 </>
                             )}
 
@@ -87,8 +76,8 @@ export default function Navbar() {
                                     <Link to="/supervisor" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Dashboard</Link>
                                     <Link to="/supervisor/view-anomalies" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Review Anomalies</Link>
                                     <Link to="/supervisor/send-instructions" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Send Instructions</Link>
+                                    <Link to="/supervisor/view-advisories" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Advisories</Link>
                                     <Link to="/supervisor/view-operators" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Manage Operators</Link>
-                                    <Link to="/supervisor/view-profile" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Profile</Link>
                                 </>
                             )}
 
@@ -97,8 +86,9 @@ export default function Navbar() {
                                     <Link to="/analyst" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Dashboard</Link>
                                     <Link to="/analyst/view-anomalies" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Review Anomalies</Link>
                                     <Link to="/analyst/view-live-data" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Live Data</Link>
+                                    <Link to="/analyst/predict-anomalies" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Predict</Link>
+                                    <Link to="/analyst/view-advisories" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Issued Advisories</Link>
                                     <Link to="/analyst/view-graphs" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Graphs</Link>
-                                    <Link to="/analyst/view-profile" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Profile</Link>
                                 </>
                             )}
 
@@ -106,16 +96,10 @@ export default function Navbar() {
                                 <>
                                     <Link to="/admin" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Admin Panel</Link>
                                     <Link to="/admin/manage-users" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Manage Users</Link>
-                                    <Link to="/admin/view-profile" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Profile</Link>
                                 </>
                             )}
 
-                            <button
-                                onClick={handleLogout}
-                                className="bg-red-600/80 px-4 py-1 rounded text-white hover:bg-red-600 transition-colors ml-4 cursor-pointer hover:scale-105 transform duration-300"
-                            >
-                                Logout
-                            </button>
+                            <ProfileMenu />
                         </>
                     )}
                 </div>

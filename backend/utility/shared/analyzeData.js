@@ -1,12 +1,14 @@
 import LiveData from '../../models/liveData.js';
 import Anomaly from '../../models/anomalies.js';
+import Advisory from '../../models/advisories.js';
 
 export async function analyzeData(req, res) {
     try {
         const currentSource = process.env.DATA_SOURCE || 'live';
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
         let recentAnomalies = []
-        let pendingCount = 0
+        let anomalyPendingCount = 0
+        let advisoryPendingCount = 0
 
         if (req.user.role === 'Supervisor') {
             recentAnomalies = await Anomaly.find({
@@ -27,7 +29,7 @@ export async function analyzeData(req, res) {
             return res.status(403).json({ message: 'Unauthorized access' })
         }
 
-        pendingCount = await Anomaly.countDocuments({
+        anomalyPendingCount = await Anomaly.countDocuments({
             source: currentSource,
             time_tag: { $gte: twentyFourHoursAgo },
             isAcknowledged: false
@@ -37,6 +39,17 @@ export async function analyzeData(req, res) {
             source: currentSource,
             time_tag: { $gte: twentyFourHoursAgo }
         }).sort({ flux: -1 });
+
+        const advisoryCount = await Advisory.countDocuments({
+            source: currentSource,
+            createdAt: { $gte: twentyFourHoursAgo }
+        });
+
+        advisoryPendingCount = await Advisory.countDocuments({
+            source: currentSource,
+            createdAt: { $gte: twentyFourHoursAgo },
+            status: 'Pending'
+        });
 
         const totalAnomalies = recentAnomalies.length;
         const peakFlux = peakReading ? peakReading.flux : 0;
@@ -76,7 +89,9 @@ export async function analyzeData(req, res) {
                 peakFlux,
                 maxSeverity,
                 breakdown,
-                pendingCount
+                anomalyPendingCount,
+                advisoryCount,
+                advisoryPendingCount
             }
         });
 

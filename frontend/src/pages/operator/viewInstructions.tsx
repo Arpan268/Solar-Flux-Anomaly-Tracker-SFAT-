@@ -9,6 +9,8 @@ interface Instruction {
     supervisorId: string;
     targetOperatorId: string;
     createdAt: string;
+    isAdvisoryDerived?: boolean;
+    expiresAt?: string;
 }
 
 export default function OperatorInstructions() {
@@ -77,6 +79,34 @@ export default function OperatorInstructions() {
         }
     }
 
+    const renderExpiryBadge = (inst: Instruction) => {
+        if (!inst.isAdvisoryDerived || !inst.expiresAt) return null;
+
+        const isExpired = new Date() > new Date(inst.expiresAt);
+
+        const dateTimeString = new Date(inst.expiresAt).toLocaleString([], {
+            month: 'numeric',
+            day: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        if (isExpired) {
+            return (
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-900/30 text-red-500 border border-red-700/50 whitespace-nowrap">
+                    Expired: {dateTimeString}
+                </span>
+            );
+        } else {
+            return (
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-900/30 text-orange-400 border border-orange-700/50 whitespace-nowrap">
+                    Expires: {dateTimeString}
+                </span>
+            );
+        }
+    };
+
     return (
         <div className="max-w-7xl mx-auto mt-12 p-6">
             <div className="mb-8">
@@ -101,12 +131,15 @@ export default function OperatorInstructions() {
 
                 <div className="grid grid-cols-1 gap-4">
                     {unread.map((inst) => (
-                        <div key={inst._id} className="bg-gray-900 rounded-xl shadow-2xl border border-yellow-900/50 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div key={inst._id} className="bg-gray-900 rounded-xl shadow-2xl border border-yellow-900/50 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div className="flex-1 space-y-2">
-                                <div className="flex items-center gap-3">
-                                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-yellow-900/30 text-yellow-500 border border-yellow-700/50">
+                                <div className="flex items-center flex-wrap gap-3">
+                                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-yellow-900/30 text-yellow-500 border border-yellow-700/50 whitespace-nowrap">
                                         New Directive
                                     </span>
+
+                                    {renderExpiryBadge(inst)}
+
                                     <span className="text-sm text-slate-500 font-medium">
                                         {new Date(inst.createdAt).toLocaleString()}
                                     </span>
@@ -117,7 +150,7 @@ export default function OperatorInstructions() {
 
                             <button
                                 onClick={() => handleMarkAsRead(inst._id)}
-                                className="w-full md:w-auto cursor-pointer whitespace-nowrap bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/30 px-6 py-3 rounded-lg font-bold shadow-sm transition-colors"
+                                className="w-full md:w-auto cursor-pointer whitespace-nowrap bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/50 px-6 py-2 rounded-lg font-bold transition-all shadow-md"
                             >
                                 Mark as Read
                             </button>
@@ -135,7 +168,7 @@ export default function OperatorInstructions() {
             <div className="flex justify-center mb-10">
                 <button
                     onClick={() => setShowHistory(!showHistory)}
-                    className="bg-gray-800 text-slate-300 hover:text-white px-8 py-3 rounded-lg font-semibold border border-gray-700 hover:border-gray-500 transition-all shadow-lg hover:shadow-gray-700/20 cursor-pointer transform hover:scale-102 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="bg-gray-800 text-slate-300 cursor-pointer hover:text-white px-8 py-3 rounded-lg font-semibold border border-gray-700 hover:border-gray-500 transition-all shadow-md"
                 >
                     {showHistory ? "Hide Instruction History" : "View Previous Instructions"}
                 </button>
@@ -148,12 +181,15 @@ export default function OperatorInstructions() {
                     <div className="bg-gray-900 rounded-xl shadow-2xl border border-gray-700 overflow-hidden">
                         <div className="grid grid-cols-1 divide-y divide-gray-800">
                             {read.map((inst) => (
-                                <div key={inst._id} className="p-6 hover:bg-gray-800/30 transition-colors opacity-80">
+                                <div key={inst._id} className="p-6 hover:bg-gray-800/50 transition-colors opacity-80">
                                     <div className="flex flex-col space-y-2">
-                                        <div className="flex items-center gap-3">
-                                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-800 text-slate-400 border border-gray-700">
+                                        <div className="flex items-center flex-wrap gap-3">
+                                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-800 text-slate-400 border border-gray-700 whitespace-nowrap">
                                                 Acknowledged
                                             </span>
+
+                                            {renderExpiryBadge(inst)}
+
                                             <span className="text-sm text-slate-500 font-medium">
                                                 {new Date(inst.createdAt).toLocaleString()}
                                             </span>
@@ -163,13 +199,13 @@ export default function OperatorInstructions() {
                                     </div>
                                 </div>
                             ))}
-                        </div>
 
-                        {read.length === 0 && (
-                            <div className="p-8 text-center text-slate-600">
-                                No historical instructions found.
-                            </div>
-                        )}
+                            {read.length === 0 && (
+                                <div className="p-8 text-center text-slate-600">
+                                    No historical instructions found.
+                                </div>
+                            )}
+                        </div>
 
                         {totalPages > 1 && (
                             <div className="bg-gray-800/50 border-t border-gray-700 p-4 flex justify-center gap-2">
@@ -178,8 +214,8 @@ export default function OperatorInstructions() {
                                         key={index}
                                         onClick={() => setPage(index + 1)}
                                         className={`w-10 h-10 rounded cursor-pointer font-semibold transition-colors ${page === index + 1
-                                                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                                                : "bg-gray-800 text-slate-400 hover:bg-gray-700 hover:text-white border border-gray-700"
+                                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+                                            : "bg-gray-800 text-slate-400 hover:bg-gray-700 hover:text-white border border-gray-700"
                                             }`}
                                     >
                                         {index + 1}
