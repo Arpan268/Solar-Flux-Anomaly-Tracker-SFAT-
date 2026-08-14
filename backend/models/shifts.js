@@ -4,7 +4,6 @@ const shiftSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        unique: true
     },
     startTime: {
         type: String,
@@ -13,7 +12,10 @@ const shiftSchema = new mongoose.Schema({
     endTime: {
         type: String,
         required: true
-    }
+    },
+    company: { type: mongoose.SchemaTypes.ObjectId, ref: 'Companies', default: null },
 });
+
+shiftSchema.index({ name: 1, company: 1 }, { unique: true });
 
 export default mongoose.models.Shift || mongoose.model('Shift', shiftSchema);

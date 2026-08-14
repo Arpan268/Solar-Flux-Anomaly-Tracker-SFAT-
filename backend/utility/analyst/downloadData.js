@@ -4,7 +4,7 @@ export async function downloadData(req, res) {
     try {
         const { startDate, endDate } = req.query;
 
-        let query = { source: process.env.DATA_SOURCE };
+        let query = { source: process.env.DATA_SOURCE, company: req.user.company };
 
         if (startDate && endDate) {
             const start = new Date(`${startDate}T00:00:00.000`);

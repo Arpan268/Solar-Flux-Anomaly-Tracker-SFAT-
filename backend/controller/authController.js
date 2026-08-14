@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { criticalEvent } from '../events/addEvents.js'
 import EmailVerification from '../models/emailVerification.js'
+import Company from '../models/companies.js';
 import { sendOtp } from './sendOtp.js'
 
 function getCookieOptions(maxAge) {
@@ -15,65 +16,107 @@ function getCookieOptions(maxAge) {
     }
 }
 
-export async function register(req, res) {
-    const { username, email, role, password } = req.body
+export async function registerCompany(req, res) {
+    const { companyName, email, companyType } = req.body;
 
-    if (!username || !email || !role || !password) {
-        return res.status(400).json({ message: 'All fields are required' })
+    if (!companyName || !email || !companyType) {
+        return res.status(400).json({ message: 'All company fields are required.' });
     }
+
     try {
-        const prefix = role.substring(0, 3).toUpperCase()
-        const randomDigits = Math.floor(1000 + Math.random() * 9000)
-        const customUserId = `${prefix}-${randomDigits}`
-
-        const verificationRecord = await EmailVerification.findOne({ email })
-
+        const verificationRecord = await EmailVerification.findOne({ email });
         if (!verificationRecord || !verificationRecord.isVerified) {
-            return res.status(400).json({ message: 'Email not verified. Please verify your email before registering.' })
+            return res.status(400).json({ message: 'Email not verified. Please verify the company email before registering.' });
+        }
+        y
+        const newCompany = new Company({
+            companyName,
+            email,
+            companyType
+        });
+
+        await newCompany.save();
+
+        await EmailVerification.findOneAndDelete({ email });
+
+        res.status(201).json({
+            message: 'Company successfully registered. Pending SFAT Admin approval.',
+            companyId: newCompany._id
+        });
+
+    } catch (err) {
+        console.error('Error registering company:', err);
+        if (err.code === 11000) {
+            const duplicateField = err.keyValue ? Object.keys(err.keyValue)[0] : 'field';
+            const fieldLabel = duplicateField === 'email' ? 'Company Email' : 'Company Name';
+            return res.status(409).json({ message: `${fieldLabel} already exists.` });
+        }
+        return res.status(500).json({ message: 'Server error during company registration.' });
+    }
+}
+
+export async function registerUser(req, res) {
+    const { username, email, role, password, companyName } = req.body;
+
+    if (!username || !email || !role || !password || !companyName) {
+        return res.status(400).json({ message: 'All fields, including company selection, are required.' });
+    }
+
+    try {
+        const verificationRecord = await EmailVerification.findOne({ email });
+        if (!verificationRecord || !verificationRecord.isVerified) {
+            return res.status(400).json({ message: 'Email not verified. Please verify your email before registering.' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10)
+        const targetCompany = await Company.findOne({ companyName, status: 'Approved' });
+        if (!targetCompany) {
+            return res.status(404).json({ message: 'Selected company does not exist or is not yet approved.' });
+        }
+
+        const prefix = role.substring(0, 3).toUpperCase();
+        const randomDigits = Math.floor(1000 + Math.random() * 9000);
+        const customUserId = `${prefix}-${randomDigits}`;
+
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = new User({
             username,
             email,
             userId: customUserId,
             role,
-            password: hashedPassword
-        })
-        await user.save()
+            password: hashedPassword,
+            company: targetCompany._id
+        });
 
-        await EmailVerification.findOneAndDelete({ email })
+        await user.save();
+        await EmailVerification.findOneAndDelete({ email });
 
-        const { password: dbPassword, ...userWithoutPassword } = user.toObject()
-        criticalEvent.emit('admin-email', { userWithoutPassword })
-        criticalEvent.emit('registration-email', { userWithoutPassword })
+        const { password: dbPassword, ...userWithoutPassword } = user.toObject();
+
+        criticalEvent.emit('admin-email', { userWithoutPassword });
+        criticalEvent.emit('registration-email', { userWithoutPassword });
 
         res.status(201).json({
-            message: 'User successfully registered',
+            message: 'User successfully registered. Pending approval.',
             userId: user.userId,
             user: {
                 id: user.userId,
                 email: user.email,
                 username: user.username,
-                role: user.role
+                role: user.role,
+                company: user.company
             }
-        })
-    }
-
-    catch (err) {
-        console.error('Error registering user:', err)
-
+        });
+    } catch (err) {
+        console.error('Error registering user:', err);
         if (err.code === 11000) {
-            const duplicateField = err.keyValue ? Object.keys(err.keyValue)[0] : 'field'
-            const fieldLabel = duplicateField === 'email' ? 'Email' : duplicateField === 'userId' ? 'User ID' : 'Value'
-            return res.status(409).json({ message: `${fieldLabel} already exists` })
+            const duplicateField = err.keyValue ? Object.keys(err.keyValue)[0] : 'field';
+            const fieldLabel = duplicateField === 'email' ? 'Email' : 'User ID';
+            return res.status(409).json({ message: `${fieldLabel} already exists.` });
         }
-
-        return res.status(500).json({ message: 'Server error' })
+        return res.status(500).json({ message: 'Server error during user registration.' });
     }
 }
-
 
 export async function login(req, res) {
     const { userId, password } = req.body
@@ -136,6 +179,7 @@ export async function login(req, res) {
             id: user.userId,
             userId: user.userId,
             role: user.role,
+            company: user.company
         }
 
         const accessToken = jwt.sign(
@@ -159,6 +203,7 @@ export async function login(req, res) {
                 id: user.userId,
                 username: user.username,
                 role: user.role,
+                company: user.company
             }
         })
 
@@ -196,6 +241,7 @@ export async function refreshToken(req, res) {
             id: user.userId,
             userId: user.userId,
             role: user.role,
+            company: user.company
         }
 
         const newAccessToken = jwt.sign(
@@ -212,6 +258,7 @@ export async function refreshToken(req, res) {
                 id: user.userId,
                 username: user.username,
                 role: user.role,
+                company: user.company
             },
         })
     }
@@ -253,7 +300,7 @@ export async function generateOtp(req, res) {
 
         await EmailVerification.findOneAndUpdate(
             { email },
-            { otp, expiresAt },
+            { otp, expiresAt, isVerified: false },
             { upsert: true, returnDocument: 'after' }
         )
 

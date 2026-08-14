@@ -17,7 +17,7 @@ export async function sendInstructions(req, res) {
         }
 
         if (targetOperator === 'All') {
-            const operators = await User.find({ role: 'Operator', status: 'Approved' });
+            const operators = await User.find({ role: 'Operator', status: 'Approved', company: req.user.company });
 
             const broadcastData = operators.map(op => ({
                 message: message,
@@ -27,7 +27,8 @@ export async function sendInstructions(req, res) {
                 source: process.env.DATA_SOURCE,
                 advisoryId: advisoryId || null,
                 isAdvisoryDerived: isAdvisoryDerived,
-                expiresAt: expiresAt
+                expiresAt: expiresAt,
+                company: req.user.company
             }));
 
             await Instructions.insertMany(broadcastData);
@@ -44,7 +45,8 @@ export async function sendInstructions(req, res) {
                 source: process.env.DATA_SOURCE,
                 advisoryId: advisoryId || null,
                 isAdvisoryDerived: isAdvisoryDerived,
-                expiresAt: expiresAt
+                expiresAt: expiresAt,
+                company: req.user.company
             });
 
             await instruction.save();
@@ -52,10 +54,9 @@ export async function sendInstructions(req, res) {
         }
 
         if (advisoryId) {
-            await Advisory.findByIdAndUpdate(advisoryId, {
-                status: 'Acknowledged',
+            await Advisory.findOneAndUpdate({_id: advisoryId, company: req.user.company}, {
                 acknowledgedBySupervisorId: supervisorId
-            });
+            }, {new: true});
             criticalEvent.emit('advisory_acknowledged');
         }
 

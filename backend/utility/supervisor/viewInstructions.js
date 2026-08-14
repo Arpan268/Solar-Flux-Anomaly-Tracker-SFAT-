@@ -7,7 +7,7 @@ export async function viewInstructions(req, res) {
         const limit = parseInt(req.query.limit) || 6
         const skip = (page - 1) * limit
 
-        const filter = { source: process.env.DATA_SOURCE, supervisorId: supervisorId }
+        const filter = { source: process.env.DATA_SOURCE, supervisorId: supervisorId, company: req.user.company }
         const total = await Instructions.countDocuments(filter)
         const instructions = await Instructions.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }).select('-supervisorId')
 

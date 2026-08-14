@@ -1,14 +1,15 @@
 import LiveData from '../../models/liveData.js'; 
 import { predictSolarFlares } from '../../services/mlPredictionService.js';
 
-export async function generateForecast(startDate, endDate) {
+export async function generateForecast(startDate, endDate, company) {
     try {
         const telemetryRecords = await LiveData.find({
             time_tag: { 
                 $gte: startDate + "T00:00:00.000Z",
                 $lte: endDate + "T23:59:59.999Z"
             },
-            source: process.env.DATA_SOURCE || 'live'
+            source: process.env.DATA_SOURCE || 'live',
+            company: company
         }).sort({ time_tag: 1 });
 
         if (!telemetryRecords || telemetryRecords.length === 0) {
@@ -19,7 +20,6 @@ export async function generateForecast(startDate, endDate) {
         const currentFlux = latestRecord.flux || latestRecord.observed_flux || 0.0;
         const currentTime = new Date(latestRecord.time_tag).getTime();
 
-        // Standard function declaration; strictly enforces a 60-minute gap tolerance matching train.py
         function getPastFlux(minutesAgo) {
             const targetTime = currentTime - (minutesAgo * 60 * 1000);
             const maxGapTolerance = 60 * 60 * 1000; 
@@ -39,7 +39,6 @@ export async function generateForecast(startDate, endDate) {
             return closestFlux; 
         }
 
-        // Exact payload match for the server.py TelemetryRecord schema
         const forecastingPayload = {
             electron_correction: latestRecord.electron_correction || 0.0,
             electron_contaminaton: latestRecord.electron_contaminaton ? 1 : 0,

@@ -10,6 +10,7 @@ import { getAllShifts, bulkReassignShifts } from '../utility/supervisor/manageSh
 import { handleLiveData } from '../utility/operator/handleLiveData.js'
 import { viewPendingAdvisories, viewAcknowledgedAdvisories } from '../utility/supervisor/viewAdvisories.js'
 import { advisorySSEHandler } from '../utility/supervisor/advisoryStream.js'
+import { getProfile, updateProfile, deleteProfile } from '../controller/userController.js'
 
 const router = express.Router()
 
@@ -27,5 +28,8 @@ router.get('/live-data', handleLiveData)
 router.get('/pending-advisories', viewPendingAdvisories)
 router.get('/acknowledged-advisories', viewAcknowledgedAdvisories)
 router.get('/advisory-stream', advisorySSEHandler)
+router.get('/me', getProfile)
+router.put('/me/update', updateProfile)
+router.delete('/me/delete', deleteProfile)
 
 export default router

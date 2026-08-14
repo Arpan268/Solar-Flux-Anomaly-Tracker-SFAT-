@@ -1,27 +1,83 @@
 import User from '../models/users.js'
-import Shift from '../models/shifts.js'
+import Company from '../models/companies.js';
 import bcrypt from 'bcryptjs'
 import sgMail from '@sendgrid/mail'
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
+//Companies
+export async function getCompanies(req, res) {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
+
+        const filter = { status: 'Approved' };
+        const total = await Company.countDocuments(filter);
+        const companies = await Company.find(filter).skip(skip).limit(limit);
+
+        res.status(200).json({
+            companies, total, totalPages: Math.ceil(total / limit), currentPage: page
+        });
+    } catch (err) {
+        return res.status(500).json({ message: 'Server error' });
+    }
+}
+
+export async function getPendingCompanies(req, res) {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
+
+        const filter = { status: 'Pending' };
+        const total = await Company.countDocuments(filter);
+        const companies = await Company.find(filter).skip(skip).limit(limit);
+
+        res.status(200).json({
+            companies, total, totalPages: Math.ceil(total / limit), currentPage: page
+        });
+    } catch (err) {
+        return res.status(500).json({ message: 'Server error' });
+    }
+}
+
+export async function handleCompanyStatus(req, res) {
+    try {
+        const { updatedStatus } = req.body;
+        const company = await Company.findById(req.params.id);
+
+        if (!company) {
+            return res.status(404).json({ message: 'Company not found' });
+        }
+
+        company.status = updatedStatus;
+        company.rejectedAt = updatedStatus === 'Rejected' ? new Date() : null;
+
+        await company.save();
+        return res.status(200).json({ message: `Company ${updatedStatus.toLowerCase()}` });
+    } catch (err) {
+        return res.status(500).json({ message: 'Server error' });
+    }
+}
+
+//Companies Admin
 export async function getUsers(req, res) {
     try {
-        const page = parseInt(req.query.page) || 1
-        const limit = parseInt(req.query.limit) || 5
-        const skip = (page - 1) * limit
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
 
-        const filter = { status: 'Approved' }
-        const total = await User.countDocuments(filter)
-        const users = await User.find(filter).skip(skip).limit(limit).select('-password').populate('shift')
+        // SFAT Admin only views approved Company Admins
+        const filter = { status: 'Approved', role: 'Company Admin' };
+        const total = await User.countDocuments(filter);
+        const users = await User.find(filter).skip(skip).limit(limit).select('-password').populate('shift');
 
         res.status(200).json({
             users, total, totalPages: Math.ceil(total / limit), currentPage: page
-        })
-    }
-
-    catch (err) {
-        return res.status(500).json({ message: 'Server error' })
+        });
+    } catch (err) {
+        return res.status(500).json({ message: 'Server error' });
     }
 }
 
@@ -48,77 +104,61 @@ export async function deleteUser(req, res) {
 
 export async function getPendingUsers(req, res) {
     try {
-        const page = parseInt(req.query.page) || 1
-        const limit = parseInt(req.query.limit) || 5
-        const skip = (page - 1) * limit
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
 
-        const filter = { status: 'Pending' }
-        const total = await User.countDocuments(filter)
-        const users = await User.find(filter).skip(skip).limit(limit).select('-password')
+        const companiesWithAdmins = await User.find({
+            role: 'Company Admin',
+            status: 'Approved'
+        }).distinct('company');
+
+        const filter = {
+            status: 'Pending',
+            role: 'Company Admin',
+            company: { $nin: companiesWithAdmins }
+        };
+
+        const total = await User.countDocuments(filter);
+        const users = await User.find(filter).skip(skip).limit(limit).select('-password');
 
         res.status(200).json({
             users, total, totalPages: Math.ceil(total / limit), currentPage: page
-        })
-    }
-
-    catch (err) {
-        return res.status(500).json({ message: 'Server error' })
-    }
-}
-
-export async function getAvailableShifts(req, res) {
-    try {
-        const allShifts = await Shift.find()
-        const assignedUsers = await User.find({ role: 'Operator', status: 'Approved', shift: { $ne: null } })
-        const assignedShiftIds = assignedUsers.map(u => u.shift.toString())
-        const availableShifts = allShifts.filter(s => !assignedShiftIds.includes(s._id.toString()))
-
-        res.status(200).json(availableShifts)
-    }
-
-    catch (err) {
-        return res.status(500).json({ message: 'Server error' })
+        });
+    } catch (err) {
+        return res.status(500).json({ message: 'Server error' });
     }
 }
 
 export async function handleStatus(req, res) {
     try {
-        const { updatedStatus, shiftId } = req.body
-        const user = await User.findById(req.params.id)
+        const { updatedStatus, shiftId } = req.body;
+        const user = await User.findById(req.params.id);
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' })
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        user.status = updatedStatus
+        user.status = updatedStatus;
 
         if (updatedStatus === 'Rejected') {
-            user.rejectedAt = new Date()
-            user.shift = null
+            user.rejectedAt = new Date();
+            user.shift = null;
         } else {
-            user.rejectedAt = null
+            user.rejectedAt = null;
             if (updatedStatus === 'Approved' && user.role === 'Operator' && shiftId) {
-                user.shift = shiftId
+                user.shift = shiftId;
             }
         }
 
-        await user.save()
-
-        if (updatedStatus === 'Approved') {
-            return res.status(200).json({ message: 'User approved' })
-        } else if (updatedStatus === 'Rejected') {
-            return res.status(200).json({ message: 'User rejected' })
-        }
-
-        return res.status(200).json({ message: 'User status updated' })
-
-    }
-
-    catch (err) {
-        return res.status(500).json({ message: 'Server error' })
+        await user.save();
+        return res.status(200).json({ message: `User ${updatedStatus.toLowerCase()}` });
+    } catch (err) {
+        return res.status(500).json({ message: 'Server error' });
     }
 }
 
+//Profile Details
 export async function getProfile(req, res) {
     try {
         const user = await User.findOne({ userId: req.user.id }).select('-password').populate('shift')
@@ -175,52 +215,82 @@ export async function deleteProfile(req, res) {
     }
 }
 
+
+//Admin Email
 export async function adminSendEmail(data) {
-    const newUser = data.userWithoutPassword
-    console.log(`🔔 Registration event received for: ${newUser.username}`);
-
     try {
-        const admins = await User.find({
-            role: 'Admin',
-            email: { $exists: true, $ne: null }
-        });
+        const entity = data.userWithoutPassword || data.company || data;
+        const isUser = !!entity.username;
+        const isCompany = !isUser && !!entity.companyName;
 
-        if (admins.length === 0) {
-            console.log('No admins found to receive the registration alert.');
+        if (isUser && entity.role !== 'Company Admin') {
             return;
         }
 
+        if (isUser) {
+            const existingAdmin = await User.findOne({
+                role: 'Company Admin',
+                status: 'Approved',
+                company: entity.company
+            });
+            if (existingAdmin) return;
+        }
+
+        const admins = await User.find({ role: 'Admin', email: { $exists: true, $ne: null } });
+        if (admins.length === 0) return;
+
         const adminEmails = admins.map(admin => admin.email);
+        let subject, htmlContent;
+
+        if (isCompany) {
+            subject = '🚨 Action Required: New Company Registration';
+            htmlContent = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #3b82f6; border-radius: 8px;">
+          <h2 style="color: #3b82f6;">New Company Pending Approval</h2>
+          <p>A new organization has registered and requires SFAT Admin approval.</p>
+          <ul>
+            <li><strong>Company Name:</strong> ${entity.companyName}</li>
+            <li><strong>Email:</strong> ${entity.email}</li>
+            <li><strong>Industry Type:</strong> ${entity.companyType}</li>
+          </ul>
+        </div>
+      `;
+        } else if (isUser) {
+            const companyDoc = await Company.findById(entity.company);
+            const companyNameStr = companyDoc ? companyDoc.companyName : entity.company;
+
+            subject = `🚨 Action Required: New ${entity.role} Registration`;
+            htmlContent = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #3b82f6; border-radius: 8px;">
+          <h2 style="color: #3b82f6;">Initial Company Admin Pending Approval</h2>
+          <p>A user has registered as the first admin for their organization.</p>
+          <ul>
+            <li><strong>Username:</strong> ${entity.username}</li>
+            <li><strong>Email:</strong> ${entity.email}</li>
+            <li><strong>Company:</strong> ${companyNameStr}</li>
+            <li><strong>System ID:</strong> ${entity.userId}</li>
+          </ul>
+        </div>
+      `;
+        } else {
+            return;
+        }
 
         const mailOptions = {
             from: 'sfat.notification@gmail.com',
             to: adminEmails,
-            subject: `🔔 Action Required: New ${newUser.role} Registration`,
-            html: `
-                <div style="font-family: Arial, sans-serif; padding: 20px; border: 2px solid #3b82f6; border-radius: 8px;">
-                    <h2 style="color: #3b82f6;">New User Registration Pending Approval</h2>
-                    <p>A new user has registered and is currently in <strong>Pending</strong> status. They require admin approval to access the system.</p>
-                    <h3>User Details:</h3>
-                    <ul>
-                        <li><strong>Username:</strong> ${newUser.username}</li>
-                        <li><strong>Email:</strong> ${newUser.email}</li>
-                        <li><strong>Role Requested:</strong> ${newUser.role}</li>
-                        <li><strong>System ID:</strong> ${newUser.userId}</li>
-                    </ul>
-                    <p>Please log in to the SFAT Admin Dashboard to approve or reject this request.</p>
-                    <p style="margin-top: 30px;">
-                        <a href="${process.env.FRONTEND_URL}" target="_blank" style="background-color: #1a1a1a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; border: 1px solid #333333; font-weight: bold; display: inline-block; letter-spacing: 0.5px;">
-                            Open SFAT Dashboard
-                        </a>
-                    </p>
-                </div>
-            `
+            subject,
+            html: htmlContent + `
+        <p>Please log in to the SFAT Admin Dashboard to approve or reject this request.</p>
+        <p style="margin-top: 30px;">
+          <a href="${process.env.FRONTEND_URL}" target="_blank" style="background-color: #1a1a1a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Open SFAT Dashboard</a>
+        </p>
+      `
         };
 
         await sgMail.send(mailOptions);
         console.log('✅ Admin registration alert email sent successfully to:', adminEmails);
-
-    } catch (error) {
-        console.error('❌ Error sending admin registration email:', error);
+    } catch (err) {
+        console.error('❌ Error sending admin registration email:', err);
     }
 }

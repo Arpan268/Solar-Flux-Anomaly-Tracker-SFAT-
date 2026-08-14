@@ -3,7 +3,7 @@ import LiveData from '../../models/liveData.js'
 export async function viewDiagrams(req, res) {
     try {
         const { limit = 500, value, unit } = req.query;
-        let query = { source: process.env.DATA_SOURCE };
+        let query = { source: process.env.DATA_SOURCE, company: req.user.company };
 
         if (value && unit) {
             const numValue = parseInt(value);

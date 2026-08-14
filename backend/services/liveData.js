@@ -1,7 +1,7 @@
 import LiveData from "../models/liveData.js"
 import mockData from "../data/mockData.json" with { type: "json" }
 
-export async function liveData(role) {
+export async function liveData(role, company) {
     if (process.env.DATA_SOURCE === 'live') {
         try {
             const response = await fetch('https://services.swpc.noaa.gov/json/goes/primary/xrays-1-day.json')
@@ -14,7 +14,8 @@ export async function liveData(role) {
                     {
                         time_tag: latestData.time_tag,
                         energy: latestData.energy,
-                        source: process.env.DATA_SOURCE
+                        source: process.env.DATA_SOURCE,
+                        company: company
                     },
                     {
                         $setOnInsert: {
@@ -25,7 +26,8 @@ export async function liveData(role) {
                             electron_correction: latestData.electron_correction,
                             electron_contaminaton: latestData.electron_contaminaton,
                             energy: latestData.energy,
-                            source: process.env.DATA_SOURCE
+                            source: process.env.DATA_SOURCE,
+                            company: company
                         }
                     },
                     {
@@ -58,7 +60,8 @@ export async function liveData(role) {
                     {
                         time_tag: latestData.time_tag,
                         energy: latestData.energy,
-                        source: process.env.DATA_SOURCE
+                        source: process.env.DATA_SOURCE,
+                        company: company
                     },
                     {
                         $setOnInsert: {
@@ -69,7 +72,8 @@ export async function liveData(role) {
                             electron_correction: latestData.electron_correction,
                             electron_contaminaton: latestData.electron_contaminaton,
                             energy: latestData.energy,
-                            source: process.env.DATA_SOURCE
+                            source: process.env.DATA_SOURCE,
+                            company: company
                         }
                     },
                     { upsert: true }
