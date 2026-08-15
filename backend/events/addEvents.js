@@ -6,6 +6,7 @@ import { broadcastXClassAlert } from '../utility/shared/sseManager.js';
 import { sendRegistrationEmail } from '../controller/registrationEmail.js';
 import { sendAdvisoryMail } from '../utility/analyst/sendAdvisoryMail.js';
 import { broadcastNewAdvisory, broadcastAcknowledgedAdvisory } from '../utility/supervisor/advisoryStream.js';
+import { sendSuccessfulRegistrationEmail } from '../controller/successfulResistrationEmail.js';
 
 export const criticalEvent = new EventEmitter();
 
@@ -18,4 +19,5 @@ criticalEvent.on('x-class-flare', broadcastXClassAlert);
 criticalEvent.on('registration-email', sendRegistrationEmail);
 criticalEvent.on('advisory', sendAdvisoryMail);
 criticalEvent.on('advisory', broadcastNewAdvisory);
-criticalEvent.on('advisory_acknowledged', broadcastAcknowledgedAdvisory);
+criticalEvent.on('advisory-acknowledged', broadcastAcknowledgedAdvisory);
+criticalEvent.on('registration-successful', sendSuccessfulRegistrationEmail)

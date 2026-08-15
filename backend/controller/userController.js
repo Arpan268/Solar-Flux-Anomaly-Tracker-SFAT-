@@ -2,6 +2,7 @@ import User from '../models/users.js'
 import Company from '../models/companies.js';
 import bcrypt from 'bcryptjs'
 import sgMail from '@sendgrid/mail'
+import { criticalEvent } from '../events/addEvents.js';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
@@ -55,6 +56,10 @@ export async function handleCompanyStatus(req, res) {
         company.rejectedAt = updatedStatus === 'Rejected' ? new Date() : null;
 
         await company.save();
+
+        const data = { status: updatedStatus, email: company.email, name: company.companyname }
+        criticalEvent.emit('registration-successful', data)
+
         return res.status(200).json({ message: `Company ${updatedStatus.toLowerCase()}` });
     } catch (err) {
         return res.status(500).json({ message: 'Server error' });
@@ -292,5 +297,25 @@ export async function adminSendEmail(data) {
         console.log('✅ Admin registration alert email sent successfully to:', adminEmails);
     } catch (err) {
         console.error('❌ Error sending admin registration email:', err);
+    }
+}
+
+export async function getAdminMetrics(req, res) {
+    try {
+        const [totalCompanies, pendingCompanies, approvedCompanies, totalCompanyAdmins] = await Promise.all([
+            Company.countDocuments(),
+            Company.countDocuments({ status: 'Pending' }),
+            Company.countDocuments({ status: 'Approved' }),
+            User.countDocuments({ role: 'Company Admin', status: 'Approved' })
+        ]);
+
+        res.status(200).json({
+            totalCompanies,
+            pendingCompanies,
+            approvedCompanies,
+            totalCompanyAdmins
+        });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch admin metrics' });
     }
 }

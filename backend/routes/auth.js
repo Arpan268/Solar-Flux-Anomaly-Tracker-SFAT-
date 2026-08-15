@@ -1,5 +1,5 @@
 import express from 'express'
-import { generateOtp, login, logout, refreshToken, registerCompany, registerUser, verifyOtp } from '../controller/authController.js'
+import { generateOtp, login, logout, refreshToken, registerCompany, registerUser, verifyOtp, getApprovedCompanies } from '../controller/authController.js'
 
 const router = express.Router()
 
@@ -10,5 +10,6 @@ router.get('/refresh', refreshToken)
 router.post('/logout', logout)
 router.post('/generate-otp', generateOtp)
 router.post('/verify-otp', verifyOtp)
+router.get('/companies', getApprovedCompanies);
 
 export default router

@@ -8,6 +8,7 @@ import { getAvailableShifts } from '../utility/companyAdmin/getAvailableShifts.j
 import { deleteUser } from '../utility/companyAdmin/deleteUsers.js'
 import { acknowledgeAdvisory } from '../utility/companyAdmin/acknowledgeAdvisories.js'
 import { getProfile, updateProfile, deleteProfile } from '../controller/userController.js'
+import { getCompanyAdminMetrics } from '../utility/companyAdmin/getMetrics.js'
 
 const router = express.Router()
 
@@ -19,6 +20,7 @@ router.put('/:id/status', handleStatus)
 router.get('/shifts/available', getAvailableShifts)
 router.delete(':id/delete', deleteUser)
 router.put('/:id/acknowledge-advisory', acknowledgeAdvisory)
+router.get('/metrics', getCompanyAdminMetrics)
 router.get('/me', getProfile)
 router.put('/me/update', updateProfile)
 router.delete('/me/delete', deleteProfile)

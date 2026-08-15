@@ -28,7 +28,6 @@ export async function registerCompany(req, res) {
         if (!verificationRecord || !verificationRecord.isVerified) {
             return res.status(400).json({ message: 'Email not verified. Please verify the company email before registering.' });
         }
-        y
         const newCompany = new Company({
             companyName,
             email,
@@ -336,5 +335,14 @@ export async function verifyOtp(req, res) {
     } catch (err) {
         console.error('Error verifying OTP:', err)
         return res.status(500).json({ message: 'Server error' })
+    }
+}
+
+export async function getApprovedCompanies(req, res) {
+    try {
+        const companies = await Company.find({ status: 'Approved' }).select('companyName');
+        res.status(200).json(companies);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch companies' });
     }
 }

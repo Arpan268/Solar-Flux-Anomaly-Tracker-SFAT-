@@ -16,16 +16,14 @@ export default function HomeRedirect() {
     switch (auth.role) {
         case "Admin":
             return <Navigate to="/admin" replace />;
-
+        case "Company Admin":
+            return <Navigate to="/company-admin" replace />;
         case "Operator":
             return <Navigate to="/operator" replace />;
-
         case "Supervisor":
             return <Navigate to="/supervisor" replace />;
-
         case "Analyst":
             return <Navigate to="/analyst" replace />;
-
         default:
             return <Landing />;
     }

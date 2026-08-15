@@ -57,7 +57,7 @@ export async function sendInstructions(req, res) {
             await Advisory.findOneAndUpdate({_id: advisoryId, company: req.user.company}, {
                 acknowledgedBySupervisorId: supervisorId
             }, {new: true});
-            criticalEvent.emit('advisory_acknowledged');
+            criticalEvent.emit('advisory-acknowledged');
         }
 
         res.status(201).json({ message: 'Instruction processed successfully' });

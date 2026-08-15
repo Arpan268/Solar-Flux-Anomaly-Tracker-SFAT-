@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../context/authContext";
-import { useLocation } from "react-router-dom";
 
 interface Anomaly {
     _id: string;
@@ -21,9 +20,9 @@ export default function AnalystViewAnomalies() {
 
     const initialPage = location.state?.page || 1;
     const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
-    const [page, setPage] = useState(initialPage);
-    const [totalPages, setTotalPages] = useState(1);
-    const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState<number>(initialPage);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
     const [macroHours, setMacroHours] = useState<number>(24);
@@ -33,10 +32,13 @@ export default function AnalystViewAnomalies() {
             if (!auth?.accessToken) return;
             setLoading(true);
             try {
-                const res = await axios.get(`/api/user/analyst/view-anomalies?page=${page}&limit=10`, {
-                    headers: { Authorization: `Bearer ${auth.accessToken}` },
-                    withCredentials: true,
-                });
+                const res = await axios.get(
+                    `/api/user/analyst/view-anomalies?page=${page}&limit=10`,
+                    {
+                        headers: { Authorization: `Bearer ${auth.accessToken}` },
+                        withCredentials: true,
+                    }
+                );
 
                 setAnomalies(res.data.anomalies);
                 setTotalPages(res.data.totalPages);
@@ -47,6 +49,7 @@ export default function AnalystViewAnomalies() {
                 setLoading(false);
             }
         }
+
         fetchAnomalies();
     }, [auth, page]);
 
@@ -54,11 +57,18 @@ export default function AnalystViewAnomalies() {
         <div className="max-w-7xl mx-auto mt-12 p-6">
             <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-extrabold text-white tracking-tight">Verified Anomalies</h2>
-                    <p className="text-slate-400 mt-2">Historical database of all supervisor-acknowledged solar flux events.</p>
+                    <h2 className="text-3xl font-extrabold text-white tracking-tight">
+                        Verified Anomalies
+                    </h2>
+                    <p className="text-slate-400 mt-2">
+                        Historical database of all supervisor-acknowledged solar flux events.
+                    </p>
                 </div>
+
                 <div className="flex flex-col gap-2.5">
-                    <p className="text-blue-400 text-right text-sm">Macro analysis available upto last 36 hours</p>
+                    <p className="text-blue-400 text-right text-sm">
+                        Macro analysis available up to last 36 hours
+                    </p>
                     <div className="flex items-center gap-3 bg-gray-900 p-3 rounded-xl border border-gray-700/50 shadow-lg">
                         <span className="text-slate-400 text-sm font-medium">Analyze Last</span>
                         <input
@@ -72,7 +82,7 @@ export default function AnalystViewAnomalies() {
                         <span className="text-slate-400 text-sm font-medium mr-2">Hours</span>
                         <button
                             onClick={() => navigate(`/analyst/macro-analysis?hours=${macroHours}`)}
-                            className="bg-purple-600 hover:bg-purple-700 cursor-pointer text-white px-4 py-1.5 rounded-lg text-sm font-bold shadow-lg shadow-purple-900/30 transition-colors"
+                            className="bg-purple-600 hover:bg-purple-700 cursor-pointer text-white px-4 py-1.5 rounded-lg text-sm font-bold shadow-lg shadow-purple-900/30 transition"
                         >
                             AI Analysis
                         </button>
@@ -95,7 +105,7 @@ export default function AnalystViewAnomalies() {
                             <th className="p-4 font-semibold">Classification</th>
                             <th className="p-4 font-semibold">Logged By</th>
                             <th className="p-4 font-semibold">Notes</th>
-                            <th className="p-4 font-semibold">Actions</th>
+                            <th className="p-4 font-semibold text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-800">
@@ -107,7 +117,10 @@ export default function AnalystViewAnomalies() {
                             </tr>
                         ) : anomalies.length > 0 ? (
                             anomalies.map((anomaly) => (
-                                <tr key={anomaly._id} className="hover:bg-gray-800/50 transition-colors">
+                                <tr
+                                    key={anomaly._id}
+                                    className="hover:bg-gray-800/50 transition-colors"
+                                >
                                     <td className="p-4 text-slate-300 font-mono text-sm">
                                         {new Date(anomaly.time_tag).toLocaleString()}
                                     </td>
@@ -123,17 +136,44 @@ export default function AnalystViewAnomalies() {
                                         {anomaly.loggedBy}
                                     </td>
                                     <td className="p-4 text-slate-400 text-sm max-w-xs">
-                                        <span className="block truncate" title={anomaly.notes}>
+                                        <span
+                                            className="block truncate"
+                                            title={anomaly.notes || "-"}
+                                        >
                                             {anomaly.notes || "-"}
                                         </span>
                                     </td>
                                     <td className="p-4">
-                                        <button
-                                            onClick={() => navigate(`/analyst/micro-analysis/${anomaly._id}`, { state: { page } })}
-                                            className="bg-blue-600/20 text-blue-400 cursor-pointer border border-blue-600/50 hover:bg-blue-600 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap"
-                                        >
-                                            View AI Report
-                                        </button>
+                                        <div className="flex items-center justify-center gap-2">
+                                            <button
+                                                onClick={() =>
+                                                    navigate(`/analyst/micro-analysis/${anomaly._id}`, {
+                                                        state: { page },
+                                                    })
+                                                }
+                                                className="bg-blue-600/20 text-blue-400 cursor-pointer border border-blue-600/50 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition"
+                                            >
+                                                View AI Report
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    navigate("/analyst/create-advisory", {
+                                                        state: {
+                                                            source: "Anomaly",
+                                                            anomalyId: anomaly._id,
+                                                            classification: anomaly.classification,
+                                                            flux: anomaly.flux,
+                                                            time_tag: anomaly.time_tag,
+                                                            loggedBy: anomaly.loggedBy,
+                                                            page,
+                                                        },
+                                                    })
+                                                }
+                                                className="bg-amber-600/20 text-amber-300 cursor-pointer border border-amber-500/50 hover:bg-amber-600 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition"
+                                            >
+                                                Create Advisory
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
@@ -150,19 +190,20 @@ export default function AnalystViewAnomalies() {
                 {totalPages > 1 && (
                     <div className="p-4 bg-gray-800/50 border-t border-gray-700 flex justify-between items-center">
                         <button
-                            onClick={() => setPage((p: number) => Math.max(1, p - 1))}
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
                             disabled={page === 1}
-                            className="px-4 py-2 bg-gray-700 cursor-pointer hover:bg-gray-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="px-4 py-2 bg-gray-700 cursor-pointer hover:bg-gray-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-semibold"
                         >
                             Previous
                         </button>
                         <span className="text-slate-400 text-sm">
-                            Page <strong className="text-white">{page}</strong> of {totalPages}
+                            Page <strong className="text-white">{page}</strong> of{" "}
+                            <strong>{totalPages}</strong>
                         </span>
                         <button
-                            onClick={() => setPage((p: number) => Math.min(totalPages, p + 1))}
+                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                             disabled={page === totalPages}
-                            className="px-4 py-2 bg-gray-700 cursor-pointer hover:bg-gray-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="px-4 py-2 bg-gray-700 cursor-pointer hover:bg-gray-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-semibold"
                         >
                             Next
                         </button>

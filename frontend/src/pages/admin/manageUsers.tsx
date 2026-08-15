@@ -2,187 +2,295 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../context/authContext";
 import axios from "axios";
 
+interface PendingCompany {
+    _id: string;
+    companyName: string;
+    email: string;
+    companyType: string;
+    createdAt: string;
+}
+
 interface PendingUser {
     _id: string;
+    userId?: string;
     username: string;
     email: string;
     role: string;
-}
-
-interface Shift {
-    _id: string;
-    name: string;
-    startTime: string;
-    endTime: string;
+    company?: {
+        companyName: string;
+    } | string;
+    createdAt: string;
 }
 
 export default function ManageUsers() {
     const { auth } = useAuth();
+    const [activeTab, setActiveTab] = useState<"companies" | "users">("companies");
+
+    const [pendingCompanies, setPendingCompanies] = useState<PendingCompany[]>([]);
     const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
-    const [availableShifts, setAvailableShifts] = useState<Shift[]>([]);
-    const [selectedShifts, setSelectedShifts] = useState<Record<string, string>>({});
+
+    const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+
+    const fetchPendingData = async () => {
+        if (!auth?.accessToken) return;
+        setLoading(true);
+        setError(null);
+
+        try {
+            const [companiesRes, usersRes] = await Promise.all([
+                axios.get("/api/user/admin/get-pending-companies", {
+                    headers: { Authorization: `Bearer ${auth.accessToken}` },
+                    withCredentials: true,
+                }),
+                axios.get("/api/user/admin/get-pending-users", {
+                    headers: { Authorization: `Bearer ${auth.accessToken}` },
+                    withCredentials: true,
+                }),
+            ]);
+
+            const compData = Array.isArray(companiesRes.data)
+                ? companiesRes.data
+                : companiesRes.data.companies || [];
+            setPendingCompanies(compData.filter((c: any) => c.status === "Pending" || !c.status));
+
+            const userData = Array.isArray(usersRes.data)
+                ? usersRes.data
+                : usersRes.data.users || [];
+            setPendingUsers(userData.filter((u: any) => u.status === "Pending"));
+        } catch (err) {
+            console.error("Failed to load registration queues:", err);
+            setError("Failed to fetch pending registration requests.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        async function fetchPendingUsers() {
-            if (!auth?.accessToken) return;
-            try {
-                const res = await axios.get("/api/user/pending", {
-                    headers: { Authorization: `Bearer ${auth.accessToken}` },
-                    withCredentials: true,
-                });
-
-                const pending = res.data.users.filter((user: any) => user.status === 'Pending');
-                setPendingUsers(pending);
-                setError(null);
-            } catch (err) {
-                console.error(err);
-                setError("Failed to load registration requests.");
-            }
-        }
-
-        async function fetchAvailableShifts() {
-            if (!auth?.accessToken) return;
-            try {
-                const res = await axios.get("/api/user/shifts/available", {
-                    headers: { Authorization: `Bearer ${auth.accessToken}` },
-                    withCredentials: true,
-                });
-                setAvailableShifts(res.data);
-            } catch (err) {
-                console.error("Failed to load shifts:", err);
-            }
-        }
-
-        fetchPendingUsers();
-        fetchAvailableShifts();
+        fetchPendingData();
     }, [auth]);
 
-    async function handleApprove(id: string, role: string) {
+    const handleCompanyStatus = async (id: string, updatedStatus: "Approved" | "Rejected") => {
         if (!auth?.accessToken) return;
+        if (!window.confirm(`Are you sure you want to set this organization to ${updatedStatus}?`)) return;
 
-        let payload: any = { updatedStatus: 'Approved' };
-
-        if (role === 'Operator') {
-            const shiftId = selectedShifts[id];
-            if (!shiftId) {
-                setError("Please select a shift for this operator before approving.");
-                return;
-            }
-            payload.shiftId = shiftId;
-        }
-
+        setActionLoadingId(id);
         try {
-            await axios.put(`/api/user/${id}/status`, payload, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` },
-                withCredentials: true,
-            });
-
-            setPendingUsers((prev) => prev.filter((user) => user._id !== id));
-            setError(null);
-        } catch (err) {
-            console.error(err);
-            setError("Failed to approve the registration.");
+            await axios.put(
+                `/api/user/admin/${id}/handle-company-status`,
+                { updatedStatus },
+                {
+                    headers: { Authorization: `Bearer ${auth.accessToken}` },
+                    withCredentials: true,
+                }
+            );
+            setPendingCompanies((prev) => prev.filter((c) => c._id !== id));
+        } catch (err: any) {
+            console.error("Error updating company status:", err);
+            setError(err.response?.data?.message || "Failed to update company status.");
+        } finally {
+            setActionLoadingId(null);
         }
-    }
+    };
 
-    async function handleReject(id: string) {
+    const handleUserStatus = async (id: string, updatedStatus: "Approved" | "Rejected") => {
         if (!auth?.accessToken) return;
+        if (!window.confirm(`Are you sure you want to set this user to ${updatedStatus}?`)) return;
 
-        if (!window.confirm("Are you sure you want to reject this access request?")) return;
-
+        setActionLoadingId(id);
         try {
-            await axios.put(`/api/user/${id}/status`, { updatedStatus: 'Rejected' }, {
-                headers: { Authorization: `Bearer ${auth.accessToken}` },
-                withCredentials: true,
-            });
-
-            setPendingUsers((prev) => prev.filter((user) => user._id !== id));
-            setError(null);
-        } catch (err) {
-            console.error(err);
-            setError("Failed to reject the registration.");
+            await axios.put(
+                `/api/user/admin/${id}/handle-status`,
+                { updatedStatus },
+                {
+                    headers: { Authorization: `Bearer ${auth.accessToken}` },
+                    withCredentials: true,
+                }
+            );
+            setPendingUsers((prev) => prev.filter((u) => u._id !== id));
+        } catch (err: any) {
+            console.error("Error updating user status:", err);
+            setError(err.response?.data?.message || "Failed to update user status.");
+        } finally {
+            setActionLoadingId(null);
         }
-    }
+    };
 
     return (
-        <div className="max-w-6xl mx-auto mt-12 p-6">
-            <div className="mb-8">
-                <h2 className="text-3xl font-extrabold text-white tracking-tight">Access Requests</h2>
-                <p className="text-slate-400 mt-2">Review and approve pending registrations for the system.</p>
+        <div className="max-w-7xl mx-auto mt-10 p-6 text-white min-h-screen">
+            <div className="mb-8 border-b border-slate-700/60 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-white">
+                        Registration & Access Triage
+                    </h1>
+                    <p className="text-slate-400 text-sm mt-1">
+                        Review incoming corporate tenant applications and direct user access requests.
+                    </p>
+                </div>
+
+                <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-700/60">
+                    <button
+                        onClick={() => setActiveTab("companies")}
+                        className={`flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeTab === "companies"
+                                ? "bg-blue-600 text-white shadow-md"
+                                : "text-slate-400 hover:text-slate-200"
+                            }`}
+                    >
+                        <span>Organizations</span>
+                        {pendingCompanies.length > 0 && (
+                            <span className="bg-amber-400 text-slate-950 px-1.5 py-0.2 text-[10px] rounded-full font-black">
+                                {pendingCompanies.length}
+                            </span>
+                        )}
+                    </button>
+
+                    <button
+                        onClick={() => setActiveTab("users")}
+                        className={`flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeTab === "users"
+                                ? "bg-blue-600 text-white shadow-md"
+                                : "text-slate-400 hover:text-slate-200"
+                            }`}
+                    >
+                        <span>User Accounts</span>
+                        {pendingUsers.length > 0 && (
+                            <span className="bg-amber-400 text-slate-950 px-1.5 py-0.2 text-[10px] rounded-full font-black">
+                                {pendingUsers.length}
+                            </span>
+                        )}
+                    </button>
+                </div>
             </div>
 
             {error && (
-                <div className="bg-red-900/30 border border-red-500/50 text-red-400 p-4 rounded-lg mb-6">
-                    {error}
+                <div className="bg-red-900/40 border border-red-500/50 text-red-200 p-4 rounded-xl mb-6 text-sm flex items-center justify-between">
+                    <span>{error}</span>
+                    <button onClick={() => setError(null)} className="text-red-400 font-bold hover:text-white">✕</button>
                 </div>
             )}
 
-            <div className="bg-gray-900 rounded-xl shadow-2xl border border-gray-700 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-gray-800 border-b border-gray-700 text-slate-300 uppercase text-sm tracking-wider">
-                                <th className="p-4 font-semibold">Username</th>
-                                <th className="p-4 font-semibold">Email</th>
-                                <th className="p-4 font-semibold">Requested Role</th>
-                                <th className="p-4 font-semibold text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-800">
-                            {pendingUsers?.map((user) => (
-                                <tr
-                                    key={user._id}
-                                    className="hover:bg-gray-800/50 transition-colors group"
-                                >
-                                    <td className="p-4 text-slate-200 font-medium">{user.username}</td>
-                                    <td className="p-4 text-slate-400">{user.email}</td>
-                                    <td className="p-4">
-                                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-800 text-slate-300 border border-gray-600">
-                                            {user.role}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-right space-x-3 whitespace-nowrap">
-                                        {user.role === 'Operator' && (
-                                            <select
-                                                className="bg-gray-800 text-sm text-slate-200 border border-gray-600 rounded px-2 py-1.5 mr-2 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 cursor-pointer"
-                                                value={selectedShifts[user._id] || ""}
-                                                onChange={(e) => setSelectedShifts(prev => ({ ...prev, [user._id]: e.target.value }))}
-                                            >
-                                                <option value="" disabled>Assign Shift Slot</option>
-                                                {availableShifts.map(shift => (
-                                                    <option key={shift._id} value={shift._id}>
-                                                        {shift.name} ({shift.startTime} - {shift.endTime})
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        )}
-                                        <button
-                                            onClick={() => handleReject(user._id)}
-                                            className="opacity-0 cursor-pointer group-hover:opacity-100 transition-opacity bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-4 py-1.5 rounded-lg text-sm font-semibold"
-                                        >
-                                            Reject
-                                        </button>
-                                        <button
-                                            onClick={() => handleApprove(user._id, user.role)}
-                                            disabled={user.role === 'Operator' && !selectedShifts[user._id]}
-                                            className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${user.role === 'Operator' && !selectedShifts[user._id]
-                                                ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed border border-gray-700/50'
-                                                : 'bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white border border-emerald-600/30'
-                                                }`}
-                                        >
-                                            Approve
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                {pendingUsers?.length === 0 && (
-                    <div className="p-8 text-center text-slate-500">
-                        No pending registration requests at this time.
+            <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
+                {loading ? (
+                    <div className="py-16 text-center text-slate-400 text-sm font-medium">
+                        Loading approval queue...
                     </div>
+                ) : activeTab === "companies" ? (
+                    pendingCompanies.length === 0 ? (
+                        <div className="py-16 text-center text-slate-400">
+                            <p className="text-base font-semibold text-slate-300">No pending company registrations.</p>
+                            <p className="text-xs text-slate-500 mt-1">All organization onboarding requests have been reviewed.</p>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-700/30 border-b border-slate-700/50 text-slate-400 uppercase text-xs tracking-wider">
+                                        <th className="p-4">Organization Name</th>
+                                        <th className="p-4">Corporate Email</th>
+                                        <th className="p-4">Industry Sector</th>
+                                        <th className="p-4">Submitted Date</th>
+                                        <th className="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-700/40">
+                                    {pendingCompanies.map((company) => (
+                                        <tr key={company._id} className="hover:bg-slate-700/20 transition-colors">
+                                            <td className="p-4 text-white font-bold text-sm">
+                                                {company.companyName}
+                                            </td>
+                                            <td className="p-4 text-slate-300 text-sm font-mono">{company.email}</td>
+                                            <td className="p-4">
+                                                <span className="bg-cyan-950/40 border border-cyan-700/50 text-cyan-300 px-2.5 py-1 rounded text-xs font-semibold">
+                                                    {company.companyType || "Enterprise"}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 text-slate-400 text-xs">
+                                                {company.createdAt ? new Date(company.createdAt).toLocaleDateString() : "Recent"}
+                                            </td>
+                                            <td className="p-4 text-right space-x-2">
+                                                <button
+                                                    onClick={() => handleCompanyStatus(company._id, "Rejected")}
+                                                    disabled={actionLoadingId === company._id}
+                                                    className="text-xs font-semibold text-red-400 hover:text-red-300 bg-red-950/30 border border-red-800/40 hover:bg-red-900/50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                                                >
+                                                    Reject
+                                                </button>
+                                                <button
+                                                    onClick={() => handleCompanyStatus(company._id, "Approved")}
+                                                    disabled={actionLoadingId === company._id}
+                                                    className="text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 px-4 py-1.5 rounded-lg shadow-md transition-colors cursor-pointer disabled:opacity-50"
+                                                >
+                                                    {actionLoadingId === company._id ? "Processing..." : "Approve Organization"}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )
+                ) : (
+                    pendingUsers.length === 0 ? (
+                        <div className="py-16 text-center text-slate-400">
+                            <p className="text-base font-semibold text-slate-300">No pending user registrations.</p>
+                            <p className="text-xs text-slate-500 mt-1">All user accounts have been resolved.</p>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-700/30 border-b border-slate-700/50 text-slate-400 uppercase text-xs tracking-wider">
+                                        <th className="p-4">Username</th>
+                                        <th className="p-4">Email</th>
+                                        <th className="p-4">Assigned Company</th>
+                                        <th className="p-4">Requested Role</th>
+                                        <th className="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-700/40">
+                                    {pendingUsers.map((user) => {
+                                        const compName =
+                                            typeof user.company === "object" && user.company !== null
+                                                ? user.company.companyName
+                                                : user.company || "SFAT Platform";
+
+                                        return (
+                                            <tr key={user._id} className="hover:bg-slate-700/20 transition-colors">
+                                                <td className="p-4 text-white font-semibold text-sm">{user.username}</td>
+                                                <td className="p-4 text-slate-300 text-sm font-mono">{user.email}</td>
+                                                <td className="p-4">
+                                                    <span className="bg-slate-900/60 border border-slate-700 text-slate-300 px-2.5 py-1 rounded text-xs font-mono">
+                                                        {compName}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4">
+                                                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-900/30 text-indigo-400 border border-indigo-700/50">
+                                                        {user.role}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4 text-right space-x-2">
+                                                    <button
+                                                        onClick={() => handleUserStatus(user._id, "Rejected")}
+                                                        disabled={actionLoadingId === user._id}
+                                                        className="text-xs font-semibold text-red-400 hover:text-red-300 bg-red-950/30 border border-red-800/40 hover:bg-red-900/50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleUserStatus(user._id, "Approved")}
+                                                        disabled={actionLoadingId === user._id}
+                                                        className="text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 px-4 py-1.5 rounded-lg shadow-md transition-colors cursor-pointer disabled:opacity-50"
+                                                    >
+                                                        {actionLoadingId === user._id ? "Processing..." : "Approve Access"}
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )
                 )}
             </div>
         </div>

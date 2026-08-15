@@ -92,10 +92,18 @@ export default function Navbar() {
                                 </>
                             )}
 
+                            {auth.role === 'Company Admin' && (
+                                <>
+                                    <Link to="/company-admin" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Dashboard</Link>
+                                    <Link to="/company-admin/manage-users" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Manage Users</Link>
+                                    <Link to="/company-admin/view-advisories" className="hover:text-white transition-colors hover:scale-105 transform duration-300">View Advisories</Link>
+                                </>
+                            )}
+
                             {auth.role === 'Admin' && (
                                 <>
                                     <Link to="/admin" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Admin Panel</Link>
-                                    <Link to="/admin/manage-users" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Manage Users</Link>
+                                    <Link to="/admin/manage-users" className="hover:text-white transition-colors hover:scale-105 transform duration-300">Registration & Access Control</Link>
                                 </>
                             )}
 

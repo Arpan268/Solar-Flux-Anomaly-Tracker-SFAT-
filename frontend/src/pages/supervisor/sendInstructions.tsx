@@ -11,9 +11,11 @@ interface Operator {
 
 interface AdvisoryState {
     advisoryId: string;
-    cclass: number;
-    mclass: number;
-    xclass: number;
+    advisoryType?: 'Prediction' | 'Anomaly';
+    classification?: string;
+    cclass?: number;
+    mclass?: number;
+    xclass?: number;
     message: string;
 }
 
@@ -27,10 +29,10 @@ export default function SendInstructions() {
     const [operators, setOperators] = useState<Operator[]>([]);
     const [targetOperator, setTargetOperator] = useState<string>("All");
     const [message, setMessage] = useState<string>("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [statusMsg, setStatusMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-    const [refreshHistory, setRefreshHistory] = useState(0);
+    const [refreshHistory, setRefreshHistory] = useState<number>(0);
 
     useEffect(() => {
         async function fetchOperators() {
@@ -51,6 +53,7 @@ export default function SendInstructions() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (!message.trim()) return;
+        if (!auth?.accessToken) return;
 
         setIsSubmitting(true);
         setStatusMsg(null);
@@ -61,10 +64,10 @@ export default function SendInstructions() {
                 {
                     targetOperator,
                     message,
-                    advisoryId: advisoryState?.advisoryId
+                    advisoryId: advisoryState?.advisoryId,
                 },
                 {
-                    headers: { Authorization: `Bearer ${auth?.accessToken}` },
+                    headers: { Authorization: `Bearer ${auth.accessToken}` },
                     withCredentials: true,
                 }
             );
@@ -75,12 +78,11 @@ export default function SendInstructions() {
 
             if (advisoryState) {
                 setTimeout(() => {
-                    navigate('/supervisor/view-advisories', { replace: true });
+                    navigate("/supervisor/view-advisories", { replace: true });
                 }, 2000);
             } else {
                 setTimeout(() => setStatusMsg(null), 3000);
             }
-
         } catch (err) {
             setStatusMsg({ type: "error", text: "Failed to send instruction. Please try again." });
         } finally {
@@ -96,41 +98,56 @@ export default function SendInstructions() {
             </div>
 
             <div className="bg-gray-900 rounded-xl shadow-2xl border border-gray-700 p-6 mb-12">
-
+                {/* Linked Advisory Snapshot */}
                 {advisoryState && (
                     <div className="mb-8 bg-slate-800/50 border border-indigo-500/30 rounded-lg p-5">
                         <div className="flex items-center gap-2 mb-3">
                             <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-wider">Advisory Reference</h3>
+                            <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-wider">
+                                Advisory Reference
+                            </h3>
                         </div>
 
+                        {/* Threat Profile Tags */}
                         <div className="flex flex-wrap gap-3 mb-4">
-                            <span className="bg-gray-900 px-3 py-1.5 rounded border border-gray-700 text-xs text-slate-300">
-                                C-Class: <strong className="text-green-400">{advisoryState.cclass}%</strong>
-                            </span>
-                            <span className="bg-gray-900 px-3 py-1.5 rounded border border-gray-700 text-xs text-slate-300">
-                                M-Class: <strong className="text-amber-500">{advisoryState.mclass}%</strong>
-                            </span>
-                            <span className="bg-gray-900 px-3 py-1.5 rounded border border-gray-700 text-xs text-slate-300">
-                                X-Class: <strong className="text-red-500">{advisoryState.xclass}%</strong>
-                            </span>
+                            {advisoryState.cclass !== undefined ? (
+                                <>
+                                    <span className="bg-gray-900 px-3 py-1.5 rounded border border-gray-700 text-xs text-slate-300">
+                                        C-Class: <strong className="text-green-400">{advisoryState.cclass}%</strong>
+                                    </span>
+                                    <span className="bg-gray-900 px-3 py-1.5 rounded border border-gray-700 text-xs text-slate-300">
+                                        M-Class: <strong className="text-amber-500">{advisoryState.mclass}%</strong>
+                                    </span>
+                                    <span className="bg-gray-900 px-3 py-1.5 rounded border border-gray-700 text-xs text-slate-300">
+                                        X-Class: <strong className="text-red-500">{advisoryState.xclass}%</strong>
+                                    </span>
+                                </>
+                            ) : (
+                                <span className="bg-red-900/30 text-red-300 border border-red-500/30 px-3 py-1.5 rounded text-xs font-semibold">
+                                    {advisoryState.classification || 'Flare Anomaly Incident'}
+                                </span>
+                            )}
                         </div>
 
+                        {/* Analyst Note Body */}
                         <div className="bg-gray-900/80 p-4 rounded-lg border border-gray-700">
-                            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Analyst Note</span>
+                            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                                Analyst Note
+                            </span>
                             <p className="text-sm text-slate-300 whitespace-pre-wrap">{advisoryState.message}</p>
                         </div>
                     </div>
                 )}
 
+                {/* Form Container */}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {statusMsg && (
                         <div
-                            className={`p-4 rounded-lg border ${statusMsg.type === "success"
-                                ? "bg-emerald-900/30 border-emerald-500/50 text-emerald-400"
-                                : "bg-red-900/30 border-red-500/50 text-red-400"
+                            className={`p-4 rounded-lg border text-sm font-semibold ${statusMsg.type === "success"
+                                    ? "bg-emerald-900/30 border-emerald-500/50 text-emerald-400"
+                                    : "bg-red-900/30 border-red-500/50 text-red-400"
                                 }`}
                         >
                             {statusMsg.text}
@@ -174,8 +191,8 @@ export default function SendInstructions() {
                             type="submit"
                             disabled={isSubmitting}
                             className={`px-6 py-3 rounded-lg cursor-pointer font-bold transition-colors ${isSubmitting
-                                ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                                : "bg-blue-600 hover:bg-blue-500 text-white"
+                                    ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                                    : "bg-blue-600 hover:bg-blue-500 text-white"
                                 }`}
                         >
                             {isSubmitting ? "Sending..." : "Transmit Instruction"}
@@ -185,7 +202,6 @@ export default function SendInstructions() {
             </div>
 
             <h3 className="text-xl font-bold text-white mb-4">Transmission History</h3>
-
             <ViewInstructions refreshTrigger={refreshHistory} />
         </div>
     );
