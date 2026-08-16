@@ -89,7 +89,7 @@ export default function CreateAdvisory() {
   };
 
   return (
-    <div className="w-full p-8 text-white min-h-screen bg-slate-900">
+    <div className="w-full p-8 text-white min-h-screen mt-12">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8 border-b border-slate-700 pb-4">
           <h1 className="text-3xl font-extrabold tracking-wide mb-1">

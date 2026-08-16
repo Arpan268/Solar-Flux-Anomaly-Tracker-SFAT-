@@ -4,7 +4,8 @@ import jwt from 'jsonwebtoken'
 import { criticalEvent } from '../events/addEvents.js'
 import EmailVerification from '../models/emailVerification.js'
 import Company from '../models/companies.js';
-import { sendOtp } from './sendOtp.js'
+import Shift from '../models/shifts.js';
+import { sendOtp } from './email/sendOtp.js'
 
 function getCookieOptions(maxAge) {
     return {
@@ -36,7 +37,16 @@ export async function registerCompany(req, res) {
 
         await newCompany.save();
 
+        const defaultShifts = [
+            { name: 'Shift 1', startTime: '00:00', endTime: '08:00', company: newCompany._id },
+            { name: 'Shift 2', startTime: '08:00', endTime: '16:00', company: newCompany._id },
+            { name: 'Shift 3', startTime: '16:00', endTime: '00:00', company: newCompany._id }
+        ];
+        await Shift.insertMany(defaultShifts);
+
         await EmailVerification.findOneAndDelete({ email });
+
+        criticalEvent.emit('admin-email', { newCompany })
 
         res.status(201).json({
             message: 'Company successfully registered. Pending SFAT Admin approval.',

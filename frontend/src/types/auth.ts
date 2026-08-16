@@ -1,6 +1,6 @@
 export interface AuthData {
     accessToken: string,
-    role: 'Operator' | 'Supervisor' | 'Analyst' | 'Admin' | 'Company Admin'
+    role: 'Operator' | 'Supervisor' | 'Analyst' | 'Admin' | 'Company Admin' | 'company-admin'
 }
 
 export interface AuthContextType {

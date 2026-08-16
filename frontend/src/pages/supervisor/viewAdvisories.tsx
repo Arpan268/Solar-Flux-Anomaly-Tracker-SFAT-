@@ -138,7 +138,7 @@ export default function SupervisorViewAdvisories() {
                             <div className="w-full text-left border-collapse">
                                 <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-slate-700/30 border-b border-slate-700/50 text-xs font-bold text-slate-400 uppercase">
                                     <div className="col-span-3">Time Tag (UTC)</div>
-                                    <div className="col-span-4 text-center">Threat Profile</div>
+                                    <div className="col-span-4 text-center">Threat Profile (Next 24 H)</div>
                                     <div className="col-span-2 text-center">Status</div>
                                     <div className="col-span-3 text-right">Actions</div>
                                 </div>

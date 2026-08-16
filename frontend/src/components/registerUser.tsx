@@ -223,7 +223,7 @@ export default function RegisterUser() {
                                 type="button"
                                 onClick={handleGenerateOTP}
                                 disabled={!form.email || otpLoading}
-                                className="whitespace-nowrap px-4 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                className="whitespace-nowrap px-4 cursor-pointer bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                             >
                                 {otpLoading ? 'Sending...' : 'Generate OTP'}
                             </button>
@@ -249,7 +249,7 @@ export default function RegisterUser() {
                             type="button"
                             onClick={handleVerifyOTP}
                             disabled={otp.length !== 6 || verifyLoading}
-                            className="whitespace-nowrap px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                            className="whitespace-nowrap px-4 cursor-pointer bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         >
                             {verifyLoading ? 'Checking...' : 'Verify OTP'}
                         </button>
@@ -310,6 +310,13 @@ export default function RegisterUser() {
                     {isLoading ? 'Submitting...' : 'Register'}
                 </button>
             </form>
+
+            <div className="mt-4 text-center text-slate-400 text-sm">
+                Already have an account?{' '}
+                <Link to="/login" className="text-blue-400 hover:underline">
+                    Log in
+                </Link>
+            </div>
         </div>
     );
 }

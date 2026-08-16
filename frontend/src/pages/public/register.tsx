@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import RegisterUser from '../../components/registerUser';
 import RegisterCompany from '../../components/registerCompany';
 
@@ -12,7 +11,7 @@ export default function Register() {
                 <button
                     type="button"
                     onClick={() => setTab('user')}
-                    className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${tab === 'user'
+                    className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all cursor-pointer ${tab === 'user'
                         ? 'bg-blue-600 text-white shadow'
                         : 'text-slate-400 hover:text-slate-200'
                         }`}
@@ -22,7 +21,7 @@ export default function Register() {
                 <button
                     type="button"
                     onClick={() => setTab('company')}
-                    className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${tab === 'company'
+                    className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all cursor-pointer ${tab === 'company'
                         ? 'bg-blue-600 text-white shadow'
                         : 'text-slate-400 hover:text-slate-200'
                         }`}
@@ -32,13 +31,6 @@ export default function Register() {
             </div>
 
             {tab === 'user' ? <RegisterUser /> : <RegisterCompany />}
-
-            <div className="mt-4 text-center text-slate-400 text-sm">
-                Already have an account?{' '}
-                <Link to="/login" className="text-blue-400 hover:underline">
-                    Log in
-                </Link>
-            </div>
         </div>
     );
 }

@@ -156,39 +156,43 @@ export default function CompanyAdminDashboard() {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-                <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
-                    <p className="text-xs uppercase font-bold text-slate-400 tracking-wider">Active Personnel</p>
-                    <div className="flex items-baseline justify-between mt-2">
-                        <span className="text-3xl font-extrabold text-white font-mono">{metrics.totalEmployees}</span>
-                        <span className="text-xs text-slate-400">Team members</span>
-                    </div>
-                </div>
+            {metrics &&
+                <div>
+                    <p className="text-slate-400 mt-2 text-lg mb-5">Summary of recent activities of last 24 hours and key metrics.</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+                        <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
+                            <p className="text-xs uppercase font-bold text-slate-400 tracking-wider">Active Personnel</p>
+                            <div className="flex items-baseline justify-between mt-2">
+                                <span className="text-3xl font-extrabold text-white font-mono">{metrics.totalEmployees}</span>
+                                <span className="text-xs text-slate-400">Team members</span>
+                            </div>
+                        </div>
 
-                <div className="bg-slate-800/40 border border-amber-500/30 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
-                    <p className="text-xs uppercase font-bold text-amber-400 tracking-wider">Pending Approvals</p>
-                    <div className="flex items-baseline justify-between mt-2">
-                        <span className="text-3xl font-extrabold text-amber-300 font-mono">{metrics.pendingUsers}</span>
-                        <span className="text-xs text-amber-400/80">Awaiting role/shift</span>
-                    </div>
-                </div>
+                        <div className="bg-slate-800/40 border border-amber-500/30 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
+                            <p className="text-xs uppercase font-bold text-amber-400 tracking-wider">Pending Approvals</p>
+                            <div className="flex items-baseline justify-between mt-2">
+                                <span className="text-3xl font-extrabold text-amber-300 font-mono">{metrics.pendingUsers}</span>
+                                <span className="text-xs text-amber-400/80">Awaiting role/shift</span>
+                            </div>
+                        </div>
 
-                <div className="bg-slate-800/40 border border-red-500/30 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
-                    <p className="text-xs uppercase font-bold text-red-400 tracking-wider">Action Advisories</p>
-                    <div className="flex items-baseline justify-between mt-2">
-                        <span className="text-3xl font-extrabold text-red-400 font-mono">{metrics.pendingAdvisories}</span>
-                        <span className="text-xs text-red-400/80">Pending signature</span>
-                    </div>
-                </div>
+                        <div className="bg-slate-800/40 border border-red-500/30 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
+                            <p className="text-xs uppercase font-bold text-red-400 tracking-wider">Action Advisories</p>
+                            <div className="flex items-baseline justify-between mt-2">
+                                <span className="text-3xl font-extrabold text-red-400 font-mono">{metrics.pendingAdvisories}</span>
+                                <span className="text-xs text-red-400/80">Pending signature</span>
+                            </div>
+                        </div>
 
-                <div className="bg-slate-800/40 border border-indigo-500/30 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
-                    <p className="text-xs uppercase font-bold text-indigo-400 tracking-wider">Signed Advisories</p>
-                    <div className="flex items-baseline justify-between mt-2">
-                        <span className="text-3xl font-extrabold text-indigo-300 font-mono">{metrics.acknowledgedAdvisories}</span>
-                        <span className="text-xs text-indigo-400/80">Archived</span>
+                        <div className="bg-slate-800/40 border border-indigo-500/30 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
+                            <p className="text-xs uppercase font-bold text-indigo-400 tracking-wider">Signed Advisories</p>
+                            <div className="flex items-baseline justify-between mt-2">
+                                <span className="text-3xl font-extrabold text-indigo-300 font-mono">{metrics.acknowledgedAdvisories}</span>
+                                <span className="text-xs text-indigo-400/80">Archived</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </div>}
 
             <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
                 <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-700/20 flex justify-between items-center">

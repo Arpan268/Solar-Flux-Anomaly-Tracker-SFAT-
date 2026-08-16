@@ -13,7 +13,7 @@ router.use('/admin', verifyToken, verifyRole('Admin'), handleAdmin)
 router.use('/operator', verifyToken, verifyRole('Operator'), handleOperator)
 router.use('/supervisor', verifyToken, verifyRole('Supervisor'), handleSupervisor)
 router.use('/analyst', verifyToken, verifyRole('Analyst'), handleAnalyst)
-router.use('/company-admin', verifyToken, verifyRole('Company Admin', handleCompanyAdmin))
+router.use('/company-admin', verifyToken, verifyRole('Company Admin'), handleCompanyAdmin)
 router.use('/shared', verifyToken, sharedResources)
 
 export default router

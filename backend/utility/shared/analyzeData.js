@@ -12,6 +12,7 @@ export async function analyzeData(req, res) {
         let recentAnomalies = [];
         let anomalyPendingCount = 0;
         let advisoryPendingCount = 0;
+        let advisoryCount = 0;
 
         if (role === 'Supervisor') {
             recentAnomalies = await Anomaly.find({
@@ -27,6 +28,14 @@ export async function analyzeData(req, res) {
                 acknowledgedBySupervisorId: null,
                 company: company
             });
+
+            advisoryCount = await Advisory.countDocuments({
+                source: currentSource,
+                createdAt: { $gte: twentyFourHoursAgo },
+                company: company
+            });
+
+            advisoryCount = advisoryCount/2;
 
         } else if (role === 'Analyst') {
             recentAnomalies = await Anomaly.find({
@@ -46,6 +55,12 @@ export async function analyzeData(req, res) {
                 ]
             });
 
+            advisoryCount = await Advisory.countDocuments({
+                source: currentSource,
+                createdAt: { $gte: twentyFourHoursAgo },
+                company: company
+            });
+
         } else {
             return res.status(403).json({ message: 'Unauthorized access' });
         }
@@ -62,12 +77,6 @@ export async function analyzeData(req, res) {
             time_tag: { $gte: twentyFourHoursAgo.toISOString() },
             company: company
         }).sort({ flux: -1 });
-
-        const advisoryCount = await Advisory.countDocuments({
-            source: currentSource,
-            createdAt: { $gte: twentyFourHoursAgo },
-            company: company
-        });
 
         const totalAnomalies = recentAnomalies.length;
         const peakFlux = peakReading ? peakReading.flux : 0;

@@ -3,7 +3,7 @@ import Shift from '../../models/shifts.js'
 
 export async function getAllShifts(req, res) {
     try {
-        const shifts = await Shift.find({company: req.user.company})
+        const shifts = await Shift.find({ company: req.user.company })
         res.status(200).json(shifts)
     } catch (err) {
         return res.status(500).json({ message: 'Server error' })
@@ -36,11 +36,12 @@ export async function bulkReassignShifts(req, res) {
         }
 
         for (const { operatorId, shiftId } of assignments) {
-            await User.findByOneAndUpdate({_id: operatorId, company: req.user.company}, { shift: shiftId || null })
+            await User.findOneAndUpdate({ _id: operatorId, company: req.user.company }, { shift: shiftId || null })
         }
 
         res.status(200).json({ message: 'Shifts updated successfully' })
     } catch (err) {
+        console.error("🔥 SHIFT ASSIGNMENT CRASHED:", err);
         return res.status(500).json({ message: 'Server error' })
     }
 }

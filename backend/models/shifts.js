@@ -13,7 +13,7 @@ const shiftSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    company: { type: mongoose.SchemaTypes.ObjectId, ref: 'Companies', default: null },
+    company: { type: mongoose.Schema.Types.ObjectId, ref: 'Companies', default: null },
 });
 
 shiftSchema.index({ name: 1, company: 1 }, { unique: true });
