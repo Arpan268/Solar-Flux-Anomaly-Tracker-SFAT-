@@ -20,7 +20,8 @@ export async function logData(req, res) {
                 notes,
                 loggedBy,
                 source: process.env.DATA_SOURCE,
-                isAcknowledged: true
+                isAcknowledged: true,
+                company: req.user.company
             })
             criticalEvent.emit('x-class-flare', anomaly)
 
@@ -36,7 +37,8 @@ export async function logData(req, res) {
                 electron_contaminaton,
                 notes,
                 loggedBy,
-                source: process.env.DATA_SOURCE
+                source: process.env.DATA_SOURCE,
+                company: req.user.company
             })
 
             await anomaly.save()

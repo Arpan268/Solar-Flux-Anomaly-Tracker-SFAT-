@@ -62,7 +62,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         const enforceShiftTime = async () => {
             try {
-                const res = await axios.get('/api/user/me', {
+                const res = await axios.get('/api/user/operator/me', {
                     headers: { Authorization: `Bearer ${auth.accessToken}` }
                 });
 

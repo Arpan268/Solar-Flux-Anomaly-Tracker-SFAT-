@@ -2,7 +2,7 @@ import Instructions from '../../models/instructions.js'
 
 export async function readInstructions(req, res) {
     try {
-        const selectedInstruction = await Instructions.findById(req.params.id)
+        const selectedInstruction = await Instructions.findOne({ _id: req.params.id, company: req.user.company })
 
         if (!selectedInstruction) {
             return res.status(404).json({ message: 'Instruction not found' })

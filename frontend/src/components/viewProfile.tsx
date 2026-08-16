@@ -8,6 +8,9 @@ interface UserProfile {
     username: string;
     email: string;
     role: string;
+    company?: {
+        companyName: string;
+    } | string;
     shift?: {
         name: string;
         startTime: string;
@@ -26,7 +29,11 @@ export default function ViewProfile() {
         async function fetchProfile() {
             if (!auth?.accessToken) return;
             try {
-                const res = await axios.get("/api/user/me", {
+                let companyRole = auth?.role;
+                if(auth?.role == 'Company Admin') {
+                    companyRole = 'company-admin';
+                }
+                const res = await axios.get(`/api/user/${companyRole?.toLowerCase()}/me`, {
                     headers: { Authorization: `Bearer ${auth.accessToken}` },
                     withCredentials: true,
                 });
@@ -47,7 +54,11 @@ export default function ViewProfile() {
         if (!confirmDelete) return;
 
         try {
-            await axios.delete("/api/user/me/delete", {
+            let companyRole = auth?.role;
+                if(auth?.role == 'Company Admin') {
+                    companyRole = 'company-admin';
+                }
+            await axios.delete(`/api/user/${companyRole?.toLowerCase()}/me/delete`, {
                 headers: { Authorization: `Bearer ${auth?.accessToken}` },
                 withCredentials: true,
             });
@@ -60,7 +71,11 @@ export default function ViewProfile() {
 
     function handleUpdateNavigation() {
         if (profile?.userId) {
-            navigate(`/${profile.role}/profile/update/${profile.userId}`);
+            let companyRole = profile.role;
+            if(profile.role == 'Company Admin') {
+                companyRole = 'company-admin'
+            }
+            navigate(`/${companyRole.toLowerCase()}/profile/update/${profile.userId}`);
         }
     }
 
@@ -104,6 +119,14 @@ export default function ViewProfile() {
                             <p className="text-xs text-slate-400 uppercase tracking-wider">Role</p>
                             <p className="text-slate-200 font-medium">{profile.role}</p>
                         </div>
+                        {profile.company && <div>
+                            <p className="text-xs text-slate-400 uppercase tracking-wider">Company</p>
+                            <p className="text-slate-200 font-medium">
+                                {typeof profile.company === 'object' && profile.company !== null
+                                    ? profile.company.companyName
+                                    : profile.company || "Unassigned"}
+                            </p>
+                        </div>}
 
                         {profile.role === "Operator" && (
                             <div>

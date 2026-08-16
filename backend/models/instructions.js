@@ -8,6 +8,7 @@ const instructionSchema = new mongoose.Schema({
     advisoryId: { type: String, default: null },
     isAdvisoryDerived: { type: Boolean, default: false },
     expiresAt: { type: Date, default: null },
+    company: { type: mongoose.SchemaTypes.ObjectId, ref: 'Companies', default: null },
     source: { type: String, enum: ['live', 'mock'], required: true }
 }, { timestamps: true })
 

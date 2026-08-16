@@ -5,7 +5,8 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     userId: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['Operator', 'Supervisor', 'Analyst', 'Admin'] },
+    role: { type: String, enum: ['Operator', 'Supervisor', 'Analyst', 'Company Admin', 'Admin'] },
+    company: { type: mongoose.SchemaTypes.ObjectId, ref: 'Companies', default: null },
     status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' },
     rejectedAt: { type: Date, default: null },
     shift: { type: mongoose.Schema.Types.ObjectId, ref: 'Shift', default: null }

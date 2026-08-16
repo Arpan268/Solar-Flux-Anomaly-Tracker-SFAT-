@@ -8,7 +8,8 @@ import { microAnalysis } from '../utility/analyst/microAnalysis.js'
 import { macroAnalysis } from '../utility/analyst/macroAnalysis.js'
 import { predictionHandler } from '../utility/analyst/predictionHandler.js'
 import { viewAdvisories } from '../utility/analyst/viewAdvisories.js'
-import { createAdvisory } from '../utility/analyst/createAdvisory.js'
+import { createAnomalyAdvisory, createPredictionAdvisory } from '../utility/analyst/createAdvisory.js'
+import { getProfile, updateProfile, deleteProfile } from '../controller/userController.js'
 
 const router = express.Router()
 
@@ -21,6 +22,10 @@ router.get('/micro-analysis/:id', microAnalysis)
 router.get('/macro-analysis', macroAnalysis)
 router.get('/generate-prediction', predictionHandler)
 router.get('/view-advisories', viewAdvisories)
-router.post('/create-advisory', createAdvisory)
+router.post('/create-prediction-advisory', createPredictionAdvisory)
+router.post('/create-anomaly-advisory', createAnomalyAdvisory)
+router.get('/me', getProfile)
+router.put('/me/update', updateProfile)
+router.delete('/me/delete', deleteProfile)
 
 export default router

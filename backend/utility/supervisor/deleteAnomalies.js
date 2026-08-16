@@ -2,7 +2,7 @@ import Anomaly from '../../models/anomalies.js'
 
 export async function deleteAnomaly(req, res) {
     try {
-        const deletedAnomaly = await Anomaly.findByIdAndDelete(req.params.id)
+        const deletedAnomaly = await Anomaly.findByOneAndDelete({_id: req.params.id, company: req.user.company})
 
         if (!deletedAnomaly) {
             return res.status(404).json({ message: 'Anomaly not found' })

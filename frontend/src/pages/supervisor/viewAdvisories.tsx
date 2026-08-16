@@ -4,9 +4,11 @@ import axios from 'axios';
 
 interface Advisory {
     _id: string;
-    cclass: number;
-    mclass: number;
-    xclass: number;
+    advisoryType?: 'Prediction' | 'Anomaly';
+    classification?: string;
+    cclass?: number;
+    mclass?: number;
+    xclass?: number;
     message: string;
     status: 'Pending' | 'Acknowledged';
     acknowledgedBySupervisorId?: string;
@@ -19,15 +21,15 @@ export default function SupervisorViewAdvisories() {
     const [pendingAdvisories, setPendingAdvisories] = useState<Advisory[]>([]);
     const [acknowledgedAdvisories, setAcknowledgedAdvisories] = useState<Advisory[]>([]);
 
-    const [loading, setLoading] = useState(true);
-    const [historyLoading, setHistoryLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [historyLoading, setHistoryLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const [showAcknowledged, setShowAcknowledged] = useState(false);
+    const [showAcknowledged, setShowAcknowledged] = useState<boolean>(false);
     const [expandedId, setExpandedId] = useState<string | null>(null);
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
 
     const fetchInitialData = async () => {
         setLoading(true);
@@ -38,10 +40,10 @@ export default function SupervisorViewAdvisories() {
                 axios.get('/api/user/supervisor/acknowledged-advisories?page=1&limit=5', { withCredentials: true })
             ]);
 
-            setPendingAdvisories(pendingRes.data.advisories);
-            setAcknowledgedAdvisories(ackRes.data.advisories);
-            setTotalPages(ackRes.data.totalPages);
-            setCurrentPage(ackRes.data.currentPage);
+            setPendingAdvisories(pendingRes.data.advisories || []);
+            setAcknowledgedAdvisories(ackRes.data.advisories || []);
+            setTotalPages(ackRes.data.totalPages || 1);
+            setCurrentPage(ackRes.data.currentPage || 1);
         } catch (err: any) {
             console.error('Error fetching supervisor advisories:', err);
             setError('Failed to load the advisory queue. Please check your connection.');
@@ -54,9 +56,9 @@ export default function SupervisorViewAdvisories() {
         setHistoryLoading(true);
         try {
             const ackRes = await axios.get(`/api/user/supervisor/acknowledged-advisories?page=${page}&limit=5`, { withCredentials: true });
-            setAcknowledgedAdvisories(ackRes.data.advisories);
-            setTotalPages(ackRes.data.totalPages);
-            setCurrentPage(ackRes.data.currentPage);
+            setAcknowledgedAdvisories(ackRes.data.advisories || []);
+            setTotalPages(ackRes.data.totalPages || 1);
+            setCurrentPage(ackRes.data.currentPage || 1);
         } catch (err: any) {
             console.error('Error fetching historical advisories:', err);
         } finally {
@@ -70,8 +72,11 @@ export default function SupervisorViewAdvisories() {
 
     const formatDate = (dateString: string) => {
         const options: Intl.DateTimeFormatOptions = {
-            year: 'numeric', month: 'short', day: 'numeric',
-            hour: '2-digit', minute: '2-digit'
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
         };
         return new Date(dateString).toLocaleDateString(undefined, options);
     };
@@ -90,6 +95,8 @@ export default function SupervisorViewAdvisories() {
         navigate('/supervisor/send-instructions', {
             state: {
                 advisoryId: advisory._id,
+                advisoryType: advisory.advisoryType,
+                classification: advisory.classification,
                 cclass: advisory.cclass,
                 mclass: advisory.mclass,
                 xclass: advisory.xclass,
@@ -100,12 +107,11 @@ export default function SupervisorViewAdvisories() {
 
     return (
         <div className="w-full p-8 text-white min-h-screen">
-            <div className="max-w-7xl mx-auto space-y-8">
-
+            <div className="max-w-7xl mx-auto space-y-6">
                 <div>
-                    <h1 className="text-3xl font-extrabold tracking-wide mb-1">Advisory Management</h1>
-                    <p className="text-slate-400 text-sm">
-                        Review predictive threat assessments from analysts and issue operational instructions.
+                    <h1 className="text-3xl font-extrabold text-white">Analyst Advisories</h1>
+                    <p className="text-slate-400 text-sm mt-1">
+                        Review threat assessments and issue actionable shift instructions.
                     </p>
                 </div>
 
@@ -117,7 +123,7 @@ export default function SupervisorViewAdvisories() {
 
                 <section>
                     <div className="flex items-center gap-2 mb-4">
-                        <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
                         <h2 className="text-lg font-bold text-red-400">Action Required: Pending Advisories</h2>
                     </div>
 
@@ -130,9 +136,9 @@ export default function SupervisorViewAdvisories() {
                             </div>
                         ) : (
                             <div className="w-full text-left border-collapse">
-                                <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-slate-700/30 border-b border-slate-700/50 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-slate-700/30 border-b border-slate-700/50 text-xs font-bold text-slate-400 uppercase">
                                     <div className="col-span-3">Time Tag (UTC)</div>
-                                    <div className="col-span-4 text-center">24H Threat Profile</div>
+                                    <div className="col-span-4 text-center">Threat Profile (Next 24 H)</div>
                                     <div className="col-span-2 text-center">Status</div>
                                     <div className="col-span-3 text-right">Actions</div>
                                 </div>
@@ -147,16 +153,24 @@ export default function SupervisorViewAdvisories() {
                                                     <span className="text-xs font-mono text-slate-500">ID: {advisory._id.slice(-6).toUpperCase()}</span>
                                                 </div>
 
-                                                <div className="col-span-4 flex justify-center gap-2 cursor-pointer" onClick={() => toggleExpand(advisory._id)}>
-                                                    <span className="bg-slate-900/50 px-2 py-1 rounded text-xs border border-slate-700/40">
-                                                        C: <span className="text-green-400 font-bold">{advisory.cclass}%</span>
-                                                    </span>
-                                                    <span className="bg-slate-900/50 px-2 py-1 rounded text-xs border border-slate-700/40">
-                                                        M: <span className="text-amber-500 font-bold">{advisory.mclass}%</span>
-                                                    </span>
-                                                    <span className="bg-slate-900/50 px-2 py-1 rounded text-xs border border-slate-700/40">
-                                                        X: <span className="text-red-500 font-bold">{advisory.xclass}%</span>
-                                                    </span>
+                                                <div className="col-span-4 flex justify-center items-center gap-2 cursor-pointer" onClick={() => toggleExpand(advisory._id)}>
+                                                    {advisory.cclass !== undefined ? (
+                                                        <>
+                                                            <span className="bg-slate-900/50 px-2 py-1 rounded text-xs border border-slate-700/40">
+                                                                C: <span className="text-green-400 font-bold">{advisory.cclass}</span>
+                                                            </span>
+                                                            <span className="bg-slate-900/50 px-2 py-1 rounded text-xs border border-slate-700/40">
+                                                                M: <span className="text-amber-500 font-bold">{advisory.mclass}</span>
+                                                            </span>
+                                                            <span className="bg-slate-900/50 px-2 py-1 rounded text-xs border border-slate-700/40">
+                                                                X: <span className="text-red-500 font-bold">{advisory.xclass}</span>
+                                                            </span>
+                                                        </>
+                                                    ) : (
+                                                        <span className="bg-red-900/30 text-red-300 border border-red-500/30 px-2.5 py-1 rounded text-xs font-semibold">
+                                                            {advisory.classification || 'Flare Anomaly'}
+                                                        </span>
+                                                    )}
                                                 </div>
 
                                                 <div className="col-span-2 flex justify-center cursor-pointer" onClick={() => toggleExpand(advisory._id)}>
@@ -168,7 +182,7 @@ export default function SupervisorViewAdvisories() {
                                                 <div className="col-span-3 flex justify-end gap-3">
                                                     <button
                                                         onClick={() => toggleExpand(advisory._id)}
-                                                        className="text-xs font-semibold cursor-pointer text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-600 hover:bg-slate-700 transition-colors"
+                                                        className="text-xs font-semibold cursor-pointer text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-600 hover:bg-slate-700/40"
                                                     >
                                                         {expandedId === advisory._id ? 'Hide Note' : 'View Note'}
                                                     </button>
@@ -195,10 +209,11 @@ export default function SupervisorViewAdvisories() {
                     </div>
                 </section>
 
+                {/* Historical Records Toggle */}
                 <div className="flex justify-center my-6">
                     <button
                         onClick={() => setShowAcknowledged(!showAcknowledged)}
-                        className="px-6 py-2 cursor-pointer text-sm font-semibold text-slate-300 bg-slate-800/60 border border-slate-600 hover:bg-slate-700 rounded-lg transition-colors backdrop-blur-sm"
+                        className="px-6 py-2 cursor-pointer text-sm font-semibold text-slate-300 bg-slate-800/60 border border-slate-600 hover:bg-slate-700 rounded-lg transition-colors"
                     >
                         {showAcknowledged ? 'Hide Historical Advisories' : 'View Historical Advisories'}
                     </button>
@@ -208,34 +223,37 @@ export default function SupervisorViewAdvisories() {
                     <section className="animate-fadeIn">
                         <h2 className="text-lg font-bold text-slate-200 mb-4">Historical Records</h2>
                         <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
-                            {loading && !historyLoading ? (
+                            {historyLoading ? (
                                 <div className="py-8 text-center text-slate-400">Loading history...</div>
                             ) : acknowledgedAdvisories.length === 0 ? (
                                 <div className="py-8 text-center text-slate-400 text-sm">No historical advisories found.</div>
                             ) : (
                                 <div className="w-full text-left">
-                                    <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-slate-700/30 border-b border-slate-700/50 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                    <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-slate-700/30 border-b border-slate-700/50 text-xs font-bold text-slate-400 uppercase">
                                         <div className="col-span-3">Time Tag (UTC)</div>
                                         <div className="col-span-4 text-center">Threat Profile</div>
                                         <div className="col-span-3 text-center">Acknowledged By</div>
                                         <div className="col-span-2 text-right">Details</div>
                                     </div>
 
-                                    <div className={`divide-y divide-slate-700/50 transition-opacity ${historyLoading ? 'opacity-50' : 'opacity-100'}`}>
+                                    <div className="divide-y divide-slate-700/50">
                                         {acknowledgedAdvisories.map((advisory) => (
                                             <div key={advisory._id} className="flex flex-col">
-                                                <div
-                                                    className="grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer hover:bg-slate-700/20 transition-colors"
-                                                    onClick={() => toggleExpand(advisory._id)}
-                                                >
+                                                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer hover:bg-slate-700/20 transition-colors" onClick={() => toggleExpand(advisory._id)}>
                                                     <div className="col-span-3 flex flex-col">
                                                         <span className="text-sm font-medium text-slate-300">{formatDate(advisory.createdAt)}</span>
                                                     </div>
 
-                                                    <div className="col-span-4 flex justify-center gap-2 opacity-75">
-                                                        <span className="text-xs text-slate-300">C: {advisory.cclass}%</span>
-                                                        <span className="text-xs text-slate-300">M: {advisory.mclass}%</span>
-                                                        <span className="text-xs text-slate-300">X: {advisory.xclass}%</span>
+                                                    <div className="col-span-4 flex justify-center items-center gap-2 opacity-75">
+                                                        {advisory.cclass !== undefined ? (
+                                                            <>
+                                                                <span className="text-xs text-slate-300">C: {advisory.cclass}</span>
+                                                                <span className="text-xs text-slate-300">M: {advisory.mclass}</span>
+                                                                <span className="text-xs text-slate-300">X: {advisory.xclass}</span>
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-xs text-slate-300">{advisory.classification || 'Flare Anomaly'}</span>
+                                                        )}
                                                     </div>
 
                                                     <div className="col-span-3 text-center">
@@ -265,7 +283,7 @@ export default function SupervisorViewAdvisories() {
                                             <button
                                                 onClick={() => handlePageChange(currentPage - 1)}
                                                 disabled={currentPage === 1 || historyLoading}
-                                                className="px-4 py-2 text-xs cursor-pointer font-bold text-slate-300 bg-slate-700/50 hover:bg-slate-600 rounded-lg transition-colors disabled:opacity-40"
+                                                className="px-4 py-2 text-xs cursor-pointer font-bold text-slate-300 bg-slate-700/50 hover:bg-slate-600 rounded-lg transition-colors disabled:opacity-50"
                                             >
                                                 Previous
                                             </button>
@@ -275,19 +293,17 @@ export default function SupervisorViewAdvisories() {
                                             <button
                                                 onClick={() => handlePageChange(currentPage + 1)}
                                                 disabled={currentPage === totalPages || historyLoading}
-                                                className="px-4 py-2 text-xs cursor-pointer font-bold text-slate-300 bg-slate-700/50 hover:bg-slate-600 rounded-lg transition-colors disabled:opacity-40"
+                                                className="px-4 py-2 text-xs cursor-pointer font-bold text-slate-300 bg-slate-700/50 hover:bg-slate-600 rounded-lg transition-colors disabled:opacity-50"
                                             >
                                                 Next
                                             </button>
                                         </div>
                                     )}
-
                                 </div>
                             )}
                         </div>
                     </section>
                 )}
-
             </div>
         </div>
     );

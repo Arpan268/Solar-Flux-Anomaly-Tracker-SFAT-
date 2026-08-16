@@ -9,7 +9,8 @@ export async function createAlert(data) {
     try {
         const allOperators = await User.find({
             role: 'Operator',
-            email: { $exists: true, $ne: null }
+            email: { $exists: true, $ne: null },
+            company: data.company
         }).populate('shift');
 
         const now = new Date();

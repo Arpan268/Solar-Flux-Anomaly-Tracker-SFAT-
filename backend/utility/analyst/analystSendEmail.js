@@ -5,7 +5,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export async function analystSendEmail(anomaly) {
     try {
-        const analysts = await User.find({ role: 'Analyst' });
+        const analysts = await User.find({ role: 'Analyst', company: anomaly.company });
 
         if (!analysts || analysts.length === 0) {
             console.warn('⚠️ No analysts found in the database to receive the X-Class alert.');

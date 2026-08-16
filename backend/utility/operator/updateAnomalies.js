@@ -14,8 +14,8 @@ export async function updateAnomalies(req, res) {
             return res.status(400).json({ message: 'No update fields were provided.' })
         }
 
-        const updatedAnomaly = await Anomaly.findByIdAndUpdate(
-            req.params.id,
+        const updatedAnomaly = await Anomaly.findOneAndUpdate(
+            { _id: req.params.id, company: req.user.company },
             { $set: updateData },
             { new: true, runValidators: true }
         )

@@ -33,6 +33,10 @@ import AnalystViewGraphs from './pages/analyst/viewGraphs';
 import MicroAnalysis from './pages/analyst/microAnalysis';
 import MacroAnalysis from './pages/analyst/macroAnalysis';
 
+import CompanyAdminDashboard from './pages/companyAdmin/companyAdminDashboard';
+import CompanyAdminManageUsers from './pages/companyAdmin/manageUsers';
+import CompanyAdminViewAdvisories from './pages/companyAdmin/viewAdvisories';
+
 import AdminDashboard from './pages/admin/adminDashboard';
 import ManageUsers from './pages/admin/manageUsers';
 import UpdateProfile from './components/updateProfile';
@@ -250,6 +254,33 @@ export default function App() {
         } />
         <Route path="/admin/profile/update/:userId" element={
           <PrivateRoute allowedRoles={['Admin']}>
+            <UpdateProfile />
+          </PrivateRoute>
+        } />
+
+        {/* Admin Routes */}
+        <Route path="/company-admin" element={
+          <PrivateRoute allowedRoles={['Company Admin']}>
+            <CompanyAdminDashboard />
+          </PrivateRoute>
+        } />
+        <Route path="/company-admin/manage-users" element={
+          <PrivateRoute allowedRoles={['Company Admin']}>
+            <CompanyAdminManageUsers />
+          </PrivateRoute>
+        } />
+        <Route path="/company-admin/view-advisories" element={
+          <PrivateRoute allowedRoles={['Company Admin']}>
+            <CompanyAdminViewAdvisories />
+          </PrivateRoute>
+        } />
+        <Route path="/company-admin/view-profile" element={
+          <PrivateRoute allowedRoles={['Company Admin']}>
+            <ViewProfile />
+          </PrivateRoute>
+        } />
+        <Route path="/company-admin/profile/update/:userId" element={
+          <PrivateRoute allowedRoles={['Company Admin']}>
             <UpdateProfile />
           </PrivateRoute>
         } />

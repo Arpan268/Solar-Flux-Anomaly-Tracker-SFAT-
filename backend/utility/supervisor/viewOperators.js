@@ -6,7 +6,7 @@ export async function viewOperators(req, res) {
         const limit = parseInt(req.query.limit) || 5
         const skip = (page - 1) * limit
 
-        const filter = { role: 'Operator', status: 'Approved' }
+        const filter = { role: 'Operator', status: 'Approved', company: req.user.company }
         const total = await User.countDocuments(filter)
         const users = await User.find(filter).skip(skip).limit(limit).select('-password -status -rejectedAt -role').populate('shift')
 

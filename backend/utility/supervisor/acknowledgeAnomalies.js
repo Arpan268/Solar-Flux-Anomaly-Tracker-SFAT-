@@ -2,7 +2,7 @@ import Anomaly from '../../models/anomalies.js'
 
 export async function acknowledgeAnomaly(req, res) {
     try {
-        const selectedAnomaly = await Anomaly.findById(req.params.id)
+        const selectedAnomaly = await Anomaly.findOne({_id: req.params.id, company: req.user.company})
         const supervisorId = req.user.userId
 
         if (!selectedAnomaly) {

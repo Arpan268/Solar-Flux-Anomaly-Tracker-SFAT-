@@ -10,6 +10,7 @@ const anomalySchema = new mongoose.Schema({
     notes: { type: String, default: '' },
     loggedBy: { type: String, required: true },
     source: { type: String, enum: ['live', 'mock'], required: true },
+    company: { type: mongoose.SchemaTypes.ObjectId, ref: 'Companies', default: null },
     analysis: { type: String, default: null }
 }, { timestamps: true })
 

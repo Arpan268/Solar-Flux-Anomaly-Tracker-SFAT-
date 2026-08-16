@@ -2,7 +2,7 @@ import Advisory from '../../models/advisories.js';
 
 export async function viewPendingAdvisories(req, res) {
     try {
-        const advisories = await Advisory.find({ source: process.env.DATA_SOURCE, status: 'Pending' }).sort({ createdAt: -1 })
+        const advisories = await Advisory.find({ source: process.env.DATA_SOURCE, acknowledgedBySupervisorId: null, company: req.user.company, advisoryType: 'Prediction' }).sort({ createdAt: -1 })
 
         res.status(200).json({ advisories })
     } catch (err) {
@@ -16,8 +16,8 @@ export async function viewAcknowledgedAdvisories(req, res) {
         const page = parseInt(req.query.page) || 1
         const limit = parseInt(req.query.limit) || 10
         const skip = (page - 1) * limit
-        const total = await Advisory.countDocuments({ source: process.env.DATA_SOURCE, status: 'Acknowledged' })
-        const advisories = await Advisory.find({ source: process.env.DATA_SOURCE, status: 'Acknowledged' }).skip(skip).limit(limit).sort({ createdAt: -1 })
+        const total = await Advisory.countDocuments({ source: process.env.DATA_SOURCE, acknowledgedBySupervisorId: { $ne: null }, company: req.user.company, advisoryType: 'Prediction' })
+        const advisories = await Advisory.find({ source: process.env.DATA_SOURCE, acknowledgedBySupervisorId: { $ne: null }, company: req.user.company, advisoryType: 'Prediction' }).skip(skip).limit(limit).sort({ createdAt: -1 })
 
         res.status(200).json({
             advisories, total, totalPages: Math.ceil(total / limit), currentPage: page

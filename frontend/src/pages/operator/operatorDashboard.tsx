@@ -24,7 +24,7 @@ export default function OperatorDashboard() {
         async function fetchProfile() {
             if (!auth?.accessToken) return;
             try {
-                const res = await axios.get('/api/user/me', {
+                const res = await axios.get(`/api/user/${auth?.role?.toLowerCase()}/me`, {
                     headers: { Authorization: `Bearer ${auth.accessToken}` }
                 });
                 const userData = res.data.user || res.data;

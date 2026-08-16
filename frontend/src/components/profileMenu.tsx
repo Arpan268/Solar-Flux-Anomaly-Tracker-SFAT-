@@ -9,7 +9,10 @@ export default function ProfileMenu() {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    const rolePath = auth?.role ? auth.role.toLowerCase() : '';
+    let rolePath = auth?.role ? auth.role.toLowerCase() : '';
+    if(auth?.role == 'Company Admin') {
+        rolePath = 'company-admin';
+    }
     const profileRoute = `/${rolePath}/view-profile`;
 
     useEffect(() => {

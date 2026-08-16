@@ -19,7 +19,11 @@ export default function UpdateProfile() {
         async function fetchCurrentData() {
             if (!auth?.accessToken) return;
             try {
-                const res = await axios.get("/api/user/me", {
+                let companyRole = auth?.role;
+                if (auth?.role == 'Company Admin') {
+                    companyRole = 'company-admin'
+                }
+                const res = await axios.get(`/api/user/${companyRole?.toLowerCase()}/me`, {
                     headers: { Authorization: `Bearer ${auth.accessToken}` },
                     withCredentials: true,
                 });
@@ -46,14 +50,18 @@ export default function UpdateProfile() {
         if (password.trim()) payload.password = password;
 
         try {
-            await axios.put("/api/user/me/update", payload, {
+            let companyRole = auth?.role;
+            if (auth?.role == 'Company Admin') {
+                companyRole = 'company-admin'
+            }
+            await axios.put(`/api/user/${companyRole?.toLowerCase()}/me/update`, payload, {
                 headers: { Authorization: `Bearer ${auth.accessToken}` },
                 withCredentials: true,
             });
 
             setSuccess("Profile updated successfully!");
             setTimeout(() => {
-                navigate(`/${auth.role}/view-profile`);
+                navigate(-1);
             }, 1500);
         } catch (err: any) {
             const message = err.response?.data?.message || "Failed to update profile.";
@@ -135,7 +143,7 @@ export default function UpdateProfile() {
                         </button>
                         <button
                             type="button"
-                            onClick={() => navigate(`/${auth?.role}/view-profile`)}
+                            onClick={() => navigate(-1)}
                             className="bg-gray-800 cursor-pointer text-slate-300 border border-gray-700 font-semibold px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
                         >
                             Cancel

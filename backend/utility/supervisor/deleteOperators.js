@@ -2,7 +2,7 @@ import User from '../../models/users.js'
 
 export async function deleteOperator(req, res) {
     try {
-        const deletedOperator = await User.findByIdAndDelete(req.params.id)
+        const deletedOperator = await User.findOneAndDelete({_id: req.params.id, company: req.user.company})
 
         if (!deletedOperator) {
             return res.status(404).json({ message: 'Operator not found' })
