@@ -1,5 +1,10 @@
 import User from '../models/users.js'
 import Company from '../models/companies.js';
+import Shift from '../models/shifts.js'
+import LiveData from '../models/liveData.js';
+import Anomaly from '../models/anomalies.js'
+import Advisory from '../models/advisories.js';
+import Instructions from '../models/instructions.js'
 import bcrypt from 'bcryptjs'
 import sgMail from '@sendgrid/mail'
 import { criticalEvent } from '../events/addEvents.js';
@@ -68,12 +73,25 @@ export async function handleCompanyStatus(req, res) {
 
 export async function deleteCompany(req, res) {
     try {
-        const company = await Company.findById(req.params.id)
+        const companyId = req.params.id
+        const company = await Company.findById(companyId)
         if (!company) {
             return res.status(404).json({ message: 'Company not found' })
         }
 
-        await Company.findByIdAndDelete(req.params.id)
+        await User.deleteMany({ company: companyId })
+        await Shift.deleteMany({ company: companyId })
+        await LiveData.deleteMany({ company: companyId })
+        await Anomaly.deleteMany({ company: companyId })
+        await Advisory.deleteMany({ company: companyId })
+        await Instructions.deleteMany({ company: companyId })
+
+        await Company.findByIdAndDelete(companyId)
+
+        criticalEvent.emit('company-deleted', {
+            email: company.email,
+            companyName: company.companyName
+        })
 
         res.status(200).json({ message: 'Company deleted successfully' })
     }
@@ -183,7 +201,7 @@ export async function handleStatus(req, res) {
 //Profile Details
 export async function getProfile(req, res) {
     try {
-        const user = await User.findById(req.user.id ).select('-password').populate('shift').populate('company')
+        const user = await User.findById(req.user.id).select('-password').populate('shift').populate('company')
         if (!user) {
             return res.status(404).json({ message: 'User not found' })
         }

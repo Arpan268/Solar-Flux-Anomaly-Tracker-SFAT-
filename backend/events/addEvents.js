@@ -6,6 +6,7 @@ import { sendRegistrationEmail, handleRegistrationEmail } from '../controller/em
 import { sendAdvisoryMail } from '../utility/analyst/sendAdvisoryMail.js';
 import { broadcastNewAdvisory, broadcastAcknowledgedAdvisory } from '../utility/supervisor/advisoryStream.js';
 import { sendSuccessfulRegistrationEmail } from '../controller/email/successfulResistrationEmail.js';
+import { handleCompanyDeletionEmail } from '../controller/email/companyDeletion.js';
 
 export const criticalEvent = new EventEmitter();
 
@@ -20,3 +21,4 @@ criticalEvent.on('advisory', sendAdvisoryMail);
 criticalEvent.on('advisory', broadcastNewAdvisory);
 criticalEvent.on('advisory-acknowledged', broadcastAcknowledgedAdvisory);
 criticalEvent.on('registration-successful', sendSuccessfulRegistrationEmail)
+criticalEvent.on('company-deleted', handleCompanyDeletionEmail);
